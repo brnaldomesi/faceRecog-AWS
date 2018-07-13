@@ -1,0 +1,60 @@
+/*#sidebar {
+  background-color: rgba(0,0,0,.03);
+}*/
+.page-header-top {
+	height: 50px !important;
+}
+
+.nav.navbar-nav {
+	float: right;
+}
+.navbar-nav .dropdown-menu-right {
+	right:auto !important;
+	transform: translate3d(0px, 51px, 0px) !important;
+}
+
+.open>.dropdown-menu {
+	display: none;
+}
+
+.navbar-nav {
+	display: block;
+}
+
+.page-header .page-header-menu .hor-menu .navbar-nav > li .dropdown-menu {
+	/*background-color: #fff;*/
+}
+
+.page-header {
+	height: auto;
+}
+
+body {
+  background-color: rgb(239, 243, 248);
+}
+
+.page-head{
+	margin-top: -1.5rem;
+}
+
+.page-footer{
+	margin-top: -1.5rem;
+}
+
+.posBottomRight{
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+}
+
+.loading-message::after {
+	content: 'Please wait';
+	color: #5fbbad;
+	font-size: 20px;
+	display: block;
+	padding-top: 15px;
+}
+
+img {
+    image-orientation: from-image;
+}
