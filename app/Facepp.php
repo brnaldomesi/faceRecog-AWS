@@ -58,11 +58,27 @@ class Facepp
           CURLOPT_RETURNTRANSFER => true)
         );
         ini_set('max_execution_time', 300);
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
 
+        $concurrencyErrorMsg = 'CONCURRENCY_LIMIT_EXCEEDED';
+        $response = false;
+        while($response === false || $concurrencyErrorMsg === 'CONCURRENCY_LIMIT_EXCEEDED' || $err) {
+          $response = curl_exec($curl);
+          $err = curl_error($curl);
+          $jsonRes = json_decode( $response );
+          if(isset($jsonRes->error_message)) {
+            $concurrencyErrorMsg = $jsonRes->error_message;
+          }
+          else {
+            if($response){
+              $concurrencyErrorMsg = 'No Concurrency error';
+            }
+          }
+        }
+
+        $err = curl_error($curl);
         curl_close($curl);
         if ($err) {
+          //return "cURL Error #:" . $err;
           return false;
         } else {
           return $response;

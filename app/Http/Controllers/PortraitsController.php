@@ -39,9 +39,6 @@ class PortraitsController extends Controller
      * @return void
      */
     public function search(Request $request) {
-      $params['image_url'] = 'https://services.bentoncountyar.gov/dcn/image?id=YeJdHxjRYtw%253d&u=8bc7e285-8bfb-4250-a4f0-5d309bcd76cf&m=wtXXvj3tBT4%253d';
-      $detectApiCallResult = $this->detectFace($params);
-      dd($detectApiCallResult);
       
       $organizationId = Auth::user()->organizationId;
       //$portraitData = $request->portraitData;
@@ -134,18 +131,13 @@ class PortraitsController extends Controller
      */
     public function detectFace($params){
       $errorReturnVal = false;
-      $isErrorDetected = false;
-      $errMsg = 'CONCURRENCY_LIMIT_EXCEEDED';
-      $faceCount = 1;
-      while($errorReturnVal === false && $errMsg == 'CONCURRENCY_LIMIT_EXCEEDED') {
+      while($errorReturnVal === false) {
 
           //$detectApiCallResult = $this->detectFace($filename);
           $detectApiCallResult = $this->facepp->execute('/detect', $params);
           $errorReturnVal = $detectApiCallResult;
           $returnVal = json_decode($detectApiCallResult);
-          if(isset($returnVal->error_message)) {
-            $errMsg = $returnVal->error_message;
-          }
+          $isErrorDetected = isset($returnVal->error_message);
       }
 
       return json_decode($detectApiCallResult);
@@ -228,10 +220,8 @@ class PortraitsController extends Controller
      * @return void
      */
     public function store(Request $request)
-    {  
+    {
       if($request->isCsv == true){ //Case CSV
-        //$loader = new CsvFileLoader($request->csv->getPathName());
-        //dd('ff');
         
         $header = true;
         $faceInfoArray = [];
@@ -251,8 +241,8 @@ class PortraitsController extends Controller
             if(count($csvLine) == 3) {
               $params = [];
               $params['image_url'] = $csvLine[0];
-              $detectApiCallResult = $this->detectFace($params);
-              $errorUrlList = [];
+              $detectApiCallResult = $this->facepp->execute('/detect', $params);
+              $detectApiCallResult = json_decode($detectApiCallResult);
               if(isset($detectApiCallResult->error_message)) {
                 continue;
               }
@@ -292,26 +282,28 @@ class PortraitsController extends Controller
       else{ //Case Upload file from local disk
         ini_set('max_execution_time', 300);
         $res = new \stdClass;
-        $res->status = 201;
-        $res->msg = 'This image is not portrait. Please select portrait.';
-        
+
         $filename = $request->portraitInput->getPathName();
         
-        $params['image_file'] = new \CURLFile($filename);
         //Detect face
-        $errorReturnVal = false;
-        while($errorReturnVal === false || $errorReturnVal === []) {
-
-            //$detectApiCallResult = $this->detectFace($filename);
-            $detectApiCallResult = $this->facepp->execute('/detect', $params);
-            $errorReturnVal = $detectApiCallResult;
-        }
-
+        $params['image_file'] = new \CURLFile($filename);
+        $detectApiCallResult = $this->facepp->execute('/detect', $params);
         $detectApiCallResult = json_decode($detectApiCallResult);
-        if(count($detectApiCallResult->faces) == 0) { //Uploaded image isn't portrait.
+
+        if(isset($detectApiCallResult->error_message)) {
+          $res->status = 300;
+          $res->msg = $detectApiCallResult->error_message;
           echo json_encode( $res );
           return;
         }
+
+        if(count($detectApiCallResult->faces) == 0) { //Uploaded image isn't portrait.
+          $res->status = 201;
+          $res->msg = 'Please select a portrait';
+          echo json_encode( $res );
+          return;
+        }
+
         $imageId =  $detectApiCallResult->image_id;
         $faceId =  $detectApiCallResult->faces[0]->face_token;
         
