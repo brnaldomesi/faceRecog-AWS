@@ -41,7 +41,9 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
-    public function showRegisterForm(){
+	// THIS WILL BE REMOVED.  USERS WILL BE ADMINISTERED BY AN ORGANIZATION ADMIN.  ALL ORGANIZATIONS ARE MADE BY BRIAN WHEN NEW CLIENT PURCHASES A LICENSE
+    public function showRegisterForm()
+	{
         $organizations = Organization::select('id', 'name')->get();
         return view('auth.register')->with('organizations', $organizations);
     }

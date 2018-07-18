@@ -14,15 +14,11 @@ class Facepp
 {
     ######################################################
     ### If you choose Amazon(US) server,please use the ###
-    ### http://api-us.faceplusplus.com/facepp/v3               ###
+    ### http://api-us.faceplusplus.com/facepp/v3       ###
     ### or                                             ###
-    ### https://api-us.faceplusplus.com/facepp/v3              ###
+    ### https://api-us.faceplusplus.com/facepp/v3      ###
     ######################################################
     public $server          = 'https://api-us.faceplusplus.com/facepp/v3';
-    #public $server         = 'https://apicn.faceplusplus.com/facepp/v3';
-    #public $server         = 'http://api-us.faceplusplus.com/facepp/v3';
-    #public $server         = 'https://api-us.faceplusplus.com/facepp/v3';
-
 
     public $api_key         = '';        // set your API KEY or set the key static in the property
     public $api_secret      = '';        // set your API SECRET or set the secret static in the property
@@ -58,30 +54,39 @@ class Facepp
           CURLOPT_RETURNTRANSFER => true)
         );
         ini_set('max_execution_time', 300);
-
-        $concurrencyErrorMsg = 'CONCURRENCY_LIMIT_EXCEEDED';
+		
+		$concurrencyErrorMsg = 'CONCURRENCY_LIMIT_EXCEEDED';
         $response = false;
-        while($response === false || $concurrencyErrorMsg === 'CONCURRENCY_LIMIT_EXCEEDED' || $err) {
-          $response = curl_exec($curl);
-          $err = curl_error($curl);
-          $jsonRes = json_decode( $response );
-          if(isset($jsonRes->error_message)) {
-            $concurrencyErrorMsg = $jsonRes->error_message;
-          }
-          else {
-            if($response){
-              $concurrencyErrorMsg = 'No Concurrency error';
-            }
-          }
+        
+		while($response === false || $concurrencyErrorMsg === 'CONCURRENCY_LIMIT_EXCEEDED' || $err) 
+		{
+			$response = curl_exec($curl);
+			$err = curl_error($curl);
+          
+			$jsonRes = json_decode( $response );
+			
+			if(isset($jsonRes->error_message)) 
+			{
+				$concurrencyErrorMsg = $jsonRes->error_message;
+			}
+			else 
+			{
+				if($response){
+					$concurrencyErrorMsg = 'No Concurrency error';
+				}
+			}
         }
 
+        $response = curl_exec($curl);
         $err = curl_error($curl);
+
         curl_close($curl);
-        if ($err) {
-          //return "cURL Error #:" . $err;
-          return false;
+        
+		if ($err) {
+			return "cURL error #:" . $err;
+			return false;
         } else {
-          return $response;
+			return $response;
         }
     }
 

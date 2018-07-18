@@ -144,7 +144,7 @@
     <!-- BEGIN FOOTER -->
     <div class="page-footer">
       <div class="container">
-         2018 &copy; Face 
+         2018 &copy; Brian Marlow
       </div>
     </div>
     <div class="scroll-to-top">
