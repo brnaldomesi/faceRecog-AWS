@@ -16,6 +16,7 @@ function initEvent() {
   $("[name=searchPortraitInput]").on('change', function (e) {
     var file = $(this)[0].files[0];
     var thisObj = this;
+	
     if(file) {
       orientation(file, function(base64img, value) {
         
@@ -40,55 +41,64 @@ function initEvent() {
 
 function search() {
   if(validateSearchForm()){
-    var htmlStr = '<tr><td class="text-center" colspan="3">Search results</td></tr>';
+    var htmlStr = '<tr><td class="text-center" colspan="4">Search results</td></tr>';
     $('#searchResultTable tbody').html(htmlStr);
 
     let portraitData = $('#searchPortraitDiv').children()[0].src;
     portraitData = portraitData.split(",")[1]
     let faceSetVal = $('#facesetSelect').val()
-    Metronic.blockUI({
+    
+	Metronic.blockUI({
         animate:true,
         overlayColor: 'none'
     });
+	
     var form = $('#searchForm')[0]; // You need to use standard javascript object here
     var formData = new FormData(form);
+	
+	
     $.ajax({
-      url : '/portraits/search',
-      type : 'POST',
-      dataType : 'json',
-      //data : {portraitType : 'image_base64', portraitData : portraitData},
-      data : formData,
-      //data: {portraitType : 'image_base64', portraitData : portraitData, name: $('[name=name]').val(), dob : $('[name=dob]').val()},
-      contentType: false,
-      processData: false,
-      success: function(data) {
-        Metronic.unblockUI();
-        if (data['status'] == 201) {
-          bootbox.alert(data['msg']);
-          return;
-        }
+		  url : '/portraits/search',
+		  type : 'POST',
+		  dataType : 'json',
+		  //data : {portraitType : 'image_base64', portraitData : portraitData},
+		  data : formData,
+		  //data: {portraitType : 'image_base64', portraitData : portraitData, name: $('[name=name]').val(), dob : $('[name=dob]').val()},
+		  contentType: false,
+		  processData: false,
+		  success: function(data) 
+		  {
+			Metronic.unblockUI();
+			
+			if (data['status'] == 201) {
+			  bootbox.alert(data['msg']);
+			  return;
+			}
+		
+			var optionValues = [];
+			filteredResultObject = data;
+			
+			makeResultsTable(data)
+			
+			$('#facesetSelect option').each(function() {
+				if($(this).val() != '')
+				 optionValues.push($(this).val());
+			});
 
-        var optionValues = [];
-        filteredResultObject = data;
-        $('#facesetSelect option').each(function() {
-            if($(this).val() != '')
-             optionValues.push($(this).val());
-        });
+			filteredResultArray = []
+			var i
+			for(i = 0; i < optionValues.length; i++) {
+			  filteredResultArray = filteredResultArray.concat(data[optionValues[i]])
+			}
 
-        filteredResultArray = []
-        var i
-        for(i = 0; i < optionValues.length; i++) {
-          filteredResultArray = filteredResultArray.concat(data[optionValues[i]])
-        }
-
-        if(faceSetVal != '') {
-          faceSetVal = parseInt(faceSetVal);
-          filteredResult_per_faceSet = data[faceSetVal]
-        }
-        else
-          filteredResult_per_faceSet = filteredResultArray
-        make_searchResult_table()
-      }
+			if(faceSetVal != '') {
+			  faceSetVal = parseInt(faceSetVal);
+			  filteredResult_per_faceSet = data[faceSetVal]
+			}
+			else
+			  filteredResult_per_faceSet = filteredResultArray
+			make_searchResult_table()
+		}
     });
   }
 }
@@ -106,7 +116,7 @@ $("#facesetSelect").live('change', function(){
   }
 });
 
-function make_searchResult_table() {
+function make_compiledResult_table() {
   var htmlStr = '';
   var count = filteredResult_per_faceSet.length
   if(count > 0) {
@@ -118,20 +128,101 @@ function make_searchResult_table() {
       htmlStr += '<tr>' + 
                     '<td>' +
                       '<a href="' + savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
-                        '<img src="' + savedPath + '" style="height:45px;"></img>' +
+                        '<img src="' + savedPath + '" style="width:75px;"></img>' +
                       '</a' +
                     '</td>' +
+					'<td>' + record.confidence + '% FUCK</td>' +
                     '<td>' + record.name + '</td>' +
                     '<td>' + record.dob + '</td>' +
                   '</tr>'
     }
   }
   else{
-    htmlStr += '<tr><td class="text-center" colspan="3">No portrait matched.</td></tr>';
+    htmlStr += '<tr><td class="text-center" colspan="4">No portrait matched.</td></tr>';
   }
   $('#searchResultTable tbody').html(htmlStr);
   $('#filteredCountLabel').text('Total count : ' + count)
   handleFancybox()
+}
+
+function old_make_searchResult_table() {
+  var htmlStr = '';
+  var count = filteredResult_per_faceSet.length
+  if(count > 0) {
+    var i
+    for(i = 0; i < count; i++) {
+      var record = filteredResult_per_faceSet[i]
+      var savedPath = record.savedPath.replace('public/', '');
+
+      htmlStr += '<tr>' + 
+                    '<td>' +
+                      '<a href="' + savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
+                        '<img src="' + savedPath + '" style="width:75px;"></img>' +
+                      '</a' +
+                    '</td>' +
+					'<td>' + record.confidence + '%</td>' +
+                    '<td>' + record.name + '</td>' +
+                    '<td>' + record.dob + '</td>' +
+                  '</tr>'
+    }
+  }
+  else{
+    htmlStr += '<tr><td class="text-center" colspan="4">No portrait matched.</td></tr>';
+  }
+  $('#searchResultTable tbody').html(htmlStr);
+  $('#filteredCountLabel').text('Total count : ' + count)
+  handleFancybox()
+}
+
+function GetSortOrder(prop) {  
+    return function(a, b) {  
+        if (a[prop] > b[prop]) {  
+            return -1;  
+        } else if (a[prop] < b[prop]) {  
+            return 1;  
+        }  
+        return 0;  
+    }  
+}  
+
+function makeResultsTable(data) 
+{
+	var htmlStr = '';
+	var count = data.length - 1;
+  
+	sorted = data.sort(GetSortOrder("confidence"));
+	
+	if(count > 0) 
+	{
+		for(i = 0; i < count; i++) 
+		{
+			var record = sorted[i];
+			
+			var savedPath = record.savedPath.replace('public/', '');
+
+			htmlStr += '<tr>' + 
+						'<td>' +
+						  '<a href="' + savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
+							'<img src="' + savedPath + '" style="width:75px;"></img>' +
+						  '</a' +
+						'</td>' +
+						'<td>' + record.confidence + '%asdf</td>' +
+						'<td>' + record.name + '</td>' +
+						'<td>' + record.dob + '</td>' +
+					  '</tr>'
+		}
+		
+	}
+	else
+	{
+		htmlStr += '<tr><td class="text-center" colspan="4">No portrait matched.</td></tr>';
+	}
+  
+	
+	
+	$('#searchResultTable tbody').html(htmlStr);
+	$('#filteredCountLabel').text('Total count : ' + count)
+	handleFancybox()
 }
 
 var handleFancybox = function() {

@@ -2,6 +2,9 @@
 
 return [
 
+	Face\FaceServiceProvider::class,
+	'Face' => Face\Facades\Face::class,
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -13,7 +16,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Face'),
+    'name' => env('APP_NAME', 'Facial Recognition'),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +55,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'localface.com'),
 
     /*
     |--------------------------------------------------------------------------

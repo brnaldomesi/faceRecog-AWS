@@ -106,6 +106,9 @@
 															Photo
 														</th>
 														<th>
+															Confidence
+														</th>
+														<th>
 															Name
 														</th>
 														<th>
@@ -115,7 +118,7 @@
 												</thead>
 												<tbody>
 													<tr>
-														<td class="text-center" colspan="3">Search Result</td>
+														<td class="text-center" colspan="4">Search results</td>
 													</tr>
 												</tbody>
 												

@@ -138,7 +138,11 @@ function uploadPortrait() {
       success: function(data) {
         Metronic.unblockUI();
         bootbox.alert(data.msg);
-      }
+      },
+	  error: function(data) {
+		Metronic.unblockUI();
+		bootbox.alert("Something went wrong.");
+	  }
     });
   }
 }
