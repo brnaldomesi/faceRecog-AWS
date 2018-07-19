@@ -106,12 +106,18 @@
                         <li class="nav-item @if(Request::segment(1) == 'home'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/home') }}">{{ __('Dashboard') }}</a>
                         </li>
+						<li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
+                            <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Cases') }}</a>
+                        </li>
+						<li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == ''){{ __('active')}}@endif">
+                            <a class="nav-link" href="{{ url('/portraits') }}">{{ __('Administration') }}</a>
+                        </li>
                         <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Enroll') }}</a>
+                            <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('-- Enroll (Legacy)') }}</a>
                         </li>
                         <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == ''){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/portraits') }}">{{ __('Search') }}</a>
-                        </li>
+                            <a class="nav-link" href="{{ url('/portraits') }}">{{ __('-- Search (Legacy)') }}</a>
+                        </li>						
                       </ul>
                       <!-- Right Side Of Navbar -->
                       
