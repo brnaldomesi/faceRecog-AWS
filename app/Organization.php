@@ -16,4 +16,5 @@ class Organization extends Model
   {
     return $this->hasManyThrough('App\Face', 'App\Faceset', 'organizationId' ,'facesetId');
   }  
+  
 }

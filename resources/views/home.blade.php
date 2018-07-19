@@ -29,6 +29,21 @@
         </li>
       </ul>
       <div class="row">
+		<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 margin-bottom-10">
+          <a class="dashboard-stat dashboard-stat-light blue-madison" href="javascript:;">
+          <div class="visual">
+            <i class="fa fa-database fa-icon-medium"></i>
+          </div>
+          <div class="details">
+            <div class="number">
+               {{ $caseCount }}
+            </div>
+            <div class="desc">
+               Your Active Cases
+            </div>
+          </div>
+          </a>
+        </div>
         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 margin-bottom-10">
           <a class="dashboard-stat dashboard-stat-light blue-madison" href="javascript:;">
           <div class="visual">
@@ -39,7 +54,7 @@
                {{ $facesCount }}
             </div>
             <div class="desc">
-               Total portraits
+               Searchable Faces
             </div>
           </div>
           </a>
@@ -54,26 +69,12 @@
               {{ $searchCount}}
             </div>
             <div class="desc">
-               Total searchs
+               Searches Performed
             </div>
           </div>
           </a>
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-          <a class="dashboard-stat dashboard-stat-light green-haze" href="javascript:;">
-          <div class="visual">
-            <i class="fa fa-shopping-cart fa-icon-medium"></i>
-          </div>
-          <div class="details">
-            <div class="number counter">
-              {{ $faceMatchesCount }}
-            </div>
-            <div class="desc">
-               Successful searchs
-            </div>
-          </div>
-          </a>
-        </div>
+
       </div>
     </div>
   </div>
