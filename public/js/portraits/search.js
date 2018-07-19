@@ -97,7 +97,7 @@ function search() {
 			}
 			else
 			  filteredResult_per_faceSet = filteredResultArray
-			make_searchResult_table()
+			  //makeResultsTable(data)
 		}
     });
   }
@@ -174,42 +174,44 @@ function old_make_searchResult_table() {
   handleFancybox()
 }
 
-function GetSortOrder(prop) {  
-    return function(a, b) {  
-        if (a[prop] > b[prop]) {  
-            return -1;  
-        } else if (a[prop] < b[prop]) {  
-            return 1;  
-        }  
-        return 0;  
-    }  
-}  
+function sortByKey(array, key) {
+    return array.sort(function(a, b) {
+        var x = a[key]; var y = b[key];
+        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    });
+} 
 
 function makeResultsTable(data) 
 {
 	var htmlStr = '';
 	var count = data.length - 1;
+	var record;
+	var savedPath;
   
-	sorted = data.sort(GetSortOrder("confidence"));
-	
+	// Sort our JSON by Confidence DESC
+	sorted = sortByKey(data,"confidence");
+
 	if(count > 0) 
 	{
-		for(i = 0; i < count; i++) 
+		for(i=count; i >= 0; i--) 
 		{
-			var record = sorted[i];
-			
-			var savedPath = record.savedPath.replace('public/', '');
+			if (data[i] !== "undefined" && data[i].savedPath) {
+				
+				record = sorted[i];
+				
+				savedPath = record.savedPath.replace('public/', '');
 
-			htmlStr += '<tr>' + 
-						'<td>' +
-						  '<a href="' + savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
-							'<img src="' + savedPath + '" style="width:75px;"></img>' +
-						  '</a' +
-						'</td>' +
-						'<td>' + record.confidence + '%asdf</td>' +
-						'<td>' + record.name + '</td>' +
-						'<td>' + record.dob + '</td>' +
-					  '</tr>'
+				htmlStr += '<tr>' + 
+							'<td>' +
+							  '<a href="' + savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
+								'<img src="' + savedPath + '" style="width:75px;"></img>' +
+							  '</a' +
+							'</td>' +
+							'<td>' + record.confidence + '%</td>' +
+							'<td>' + record.name + '</td>' +
+							'<td>' + record.dob + '</td>' +
+						  '</tr>'
+			} 
 		}
 		
 	}
