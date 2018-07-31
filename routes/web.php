@@ -36,8 +36,11 @@ Route::group(['middleware' => ['auth']], function () {
 
 	Route::group(['middleware' => ['admin']], function () {
 		Route::get('/admin', 'AdminController@index')->name('admin');
+		Route::post('/admin', 'AdminController@create')->name('admin.create');
+		Route::get('/admin/create', 'AdminController@createForm')->name('admin.create.show');
 		Route::get('/admin/{user}', 'AdminController@user')->name('admin.id.show');
 		Route::put('/admin/{user}', 'AdminController@update')->name('admin.id.update');
+		Route::delete('/admin/{user}', 'AdminController@delete')->name('admin.id.delete');
 	});
 
 	Route::get('/home', 'HomeController@index')->name('home');

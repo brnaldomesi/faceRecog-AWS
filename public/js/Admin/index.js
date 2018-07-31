@@ -27,4 +27,9 @@ $(document).ready(function () {
 
         "order" : [[1, 'desc']]
 	});
+
+    $('#table-user tbody tr .delete').click(function () {
+        $('.form-delete').attr('action', $(this).attr('url')).submit();
+        return false;
+    });
 });
