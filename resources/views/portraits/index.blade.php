@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.master')
 
 @section('extracss')
 	<link href="{{ asset('global/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet">
@@ -80,7 +80,7 @@
 								</div>
 								<!-- END PHOTO -->
 								<!-- BEGIN TABLE -->
-								<div class="col-md-6 border-left">
+								<div class="col-md-6">
 									<div class="portlet light">
 										<!-- BEGIN FACESET SELECT -->
 										<div>
@@ -163,6 +163,7 @@
 								</div>
 								<!-- END TABLE -->
 							</div>
+							<!-- END PAGE CONTENT INNER -->
 	            <!-- </div>
 	          </div>
 	        </div>
@@ -175,8 +176,8 @@
 
 @section('extrajs')
 	<script type="text/javascript" src="{{ asset('global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
-  <script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
-  <script type="text/javascript" src="{{ asset('global/plugins/fancybox/source/jquery.fancybox.pack.js') }}"></script>
-  <script type="text/javascript" src="{{ asset('js/portraits.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('global/plugins/fancybox/source/jquery.fancybox.pack.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('js/portraits.js') }}"></script>
 	<script type="text/javascript" src="{{ asset('js/portraits/search.js') }}"></script>
 @endsection

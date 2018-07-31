@@ -17,8 +17,9 @@ class CreateImagesTable extends Migration
             $table->increments('id');
             $table->integer('caseId');
             $table->string('filename');
+            $table->string('filename_uploaded');
             $table->dateTime('uploaded');
-            $table->dateTime('lastSearched');
+            $table->dateTime('lastSearched')->nullable();
             $table->timestamps();
         });
     }

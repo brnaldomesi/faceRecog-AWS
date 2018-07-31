@@ -8,10 +8,11 @@ Home Screen once the user is logged in
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Organization;
+use App\Models\Stat;
+use App\Models\Cases;
+
 use Auth;
-use App\Organization;
-use App\Stat;
-use App\Cases;
 
 class HomeController extends Controller
 {

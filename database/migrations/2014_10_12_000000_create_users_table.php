@@ -18,6 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->tinyInteger('organizationId');
+            $table->tinyInteger('userGroupId');
             $table->string('password');
             $table->string('activation_code')->nullable();
             $table->boolean('status')->default(0);

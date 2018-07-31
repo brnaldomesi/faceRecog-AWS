@@ -1,0 +1,59 @@
+
+.table.table-hover tbody tr {
+	cursor: pointer;
+}
+
+button.btn.delete+input {
+	display: none;
+}
+
+form#enrollForm table tr td:last-child .delete {
+	display: none;
+}
+
+form#enrollForm table tr .preview img {
+	width: 96px;
+}
+
+textarea:disabled {
+	resize: none;
+}
+
+.my-bootbox-body .field div:first-child {
+	width: 90px;
+	margin-right:20px;
+	text-align: right;
+}
+
+.my-bootbox-body .field div {
+	display: inline-block;
+}
+
+.my-bootbox-body {
+	max-height: 500px;
+	border-left: 1px solid #eee;
+	overflow-y: auto;
+}
+
+.bootbox.modal.wide .modal-dialog {
+	width: 90% !important;
+}
+
+.my-tile:hover {
+	background: #f5f5f5;
+}
+
+.my-tile {
+	padding:10px;
+	border-radius: 10px
+}
+
+.needle-side-bar img {
+	width: 100%;
+}
+
+@media (max-width: 767px) {
+	.needle-side-bar {
+		margin-bottom: 20px;
+	}
+}
