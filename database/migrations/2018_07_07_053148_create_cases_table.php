@@ -17,7 +17,12 @@ class CreateCasesTable extends Migration
             $table->increments('id');
             $table->tinyInteger('organizationId');
             $table->integer('userId');
-            $table->tinyInteger('status');
+            $table->enum('status', ['ACTIVE', 'CLOSED', 'SOLVED'])->default('ACTIVE');
+            $table->string('caseNumber');
+            $table->string('type');
+            $table->string('dispo')->nullable()->default(NULL);
+            $table->dateTime('lastSearched')->nullable()->default(NULL);
+            $table->timestamps();
         });
     }
 

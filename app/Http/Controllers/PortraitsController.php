@@ -1,18 +1,23 @@
 <?php
-use luchaninov\CsvFileLoader;
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Role;
-use App\User;
-use App\Facepp;
+
 use Illuminate\Http\Request;
-use Face;
-use Auth;
-use App\Face as FaceModel;
-use App\Faceset;
-use App\Organization;
 use Illuminate\Support\Facades\Input;
+
+use luchaninov\CsvFileLoader;
+
+use App\Models\Face as FaceModel;
+use App\Models\User;
+use App\Models\Faceset;
+use App\Models\Organization;
+
+use App\Utils\Facepp;
+use App\Utils\FaceSearch;
+
+use Auth;
+use Face;
 use Storage;
 
 class PortraitsController extends Controller
@@ -43,105 +48,8 @@ class PortraitsController extends Controller
 	  // Get the organizationID for the logged in user
       $organizationId = Auth::user()->organizationId;
       
-	  //$portraitData = $request->portraitData;
-      
-	  ini_set('max_execution_time', 300);
-      $noError = false;
-	  
-	  // ******* FIX: Allow the user to select the minimum confidence level for filtering results
-	  $minConfidence = 65;
-	  
-      // Get our list of Facesets for the organization of the user logged in
-	  // 
-	  // **NOTE:
-	  // We will need to expand this so the search will also grab Facesets for other organizations that opted-in to sharing their Faceset data.
-      $faceSets = Faceset::select('id', 'facesetToken')->where('organizationId', $organizationId)->get();
-      $res = [];
-	  
-	  // Get the path of the uploaded image
-      $filename = $request->searchPortraitInput->getPathName();
-      $params['image_file'] = new \CURLFile($filename);
-
-	  $results = [];
-	  
-	  // Loop through our facesets and find matches
-      for($i = 0; $i < count($faceSets); $i++) {
-        $faceSetId = $faceSets[$i]->id;
-        $facesCount = FaceModel::where('facesetId', $faceSetId)->count();
-        
-		//Set the limit of return_result_count
-		// ******* FIX: Allow the user to select the max # of returns from the Search screen
-		$maxResults = 5;
-		
-        $return_result_count = $facesCount < $maxResults ? $facesCount : $maxResults;
-
-        $params['return_result_count'] = $return_result_count;
-        $params['faceset_token'] = $faceSets[$i]->facesetToken;
-
-        while($noError === false || !$isFaceDetected) {
-          // $searchResults = Face::search($request->searchPortraitInput, $faceSets[$i]->facesetToken, ['return_result_count' => $return_result_count]);
-          
-		  // Call Search API and pass the Faceset token and the # of requested results
-		  $searchResults = $this->facepp->execute('/search', $params);
-          $noError = $searchResults;
-		  
-		  // Set isFaceDetected if there are matches in this faceSet so we can break the loop
-          $isFaceDetected = isset(json_decode( $searchResults )->faces);
-        }
-		
-        $noError = false;
-        $searchResults = json_decode( $searchResults );
-        
-		// API did not detect a face in the uploaded image.  Either no face or low quality image.
-        if(count($searchResults->faces) == 0) {
-          $res['status'] = 201;
-          $res['msg'] = 'No faces were detected in the image';
-          echo json_encode( $res );
-          return;
-        }
-
-		// ??
-        $filteredCount_per_faceSet = count($searchResults->results);
-        $filteredResult_per_faceSet = $searchResults->results;   
-        $resultPer_faceSet = [];
-		
-		
-
-        for($j = 0; $j < $filteredCount_per_faceSet; $j++) {
-          $faceToken = $filteredResult_per_faceSet[$j]->face_token;
-		  $confidence = $filteredResult_per_faceSet[$j]->confidence;
-		  
-		  // If detected face is >= the minimum confidence level, get the face information from the DB
-          if($confidence >= $minConfidence) {
-            
-			// Set our Face object
-			FaceModel::where('faceToken', $faceToken)->increment('faceMatches');
-			
-			// Get the path to the face image
-            $savedPath = FaceModel::where('faceToken', $faceToken)->value('savedPath');
-            
-			// Set the name and DOB for the face
-            $name = FaceModel::where('faceToken', $faceToken)->value('name');
-            $dob = FaceModel::where('faceToken', $faceToken)->value('dob');
-
-			
-            //$resultPer_faceSet[] = array_merge((array)$filteredResult_per_faceSet[$j], ['savedPath' => $savedPath, 'name' => $name, 'dob' => $dob, 'confidence' => $confidence]);
-			array_push($results, ['savedPath' => $savedPath, 'name' => $name, 'dob' => $dob, 'confidence' => $confidence]);
-			
-          }
-        }
-		
-        //$res['status'] = 200;
-        //$res[$faceSetId] = $resultPer_faceSet;
-
-      }
-	  
-	  array_push($results, ['status' => '200']);
-	  
-	  // Increment our search count for the organization
-      Organization::find($organizationId)->stat->increment('searches');
-      //echo json_encode( $res );
-	  echo json_encode( $results );
+      $result = FaceSearch::search($request->searchPortraitInput->getPathName(), $organizationId, 'MANUAL_SEARCH');
+      return json_encode($result);
     }
 
 
@@ -365,17 +273,13 @@ class PortraitsController extends Controller
 							$detectedFaceItem->dobDate = date('Y-m-d', 0);
 					
 							// Set the local path to store the image on our server
-							$url = $csvLine[0];
-							$path = 'public/' . $organizationName . "-" . $organizationId . "/faceset-" . $facesetIndex . '/' . $faceId . '.png';
+							$path = 'face/' . $organizationName . "-" . $organizationId . "/faceset-" . $facesetIndex . '/' . $faceId . ".png";
 							$faceInfoArray[] = $detectedFaceItem;
 							$faceIdArray[] = $faceId;
-							
-							$contents = file_get_contents($url);
-							Storage::put($path, $contents);
-							
-							$path = url('/') . '/storage/' . $path;
-							$detectedFaceItem->path = $path;
+							Storage::put('public/' . $path, file_get_contents($csvLine[0]));
+							$path = url('/storage/' . $path);
 
+							$detectedFaceItem->path = $path;
 						}
 						else 
 						{
@@ -463,8 +367,10 @@ class PortraitsController extends Controller
 				  'organizationId' => $organizationId
 				])->id;
 
-				$path = $request->portraitInput->storeAs('public/' . $organizationName . "-" . $organizationId . "/faceset-" . $facesetIndex, $faceId . "." . $ext);
-				$path = url('/') . '/storage/' . $path;
+				$path = 'face/' . $organizationName . "-" . $organizationId . "/faceset-" . $facesetIndex;
+				$filename = $faceId . "." . $ext;
+				$request->portraitInput->storeAs('public/' . $path, $filename);
+				$path = url('/storage/' . $path . "/" . $filename);
 
 				FaceModel::create([
 				  'faceToken' => $faceId,
@@ -514,8 +420,10 @@ class PortraitsController extends Controller
 					Organization::where('id', $organizationId)->update(['active_facesetToken' => $newAlbum->getId()]);
 				}
 
-				$path = $request->portraitInput->storeAs('public/' . $organizationName . "-" . $organizationId . "/faceset-" . $facesetIndex, $faceId . "." . $ext);
-				$path = url('/') . '/storage/' . $path;
+				$path = 'face/' . $organizationName . "-" . $organizationId . "/faceset-" . $facesetIndex;
+				$filename = $faceId . "." . $ext;
+				$request->portraitInput->storeAs('public/' . $path, $filename);
+				$path = url('/storage/' . $path . "/" . $filename);
 
 				FaceModel::create([
 				  'faceToken' => $faceId,

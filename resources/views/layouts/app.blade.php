@@ -23,9 +23,9 @@
     @yield('extracss')
     <link href="{{ asset('css/components-rounded.css') }}" rel="stylesheet">
     <link href="{{ asset('css/plugins.css') }}" rel="stylesheet">
-    <link href="{{ asset('admin/layout3/css/layout.css') }}" rel="stylesheet">
-    <link href="{{ asset('admin/layout3/css/themes/default.css') }}" rel="stylesheet" id="style_color">
-    <link href="{{ asset('admin/layout3/css/custom.css') }}" rel="stylesheet">
+    <link href="{{ asset('admin_assets/layout3/css/layout.css') }}" rel="stylesheet">
+    <link href="{{ asset('admin_assets/layout3/css/themes/default.css') }}" rel="stylesheet" id="style_color">
+    <link href="{{ asset('admin_assets/layout3/css/custom.css') }}" rel="stylesheet">
     <!-- END THEME STYLES -->
     <link href="{{ asset('css/appcustom.css') }}" rel="stylesheet">
 </head>
@@ -37,7 +37,7 @@
     <div id="app">
         <!-- <nav class="navbar navbar-expand-md navbar-light navbar-laravel"> -->
           <!-- BEGIN HEADER -->
-          <div class="page-header">
+          <div class="page-header" style="height: 50px;">
             <!-- BEGIN HEADER TOP -->
             <div class="page-header-top">
               <div class="container">
@@ -53,7 +53,7 @@
                 <!-- END RESPONSIVE MENU TOGGLER -->
                 <!-- BEGIN TOP NAVIGATION MENU -->
 
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav d-inline-block float-right">
                     <!-- Authentication Links -->
                     @guest
                         <li>
@@ -106,18 +106,12 @@
                         <li class="nav-item @if(Request::segment(1) == 'home'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/home') }}">{{ __('Dashboard') }}</a>
                         </li>
-						<li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Cases') }}</a>
-                        </li>
-						<li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == ''){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/portraits') }}">{{ __('Administration') }}</a>
-                        </li>
                         <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('-- Enroll (Legacy)') }}</a>
+                            <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Enroll') }}</a>
                         </li>
                         <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == ''){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/portraits') }}">{{ __('-- Search (Legacy)') }}</a>
-                        </li>						
+                            <a class="nav-link" href="{{ url('/portraits') }}">{{ __('Search') }}</a>
+                        </li>
                       </ul>
                       <!-- Right Side Of Navbar -->
                       
@@ -150,7 +144,7 @@
     <!-- BEGIN FOOTER -->
     <div class="page-footer">
       <div class="container">
-         2018 &copy; Brian Marlow
+         2018 &copy; Face 
       </div>
     </div>
     <div class="scroll-to-top">
@@ -174,9 +168,9 @@
     <script src="{{ asset('global/plugins/exif-js/exif.js') }}" type="text/javascript"></script>
     <script src="{{ asset('global/plugins/javascript-load-image/js/load-image.all.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('global/scripts/metronic.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('admin/layout3/scripts/layout.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('admin/layout3/scripts/demo.js') }}" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js" type="text/javascript"></script>
+    <script src="{{ asset('admin_assets/layout3/scripts/layout.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('admin_assets/layout3/scripts/demo.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('global/plugins/bootbox/bootbox.min.js') }}" type="text/javascript"></script>
     <script>
       jQuery(document).ready(function() {    
         Metronic.init(); // init metronic core components

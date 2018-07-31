@@ -70,11 +70,12 @@ function search() {
 		  {
 			Metronic.unblockUI();
 			
-			if (data['status'] == 201) {
+			if (data['status'] != 200) {
 			  bootbox.alert(data['msg']);
 			  return;
 			}
 		
+      data = data.result;
 			var optionValues = [];
 			filteredResultObject = data;
 			
@@ -103,7 +104,7 @@ function search() {
   }
 }
 
-$("#facesetSelect").live('change', function(){
+$("#facesetSelect").on('change', function(){
   var value = this.value;
   if(typeof filteredResultObject !== 'undefined') {
     if(value != '') {
@@ -123,12 +124,11 @@ function make_compiledResult_table() {
     var i
     for(i = 0; i < count; i++) {
       var record = filteredResult_per_faceSet[i]
-      var savedPath = record.savedPath.replace('public/', '');
 
       htmlStr += '<tr>' + 
                     '<td>' +
-                      '<a href="' + savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
-                        '<img src="' + savedPath + '" style="width:75px;"></img>' +
+                      '<a href="' + record.savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
+                        '<img src="' + record.savedPath + '" style="width:75px;"></img>' +
                       '</a' +
                     '</td>' +
 					'<td>' + record.confidence + '% FUCK</td>' +
@@ -152,12 +152,11 @@ function old_make_searchResult_table() {
     var i
     for(i = 0; i < count; i++) {
       var record = filteredResult_per_faceSet[i]
-      var savedPath = record.savedPath.replace('public/', '');
 
       htmlStr += '<tr>' + 
                     '<td>' +
-                      '<a href="' + savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
-                        '<img src="' + savedPath + '" style="width:75px;"></img>' +
+                      '<a href="' + record.savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
+                        '<img src="' + record.savedPath + '" style="width:75px;"></img>' +
                       '</a' +
                     '</td>' +
 					'<td>' + record.confidence + '%</td>' +
@@ -198,13 +197,11 @@ function makeResultsTable(data)
 			if (data[i] !== "undefined" && data[i].savedPath) {
 				
 				record = sorted[i];
-				
-				savedPath = record.savedPath.replace('public/', '');
 
 				htmlStr += '<tr>' + 
 							'<td>' +
-							  '<a href="' + savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
-								'<img src="' + savedPath + '" style="width:75px;"></img>' +
+							  '<a href="' + record.savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
+								'<img src="' + record.savedPath + '" style="width:75px;"></img>' +
 							  '</a' +
 							'</td>' +
 							'<td>' + record.confidence + '%</td>' +

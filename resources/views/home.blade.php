@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('extracss')
-   
-@endsection
+@extends('layouts.master')
 
 @section('content')
 <div class="page-container">
@@ -29,7 +25,7 @@
         </li>
       </ul>
       <div class="row">
-		<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 margin-bottom-10">
+		    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 margin-bottom-10">
           <a class="dashboard-stat dashboard-stat-light blue-madison" href="javascript:;">
           <div class="visual">
             <i class="fa fa-database fa-icon-medium"></i>
@@ -85,14 +81,14 @@
 @section('extrajs')
   <script type="text/javascript" src="{{ asset('global/plugins/counterup/jquery.waypoints.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/counterup/jquery.counterup.min.js') }}"></script>
-    <script>
-      $(document).ready(function () {
-            //Search.init()
-            $('#filteredCountLabel').text('')
-            $('.counter').counterUp({
-                delay: 10,
-                time: 1000
-            })
-        });
-    </script>
+  <script>
+    $(document).ready(function () {
+          //Search.init()
+          $('#filteredCountLabel').text('')
+          $('.counter').counterUp({
+              delay: 10,
+              time: 1000
+          })
+      });
+  </script>
 @endsection

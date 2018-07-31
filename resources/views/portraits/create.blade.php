@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.master')
 {{--
 @section('sidebar')
 <nav id="sidebar-nav">
@@ -59,9 +59,7 @@
 @section('extrajs')
     <script type="text/javascript" src="{{ asset('global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
     <script type="text/javascript" src="{{ asset('global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js') }}"></script>
-    <script src="{{ asset('admin/pages/scripts/components-pickers.js') }}"></script>
-
-    
+    <script type="text/javascript" src="{{ asset('admin_assets/pages/scripts/components-pickers.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/portraits.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/portraits/create.js') }}"></script>
 @endsection

@@ -5,11 +5,11 @@
       @if (session('status'))
         <div class="alert alert-success" role="alert">
           {{ session('status') }}
-        </div>                
+        </div>
       @else
         <div class="row bg-white">
           <!--BEGIN PHOTO -->
-          <div class="col-md-6 border-right">
+          <div class="col-md-6 border-right nopadding">
             <div class="portlet light text-center">
               <div class="portlet-title">
                 <div class="caption">
@@ -57,7 +57,7 @@
           </div>
           <!-- END PHOTO -->
           <!-- BEGIN PERSONAL INFO -->
-          <div class="col-md-6 border-left">
+          <div class="col-md-6 nopadding">
             <div class="portlet light">
               <div class="portlet-title">
                 <div class="caption">
@@ -66,25 +66,25 @@
               </div>
               <div class="portlet-body">
                 <div class="form-group row">
-                  <label for="name" class="col-md-3 col-form-label text-md-right">{{ __('Name') }}</label>
+                  <label for="name" class="col-md-3 col-form-label text-right padding-top-10">{{ __('Name') }}</label>
                   <div class="col-md-6">
                     <input id="name" type="text" class="form-control" name="name">
                   </div>
                 </div>
 
                 <div class="form-group row">
-                  <label for="name" class="col-md-3 col-form-label text-md-right">{{ __('Birthday') }}</label>
+                  <label for="name" class="col-md-3 col-form-label text-right padding-top-10">{{ __('Birthday') }}</label>
                   <div class="col-md-6">
                     <input class="form-control form-control-inline date-picker" name="dob" size="16" type="text" value=""/>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="posBottomRight">
-             <a href="javascript:uploadPortrait();" class="btn green-haze">Save</a>
-             <!-- <button type="submit">Save</button> -->
-           </div>
           </div>
+          <div class="posBottomRight">
+           <a href="javascript:uploadPortrait();" class="btn green-haze">Save</a>
+           <!-- <button type="submit">Save</button> -->
+         </div>
           <!-- END PERSONAL INFO -->
         </div>
       @endif
