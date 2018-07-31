@@ -23,7 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('activation_code')->nullable();
             $table->boolean('status')->default(0);
             $table->dateTime('lastlogin')->nullable();
-            $table->integer('loginCount')->default(1);
+            $table->integer('loginCount')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

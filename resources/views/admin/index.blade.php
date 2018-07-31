@@ -35,6 +35,8 @@
               </li>
             </ul>
             <div class="row">
+              {!! Form::open(['method' => 'DELETE', 'class' => 'form-delete form-horizontal']) !!}
+              {!! Form::close() !!}
               <div class="col-md-12">
                 <!-- BEGIN EXAMPLE TABLE PORTLET-->
                 <div class="portlet light">
@@ -45,6 +47,18 @@
                     </div>
                   </div>
                   <div class="portlet-body">
+                    <div class="table-toolbar">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="btn-group">
+                            <a href="{{ route('admin.create.show') }}" class="btn green">
+                            Add New
+                            <i class="fa fa-plus"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <table class="table table-striped table-hover" id="table-user">
                     <thead>
                     <tr>
@@ -62,6 +76,9 @@
                       </th>
                       <th>
                          Last Joined
+                      </th>
+                      <th>
+                         Action
                       </th>
                     </tr>
                     </thead>
@@ -81,6 +98,11 @@
               						<td>
               						   {{ $user->lastlogin }}
               						</td>
+                          <td>
+          @if (Auth::user()->id != $user->id)
+                             <button class="btn btn-danger delete" url="{{ route('admin.id.delete', $user) }}"><i class="fa fa-trash"></i> &nbsp;Delete</button>
+          @endif
+                          </td>
             						</tr>
 @endforeach
                     </tbody>

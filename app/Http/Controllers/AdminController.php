@@ -30,15 +30,43 @@ class AdminController extends Controller
 
     public function user(User $user)
     {
-    	$organ = Organization::all(['id', 'name'])
-    		->mapWithKeys(function ($item) {
-    		return [$item['id'] => $item['name']];
-    	});
-
     	return view('admin.user', [
     		'user' => $user,
-    		'organization' => $organ
+    		'organization' => Organization::find($user->organizationId)->name
     	]);
+    }
+
+    public function createForm()
+    {
+        return view('admin.user', [
+            'organization' => Organization::find(Auth::user()->organizationId)->name
+        ]);
+    }
+
+    public function delete(User $user)
+    {
+        if ($user->id != Auth::user()->id) {
+            $user->delete();
+        }
+        return redirect()->route('admin');
+    }
+
+    public function create(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|unique:users'
+        ]);
+
+        $user = new User;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->organizationId = Auth::user()->organizationId;
+        $user->userGroupId = 2;
+        $user->password = Hash::make('123456789');
+        $user->save();
+
+        return redirect()->route('admin');
     }
 
     public function update(Request $request, User $user)

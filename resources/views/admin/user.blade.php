@@ -33,7 +33,7 @@
         <a href="{{ route('admin') }}">Admin</a><i class="fa fa-circle"></i>
         </li>
         <li class="active">
-        {{ $user->name }}
+        {{ isset($user) ? $user->name : 'New User'}}
         </li>
       </ul>
 
@@ -45,7 +45,11 @@
           </div>
         </div>
         <div class="portlet-body">
+  @if (isset($user))
           {!! Form::model($user, ['route' => ['admin.id.update', $user->id], 'method' => 'PUT', 'class' => 'form-horizontal']) !!}
+  @else
+          {!! Form::open(['route' => ['admin.create'], 'method' => 'POST', 'class' => 'form-horizontal']) !!}
+  @endif
             
            <div class="form-group {{ $errors->has('email') ? ' has-error' : ''}}">
              {!! Form::label('email', 'E-Mail ', ['class' => 'col-md-4 control-label']) !!}
@@ -63,13 +67,7 @@
               </div>
             </div>
 
-            <div class="form-group">
-              {!! Form::label('organizationId', 'Organization ', ['class' => 'col-md-4 control-label']) !!}
-              <div class="col-md-6">
-                {!! Form::select('organizationId', $organization, null, ['class' => 'form-control bs-select', 'required' => 'required']) !!}
-              </div>
-            </div>
-
+  @if (isset($user))
             <div class="form-group {{ $errors->has('password') ? ' has-error' : ''}}">
               {!! Form::label('password', 'Password ', ['class' => 'col-md-4 control-label']) !!}
               <div class="col-md-6">
@@ -84,7 +82,22 @@
                 {!! Form::password('password_confirmation', ['class' => 'form-control']) !!}
               </div>
             </div>
+  @else
+            <div class="form-group {{ $errors->has('name') ? ' has-error' : ''}}">
+              {!! Form::label('password', 'Password ', ['class' => 'col-md-4 control-label']) !!}
+              <div class="col-md-6">
+                {!! Form::text('password', '123456789', ['class' => 'form-control', 'disabled' => 'disabled']) !!}
+              </div>
+            </div>
+  @endif
 
+            <div class="form-group">
+              {!! Form::label('organization', 'Organization ', ['class' => 'col-md-4 control-label']) !!}
+              <div class="col-md-6">
+                {!! Form::text('organization', $organization, ['class' => 'form-control bs-select', 'disabled' => 'disabled']) !!}
+              </div>
+            </div>
+  @if (isset($user))
             <div class="form-group">
               {!! Form::label('loginCount', 'Login Count ', ['class' => 'col-md-4 control-label']) !!}
               <div class="col-md-6">
@@ -98,7 +111,7 @@
                 {!! Form::text('lastlogin', null, ['class' => 'form-control', 'disabled' => 'disabled']) !!}
               </div>
             </div>
-
+  @endif
             <hr>
             <div class="form-group">
               <div class="col-md-offset-4 col-md-4">
