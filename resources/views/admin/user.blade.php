@@ -67,11 +67,14 @@
               </div>
             </div>
 
-  @if (isset($user))
             <div class="form-group {{ $errors->has('password') ? ' has-error' : ''}}">
               {!! Form::label('password', 'Password ', ['class' => 'col-md-4 control-label']) !!}
               <div class="col-md-6">
+  @if (isset($user))
                 {!! Form::password('password', ['class' => 'form-control', 'placeholder' => 'Blank would leave it unchanged']) !!}
+  @else
+                {!! Form::password('password', ['class' => 'form-control', 'placeholder' => 'Blank would set it to "123456789"']) !!}
+  @endif
                 {!! $errors->first('password', '<p class="help-block">:message</p>') !!}
               </div>
             </div>
@@ -82,14 +85,6 @@
                 {!! Form::password('password_confirmation', ['class' => 'form-control']) !!}
               </div>
             </div>
-  @else
-            <div class="form-group {{ $errors->has('name') ? ' has-error' : ''}}">
-              {!! Form::label('password', 'Password ', ['class' => 'col-md-4 control-label']) !!}
-              <div class="col-md-6">
-                {!! Form::text('password', '123456789', ['class' => 'form-control', 'disabled' => 'disabled']) !!}
-              </div>
-            </div>
-  @endif
 
             <div class="form-group">
               {!! Form::label('organization', 'Organization ', ['class' => 'col-md-4 control-label']) !!}

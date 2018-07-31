@@ -55,7 +55,8 @@ class AdminController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|unique:users'
+            'email' => 'required|unique:users',
+            'password' => 'confirmed'
         ]);
 
         $user = new User;
@@ -63,7 +64,12 @@ class AdminController extends Controller
         $user->email = $request->email;
         $user->organizationId = Auth::user()->organizationId;
         $user->userGroupId = 2;
-        $user->password = Hash::make('123456789');
+
+        if (empty($user->password)) {
+            $user->password = Hash::make('123456789');
+        } else {
+            $user->password = $request->password;
+        }
         $user->save();
 
         return redirect()->route('admin');
