@@ -113,10 +113,10 @@ function initEvent() {
 		ajaxParams = {'delete' : $(this).attr('image-no')};
 		table_image_list.ajax.reload();
 	});
-
+	
 	var showSearchResultDialog = function (data, needle_image_src) {
 		var match_count = 0;
-		var title = body = ' ';
+		var title = body = '(Images depicted below are not positive identifications. They are to be used only as investigative leads)<br><br>';
 		var body_no_result = '<div style="font-size:200px; color:lightgray; text-align:center; font-family:\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif">:(</div>';
 
 		if (data.status == 204) {
@@ -126,9 +126,10 @@ function initEvent() {
 			var flat = []; 
 
 			body += '<div class="clearfix">'
-			body += '<div class="needle-side-bar col-md-2 col-sm-3 col-xs-6 col-xs-offset-3 col-sm-offset-0">';
-			body += '<img src="' + needle_image_src + '" class="img-thumbnail fanc1ybox-button" data-rel="fancybox-button"></div>';
-			body += '<div class="my-bootbox-body col-md-10 col-sm-9 col-xs-12">';
+			body += '	<div class="needle-side-bar col-md-2 col-sm-3 col-xs-6 col-xs-offset-3 col-sm-offset-0">';
+			body += '		<img src="' + needle_image_src + '" class="img-thumbnail fanc1ybox-button" data-rel="fancybox-button">';
+			body += '	</div>';
+			
 			for (var i = 0, len = data.result.length; i < len; i++) {
 				var l = data.result[i].length;
 				for (var j = 0; j < l; j++) {
@@ -142,19 +143,30 @@ function initEvent() {
        			return ((x > y) ? -1 : ((x < y) ? 1 : 0));
 			});
 
+			body += '<div class="my-bootbox-body col-md-10 col-sm-9 col-xs-12">';
+			body += '<ul class="list-new ext1">';
 
 			$.each(flat, function (index, value) {
-				body += '<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 clearfix my-tile" style="padding-bottom:20px">';
-				body += '<a href="' + value.savedPath + '" class="fancybox-button" data-rel="fancybox-button">';
-				body += '<img src="' + value.savedPath + '" class="img-thumbnail" alt="Can not load image"></a>';
-				body += '<div style="margin-top:20px; line-height:20px">'
-				body += '<div style="text-align:center; margin-bottom:10px">' + value.name + '</div>';
-				body += '<div class="field"><div><b>Birth date</b></div><div>' + value.dob + '</div></div>';
-				body += '<div class="field"><div><b>Matches</b></div><div>' + value.matches + '</div></div>';
-				body += '<div class="field"><div><b>Confidence</b></div><div>' + value.confidence + '</div></div>';
-				body += '</div></div>';
+
+				body += '<li style="margin: 10px 0;">';
+				body += '	<div>';
+				body += '		<a href="' + value.savedPath + '" class="fancybox-button" data-rel="fancybox-button">';
+				body += '		<img src="' + value.savedPath + '" class="img-thumbnail" alt="Can not load image"></a>';
+				body += '	</div>';
+				body += '	<div style="margin-top:20px; line-height:20px">'
+				body += '		<div class="field">';
+				body += '			<div><b>Identifiers:</b></div>';
+				body += '			<div>' + value.identifiers + '</div>';
+				body += '		</div>';
+				body += '		<div class="field">';
+				body += '			<div><b>Confidence:</b></div>';
+				body += '			<div>' + value.confidence + '%</div>';
+				body += '		</div>';
+				body += '	</div>';
+				body += '</li>';
 			});
 
+			body += '</ul>';
 			body += '</div>';
 			body += '</div>';
 
@@ -231,5 +243,5 @@ function initEvent() {
 			}
 		);
 	});
-
 }
+

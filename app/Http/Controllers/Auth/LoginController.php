@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 
 use App\Models\User;
-
+use App\Models\UserLog as UserLog;
 
 class LoginController extends Controller
 {
@@ -46,5 +46,12 @@ class LoginController extends Controller
         $user->loginCount += 1;
         $user->lastLogin = now();
         $user->save();
+		
+		// Insert this login into the UserLog table
+		UserLog::create([
+		  'userId' => $user->id,
+		  'date_time' => now(),
+		  'event' => 'Login'
+		]);
     }
 }

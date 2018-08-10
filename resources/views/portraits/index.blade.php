@@ -109,10 +109,7 @@
 															Confidence
 														</th>
 														<th>
-															Name
-														</th>
-														<th>
-															Birthday
+															Identifiers
 														</th>
 													</tr>
 												</thead>

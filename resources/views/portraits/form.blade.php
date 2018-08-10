@@ -66,16 +66,20 @@
               </div>
               <div class="portlet-body">
                 <div class="form-group row">
-                  <label for="name" class="col-md-3 col-form-label text-right padding-top-10">{{ __('Name') }}</label>
+                  <label for="name" class="col-md-3 col-form-label text-right padding-top-10">{{ __('Identifiers') }}</label>
                   <div class="col-md-6">
-                    <input id="name" type="text" class="form-control" name="name">
+                    <input id="identifiers" type="text" class="form-control" name="identifiers">
                   </div>
                 </div>
 
                 <div class="form-group row">
-                  <label for="name" class="col-md-3 col-form-label text-right padding-top-10">{{ __('Birthday') }}</label>
+                  <label for="name" class="col-md-3 col-form-label text-right padding-top-10">{{ __('Gender') }}</label>
                   <div class="col-md-6">
-                    <input class="form-control form-control-inline date-picker" name="dob" size="16" type="text" value=""/>
+					<select class="form-control" name="gender">
+						<option value="">Select One</option>
+						<option name="M" value="M">Male</option>
+						<option name="F" value="F">Female</option>
+					</select>
                   </div>
                 </div>
               </div>

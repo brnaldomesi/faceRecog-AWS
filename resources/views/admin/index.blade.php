@@ -43,7 +43,7 @@
                   <div class="portlet-title">
                     <div class="caption">
                       <i class="fa fa-cogs font-green-sharp"></i>
-                      <span class="caption-subject font-green-sharp bold uppercase">User List</span>
+                      <span class="caption-subject font-green-sharp bold uppercase">User Management</span>
                     </div>
                   </div>
                   <div class="portlet-body">
@@ -52,7 +52,7 @@
                         <div class="col-md-6">
                           <div class="btn-group">
                             <a href="{{ route('admin.create.show') }}" class="btn green">
-                            Add New
+                            Add New User
                             <i class="fa fa-plus"></i>
                             </a>
                           </div>
@@ -75,7 +75,7 @@
                          Login Count
                       </th>
                       <th>
-                         Last Joined
+                         Last Login
                       </th>
                       <th>
                          Action
@@ -83,28 +83,98 @@
                     </tr>
                     </thead>
                     <tbody>
-@foreach ($users as $key => $user)
-            					  <tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }}" onClick="javascript:location.href='{{ route('admin.id.show', ['id' => $user->id]) }}';">
-                          <td>{{ $key + 1 }}</td>
-              						<td>
-              						  {{ $user->name }}
-              						</td>
-              						<td>
-              						  {{ $user->email }}
-              						</td>
-              						<td>
-                            {{ $user->loginCount }}
-              						</td>
-              						<td>
-              						   {{ $user->lastlogin }}
-              						</td>
-                          <td>
-          @if (Auth::user()->id != $user->id)
-                             <button class="btn btn-danger delete" url="{{ route('admin.id.delete', $user) }}"><i class="fa fa-trash"></i> &nbsp;Delete</button>
-          @endif
-                          </td>
-            						</tr>
-@endforeach
+					
+						@foreach ($users as $key => $user)
+							<tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }}" onClick="javascript:location.href='{{ route('admin.id.show', ['id' => $user->id]) }}';">
+								<td>{{ $key + 1 }}</td>
+              					<td>
+									{{ $user->name }}
+              					</td>
+              					<td>
+									{{ $user->email }}
+              					</td>
+              					<td>
+									{{ $user->loginCount }}
+              					</td>
+              					<td>
+								@php
+									$date = DateTime::createFromFormat("Y-m-d H:i:s",$user->lastlogin);
+									$date = $date->format('d/m/Y H:i:s');
+									echo $date;
+								@endphp
+              					</td>
+								<td>
+									@if (Auth::user()->id != $user->id)
+										<button class="btn btn-danger delete" url="{{ route('admin.id.delete', $user) }}"><i class="fa fa-trash"></i> &nbsp;Delete</button>
+									@endif
+								</td>
+							</tr>
+						@endforeach
+                    </tbody>
+                    </table>
+                  </div>
+                </div>
+                <!-- END EXAMPLE TABLE PORTLET-->
+              </div>
+            </div>
+			
+			
+			<div class="row">
+              <div class="col-md-12">
+                <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                <div class="portlet light">
+                  <div class="portlet-title">
+                    <div class="caption">
+                      <i class="fa fa-cogs font-green-sharp"></i>
+                      <span class="caption-subject font-green-sharp bold uppercase">Activity Log</span>
+                    </div>
+                  </div>
+                  <div class="portlet-body">
+                    <div class="table-toolbar">
+                      <div class="row">
+                        <div class="col-md-6">
+                        </div>
+                      </div>
+                    </div>
+                    <table class="table table-striped table-hover" id="table-activity">
+                    <thead>
+                    <tr>
+                      <th>
+                         #
+                      </th>
+                      <th>
+                         User name
+                      </th>
+                      <th>
+                         Event
+                      </th>
+                      <th>
+                         Date/Time
+                      </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+					
+					<!-- INSERT FOR/EACH STATEMENT TO SHOW ACTIVITY LOG -->
+					@foreach ($activity as $key => $event)
+							<tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }}">
+								<td>{{ $key + 1 }}</td>
+              					<td>
+									{{ $event->name }}
+              					</td>
+              					<td>
+									{{ $event->event }}
+              					</td>
+              					<td>
+								@php
+									$date = DateTime::createFromFormat("Y-m-d H:i:s",$event->date_time);
+									$date = $date->format('d/m/Y H:i:s');
+									echo $date;
+								@endphp
+              					</td>
+							</tr>
+						@endforeach
+					
                     </tbody>
                     </table>
                   </div>
