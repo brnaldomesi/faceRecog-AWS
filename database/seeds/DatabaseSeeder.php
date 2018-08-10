@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     {
     	DB::table('organizations')->insert([
           'name' => 'Organization 1',
-          'contactName' => 'org1',
+          'account' => 'org1',
 		  'contactName' => '',
           'contactEmail' => '',
           'contactPhone' => ''
