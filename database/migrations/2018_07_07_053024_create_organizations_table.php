@@ -16,7 +16,8 @@ class CreateOrganizationsTable extends Migration
         Schema::create('organizations', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('contactName');
+            $table->string('account');
+			$table->string('contactName');
             $table->string('contactEmail');
             $table->string('contactPhone');
             $table->string('active_facesetToken')->nullable();

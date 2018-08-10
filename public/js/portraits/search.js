@@ -56,14 +56,11 @@ function search() {
     var form = $('#searchForm')[0]; // You need to use standard javascript object here
     var formData = new FormData(form);
 	
-	
     $.ajax({
 		  url : '/portraits/search',
 		  type : 'POST',
 		  dataType : 'json',
-		  //data : {portraitType : 'image_base64', portraitData : portraitData},
 		  data : formData,
-		  //data: {portraitType : 'image_base64', portraitData : portraitData, name: $('[name=name]').val(), dob : $('[name=dob]').val()},
 		  contentType: false,
 		  processData: false,
 		  success: function(data) 
@@ -74,8 +71,9 @@ function search() {
 			  bootbox.alert(data['msg']);
 			  return;
 			}
-		
-      data = data.result;
+
+			data = data.result;
+			
 			var optionValues = [];
 			filteredResultObject = data;
 			
@@ -131,14 +129,13 @@ function make_compiledResult_table() {
                         '<img src="' + record.savedPath + '" style="width:75px;"></img>' +
                       '</a' +
                     '</td>' +
-					'<td>' + record.confidence + '% FUCK</td>' +
-                    '<td>' + record.name + '</td>' +
-                    '<td>' + record.dob + '</td>' +
+					'<td>' + record.confidence + '%</td>' +
+                    '<td>' + record.identifiers + '</td>' +
                   '</tr>'
     }
   }
   else{
-    htmlStr += '<tr><td class="text-center" colspan="4">No portrait matched.</td></tr>';
+    htmlStr += '<tr><td class="text-center" colspan="4">No matches found.</td></tr>';
   }
   $('#searchResultTable tbody').html(htmlStr);
   $('#filteredCountLabel').text('Total count : ' + count)
@@ -160,13 +157,12 @@ function old_make_searchResult_table() {
                       '</a' +
                     '</td>' +
 					'<td>' + record.confidence + '%</td>' +
-                    '<td>' + record.name + '</td>' +
-                    '<td>' + record.dob + '</td>' +
+                    '<td>' + record.identifiers + '</td>' +
                   '</tr>'
     }
   }
   else{
-    htmlStr += '<tr><td class="text-center" colspan="4">No portrait matched.</td></tr>';
+    htmlStr += '<tr><td class="text-center" colspan="4">No matches found.</td></tr>';
   }
   $('#searchResultTable tbody').html(htmlStr);
   $('#filteredCountLabel').text('Total count : ' + count)
@@ -183,7 +179,7 @@ function sortByKey(array, key) {
 function makeResultsTable(data) 
 {
 	var htmlStr = '';
-	var count = data.length - 1;
+	var count = data.length;
 	var record;
 	var savedPath;
   
@@ -192,12 +188,10 @@ function makeResultsTable(data)
 
 	if(count > 0) 
 	{
-		for(i=count; i >= 0; i--) 
+		data.forEach(function(record)
 		{
-			if (data[i] !== "undefined" && data[i].savedPath) {
+			if (record !== "undefined" && record.savedPath) {
 				
-				record = sorted[i];
-
 				htmlStr += '<tr>' + 
 							'<td>' +
 							  '<a href="' + record.savedPath + '" class="fancybox-button" data-rel="fancybox-button">' +
@@ -205,20 +199,17 @@ function makeResultsTable(data)
 							  '</a' +
 							'</td>' +
 							'<td>' + record.confidence + '%</td>' +
-							'<td>' + record.name + '</td>' +
-							'<td>' + record.dob + '</td>' +
+							'<td>' + record.identifiers + '</td>' +
 						  '</tr>'
 			} 
-		}
+		});
 		
 	}
 	else
 	{
-		htmlStr += '<tr><td class="text-center" colspan="4">No portrait matched.</td></tr>';
+		htmlStr += '<tr><td class="text-center" colspan="4">No matches found.</td></tr>';
 	}
   
-	
-	
 	$('#searchResultTable tbody').html(htmlStr);
 	$('#filteredCountLabel').text('Total count : ' + count)
 	handleFancybox()

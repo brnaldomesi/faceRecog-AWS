@@ -13,6 +13,6 @@ class Face extends Model
    * @var array
    */
   protected $fillable = [
-      'faceToken', 'facesetId', 'imageId', 'name', 'dob', 'faceMatches', 'savedPath'
+      'faceToken', 'facesetId', 'imageId', 'identifiers', 'gender', 'faceMatches', 'savedPath'
   ];
 }

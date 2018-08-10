@@ -14,28 +14,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-    	DB::table('organizations')->insert([[
-          'name' => 'org1',
-          'contactName' => '',
+    	DB::table('organizations')->insert([
+          'name' => 'Organization 1',
+          'contactName' => 'org1',
+		  'contactName' => '',
           'contactEmail' => '',
           'contactPhone' => ''
-        ], [
-          'name' => 'org2',
-          'contactName' => '',
-          'contactEmail' => '',
-          'contactPhone' => ''
-      ]]);
+        ]);
 
       DB::table('permissions')->insert([[
           'can_edit_all_users' => 1,
           'can_manage_organization_agreements' => 1,
-          'can_view_logs' => 0,
-          'can_create_case' => 1,
-          'can_edit_case' => 1,
-          'can_view_case' => 1
-      ], [
-          'can_edit_all_users' => 0,
-          'can_manage_organization_agreements' => 0,
           'can_view_logs' => 0,
           'can_create_case' => 1,
           'can_edit_case' => 1,
@@ -45,16 +34,10 @@ class DatabaseSeeder extends Seeder
       DB::table('user_groups')->insert([[
           'name' => 'Admin',
           'permissionId' => 1,
-      ], [
-          'name' => 'Default',
-          'permissionId' => 2,
       ]]);
 
       DB::table('stats')->insert([[
           'organizationId' => 1,
-          'searches' => 0
-      ], [
-          'organizationId' => 2,
           'searches' => 0
       ]]);
 

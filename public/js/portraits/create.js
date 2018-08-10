@@ -35,18 +35,18 @@ function initEvent() {
 
 function validateEnrollForm() {
   if($('#portraitDiv')[0].childElementCount === 0 && !$('[name=csv]').val()) { //Not choose portrait
-    bootbox.alert('Select portrait or csv');
+    bootbox.alert('Manually upload a photo or CSV file for import');
     return false;
   }
 
-  if($('[name=name]').val() === '' && !$('[name=csv]').val()) {
-    bootbox.alert('Fill the name')
-    $('[name=name]').focus()
+  if($('[name=identifiers]').val() === '' && !$('[name=csv]').val()) {
+    bootbox.alert('Please enter some identifiers for this image')
+    $('[name=identifiers]').focus()
     return false;
   }
-  if($('[name=dob]').val() === '' && !$('[name=csv]').val()) {
-    bootbox.alert('Fill the birthday')
-    $('[name=dob]').focus()
+  if($('[name=gender]').val() === '' && !$('[name=csv]').val()) {
+    bootbox.alert('Select a perceived gender')
+    $('[name=gender]').focus()
     return false;
   }
   return true;
@@ -65,6 +65,7 @@ function uploadPortrait() {
     var formData = new FormData(form);
     //formData.append('_token', $("input:hidden[name=_token]").val())
     formData.append('isCsv', $('[name=csv]').val())
+	
     $.ajax({
       url : '/portraits',
       type : 'post',

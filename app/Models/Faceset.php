@@ -14,6 +14,6 @@ class Faceset extends Model
      * @var array
      */
     protected $fillable = [
-        'facesetToken', 'organizationId'
+        'facesetToken', 'organizationId', 'gender'
     ];
 }

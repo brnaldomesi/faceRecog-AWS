@@ -94,14 +94,14 @@ function validateEnrollForm() {
     bootbox.alert('Select portrait');
     return false;
   }
-  if($('[name=name]').val() === '') {
-    bootbox.alert('Fill the name')
-    $('[name=name]').focus()
+  if($('[name=identifiers]').val() === '') {
+    bootbox.alert('Please enter some identifiers for this image')
+    $('[name=identifiers]').focus()
     return false;
   }
-  if($('[name=dob]').val() === '') {
-    bootbox.alert('Fill the birthday')
-    $('[name=dob]').focus()
+  if($('[name=gender]').val() === '') {
+    bootbox.alert('Select a perceived gender')
+    $('[name=gender]').focus()
     return false;
   }
   return true;
@@ -131,7 +131,6 @@ function uploadPortrait() {
       url : '/portraits',
       type : 'post',
       dataType : 'json',
-      //data: {portraitType : 'image_base64', portraitData : portraitData, name: $('[name=name]').val(), dob : $('[name=dob]').val()},
       data: formData,
       contentType: false,
       processData: false,
@@ -271,8 +270,8 @@ function make_searchResult_table() {
                         '<img src="' + savedPath + '" style="height:45px;"></img>' +
                       '</a' +
                     '</td>' +
-                    '<td>' + record.name + '</td>' +
-                    '<td>' + record.dob + '</td>' +
+                    '<td>' + record.identifiers + '</td>' +
+                    '<td>' + record.gender + '</td>' +
                   '</tr>'
     }
   }

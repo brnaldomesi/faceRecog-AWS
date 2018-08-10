@@ -6,9 +6,11 @@ use Illuminate\Http\Request;
 
 use App\Models\Organization;
 use App\Models\User;
+use App\Models\UserLog;
 
 use Auth;
 use Hash;
+use DB;
 
 
 class AdminController extends Controller
@@ -25,7 +27,19 @@ class AdminController extends Controller
 
     public function index(Request $request)
     {
-    	return view('admin.index')->with('users', User::all());
+		// Build our list of users for this organization
+		$users = DB::table('users')
+			->orderBy('name','asc')
+			->where('organizationId',Auth::user()->organizationId)
+			->get();
+			
+		// Build our list of activity log for this organization
+		$activity = DB::table('user_logs')
+			->orderBy('date_time','desc')
+			->join('users','userId', '=', 'users.id')
+			->get();
+		
+		return view('admin.index',compact('users','activity'));
     }
 
     public function user(User $user)
