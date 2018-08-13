@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 
 use App\Utils\Facepp;
 
-define ('MIN_CONFIDENCE', 1);
+define ('MIN_CONFIDENCE', 65);
 define ('TOP_COUNT', 5);
 
 

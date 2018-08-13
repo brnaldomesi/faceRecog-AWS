@@ -221,7 +221,7 @@ class PortraitsController extends Controller
 		$processedFaces = [];
 		
 		// Process the faces as long as we have at least one
-		if(count($faceArray) > 1) 
+		if(count($faceArray) >= 1) 
 		{
 			for ($i=0; $i < $totalCount; $i++) 
 			{
@@ -567,6 +567,8 @@ class PortraitsController extends Controller
 			// Increment our faces
 			Faceset::where('id', $activeFaceset[0]->id)->increment('faces');
 
+			Face::addIntoAlbum($active_facesetToken,$faceToken);
+			
 			$res->status = 200;
 			$res->msg = 'Uploaded successfully.';
 			echo json_encode( $res );
