@@ -37,14 +37,14 @@
     <div id="app">
         <!-- <nav class="navbar navbar-expand-md navbar-light navbar-laravel"> -->
           <!-- BEGIN HEADER -->
-          <div class="page-header" style="height: 50px;">
+          <div class="page-header" style="height: 80px;">
             <!-- BEGIN HEADER TOP -->
             <div class="page-header-top">
               <div class="container">
                 <!-- BEGIN LOGO -->
                 <div class="">
                   <a class="navbar-brand" href="{{ url('/') }}">
-                      {{ config('app.name', 'Face') }}
+						<img src="{{ $_ENV['APP_URL'] }}/img/logo_default.png" style="max-width:150px;">
                   </a>
                 </div>
                 <!-- END LOGO -->
@@ -58,9 +58,6 @@
                     @guest
                         <li>
                             <a href="{{ route('login') }}">{{ __('Login') }}</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('register') }}">{{ __('Register') }}</a>
                         </li>
                     @else
                       <li class="nav-item dropdown">

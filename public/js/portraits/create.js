@@ -1,4 +1,5 @@
 $(document).ready(function () {
+	
   $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -9,6 +10,8 @@ $(document).ready(function () {
 });
 
 function initEvent() {
+	
+	
   $("[name=portraitInput]").on('change', function (e) {
     var file = $(this)[0].files[0];
     var thisObj = this;
@@ -54,7 +57,8 @@ function validateEnrollForm() {
 
 
 function uploadPortrait() {
-
+	
+	
   if(validateEnrollForm()){
 
     Metronic.blockUI({
@@ -63,11 +67,23 @@ function uploadPortrait() {
 
     var form = $('#enrollForm')[0]; // You need to use standard javascript object here
     var formData = new FormData(form);
+	
     //formData.append('_token', $("input:hidden[name=_token]").val())
     formData.append('isCsv', $('[name=csv]').val())
 	
+	var pathArray = window.location.href.split( '/' );
+	
+	var pathStr = '';
+	for (var i = 0; i < pathArray.length - 1; i++)
+	{
+		pathStr = pathStr + pathArray[i];
+		if (i < pathArray.length - 2) {
+			pathStr = pathStr + '/';
+		}
+	}
+
     $.ajax({
-      url : '/portraits',
+      url : pathStr,
       type : 'post',
       dataType : 'json',
       //data: {portraitType : 'image_base64', portraitData : portraitData, name: $('[name=name]').val(), dob : $('[name=dob]').val()},
