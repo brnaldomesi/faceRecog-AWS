@@ -47,8 +47,8 @@
               <div class="container">
                 <!-- BEGIN LOGO -->
                 <div class="page-logo">
-                  <a class="navbar-brand" href="{{ url('/') }}" style="margin-top: 10px;">
-                      {{ config('app.name', 'Face') }}
+                  <a class="navbar-brand" href="{{ url('/') }}">
+						<img src="{{ $_ENV['APP_URL'] }}/img/logo_default.png" style="max-width:150px;">
                   </a>
                 </div>
                 <!-- END LOGO -->

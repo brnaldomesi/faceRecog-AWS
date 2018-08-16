@@ -18,7 +18,7 @@ class CreateFacesetsTable extends Migration
             $table->string('facesetToken');
             $table->tinyInteger('organizationId');
 			$table->string('gender');
-			$table->integer('faces');
+			$table->integer('faces')->default(0);
             $table->timestamps();
         });
     }

@@ -19,7 +19,7 @@ class CreateFacesTable extends Migration
             $table->string('savedPath');
             $table->integer('facesetId');
             $table->string('imageId');
-			$table->string('identifiers');
+			$table->text('identifiers');
 			$table->string('gender');
             $table->integer('faceMatches')->default(0);
             $table->timestamps();
