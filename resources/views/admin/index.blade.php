@@ -20,168 +20,62 @@
   <!-- END PAGE HEAD -->
   <div class="page-content">
     <div class="container">
-      <!-- <div class="row justify-content-center">
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-header">Enroll</div>
 
-            <div class="card-body"> -->
-            <ul class="page-breadcrumb breadcrumb">
-              <li>
-                <a href="{{ route('root') }}">Home</a><i class="fa fa-circle"></i>
-              </li>
-              <li class="active">
-                Admin
-              </li>
-            </ul>
-            <div class="row">
-              {!! Form::open(['method' => 'DELETE', 'class' => 'form-delete form-horizontal']) !!}
-              {!! Form::close() !!}
-              <div class="col-md-12">
-                <!-- BEGIN EXAMPLE TABLE PORTLET-->
-                <div class="portlet light">
-                  <div class="portlet-title">
-                    <div class="caption">
-                      <i class="fa fa-cogs font-green-sharp"></i>
-                      <span class="caption-subject font-green-sharp bold uppercase">User Management</span>
-                    </div>
-                  </div>
-                  <div class="portlet-body">
-                    <div class="table-toolbar">
-                      <div class="row">
-                        <div class="col-md-6">
-                          <div class="btn-group">
-                            <a href="{{ route('admin.create.show') }}" class="btn green">
-                            Add New User
-                            <i class="fa fa-plus"></i>
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <table class="table table-striped table-hover" id="table-user">
-                    <thead>
-                    <tr>
-                      <th>
-                         #
-                      </th>
-                      <th>
-                         User name
-                      </th>
-                      <th>
-                         E-mail
-                      </th>
-                      <th>
-                         Login Count
-                      </th>
-                      <th>
-                         Last Login
-                      </th>
-                      <th>
-                         Action
-                      </th>
-                    </tr>
-                    </thead>
-                    <tbody>
+		<ul class="page-breadcrumb breadcrumb">
+			<li><a href="{{ route('root') }}">Home</a><i class="fa fa-circle"></i></li>
+            <li class="active">Admin</li>
+        </ul>
+        
+		<div class="row">
+			<div class="container text-center">
+			{!! Form::open(['method' => 'DELETE', 'class' => 'form-delete form-horizontal']) !!}
+            {!! Form::close() !!}
+            <div class="col-lg-12 text-center">
+				<div class="tiles">
+					<div class="tile bg-blue">
+						<a href="{{ route('admin.manageusers.show') }}">
+						<div class="tile-body">
+							<i class="fa fa-users"></i>
+						</div>
+						<div class="tile-object">
+							<div class="name">
+								<center>Users</center>
+							</div>
+						</div>
+						</a>
+					</div>
 					
-						@foreach ($users as $key => $user)
-							<tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }}" onClick="javascript:location.href='{{ route('admin.id.show', ['id' => $user->id]) }}';">
-								<td>{{ $key + 1 }}</td>
-              					<td>
-									{{ $user->name }}
-              					</td>
-              					<td>
-									{{ $user->email }}
-              					</td>
-              					<td>
-									{{ $user->loginCount }}
-              					</td>
-              					<td>
-								@php
-									$date = DateTime::createFromFormat("Y-m-d H:i:s",$user->lastlogin);
-									$date = $date->format('d/m/Y H:i:s');
-									echo $date;
-								@endphp
-              					</td>
-								<td>
-									@if (Auth::user()->id != $user->id)
-										<button class="btn btn-danger delete" url="{{ route('admin.id.delete', $user) }}"><i class="fa fa-trash"></i> &nbsp;Delete</button>
-									@endif
-								</td>
-							</tr>
-						@endforeach
-                    </tbody>
-                    </table>
-                  </div>
-                </div>
-                <!-- END EXAMPLE TABLE PORTLET-->
-              </div>
-            </div>
+					<div class="tile bg-blue">
+						<a href="{{ route('admin.sharing.show') }}">
+						<div class="tile-body">
+							<i class="fa fa-sitemap"></i>
+						</div>
+						<div class="tile-object">
+							<div class="name">
+								<center>Data Sharing</center>
+							</div>
+						</div>
+						</a>
+					</div>
+					
+					<div class="tile bg-blue">
+						<a href="{{ route('admin.activity.show') }}">
+						<div class="tile-body">
+							<i class="fa fa-file"></i>
+						</div>
+						<div class="tile-object">
+							<div class="name">
+								<center>Activity Log</center>
+							</div>
+						</div>
+						</a>
+					</div>
+				</div>
+				</div>
+			  </div>
+				
 			
 			
-			<div class="row">
-              <div class="col-md-12">
-                <!-- BEGIN EXAMPLE TABLE PORTLET-->
-                <div class="portlet light">
-                  <div class="portlet-title">
-                    <div class="caption">
-                      <i class="fa fa-cogs font-green-sharp"></i>
-                      <span class="caption-subject font-green-sharp bold uppercase">Activity Log</span>
-                    </div>
-                  </div>
-                  <div class="portlet-body">
-                    <div class="table-toolbar">
-                      <div class="row">
-                        <div class="col-md-6">
-                        </div>
-                      </div>
-                    </div>
-                    <table class="table table-striped table-hover" id="table-activity">
-                    <thead>
-                    <tr>
-                      <th>
-                         #
-                      </th>
-                      <th>
-                         User name
-                      </th>
-                      <th>
-                         Event
-                      </th>
-                      <th>
-                         Date/Time
-                      </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-					
-					<!-- INSERT FOR/EACH STATEMENT TO SHOW ACTIVITY LOG -->
-					@foreach ($activity as $key => $event)
-							<tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }}">
-								<td>{{ $key + 1 }}</td>
-              					<td>
-									{{ $event->name }}
-              					</td>
-              					<td>
-									{{ $event->event }}
-              					</td>
-              					<td>
-								@php
-									$date = DateTime::createFromFormat("Y-m-d H:i:s",$event->date_time);
-									$date = $date->format('d/m/Y H:i:s');
-									echo $date;
-								@endphp
-              					</td>
-							</tr>
-						@endforeach
-					
-                    </tbody>
-                    </table>
-                  </div>
-                </div>
-                <!-- END EXAMPLE TABLE PORTLET-->
-              </div>
-            </div>
             <!-- END PAGE BREADCRUMB -->
             <!-- BEGIN PAGE CONTENT INNER -->
             <!-- END PAGE CONTENT INNER -->
@@ -189,6 +83,7 @@
           </div>
         </div>
       </div> -->
+	  
     </div>
   </div>
 </div>

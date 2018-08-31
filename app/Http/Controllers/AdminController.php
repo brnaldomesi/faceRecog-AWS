@@ -56,6 +56,59 @@ class AdminController extends Controller
             'organization' => Organization::find(Auth::user()->organizationId)->name
         ]);
     }
+	
+	public function activityLog()
+	{
+		// Build our list of activity log for this organization
+		$activity = DB::table('user_logs')
+			->orderBy('date_time','desc')
+			->join('users','userId', '=', 'users.id')
+			->get();
+			
+		return view('admin.activity',compact('activity'));
+	}
+	
+	public function manageUsers()
+    {
+		// Build our list of users for this organization
+		$users = DB::table('users')
+			->orderBy('name','asc')
+			->where('organizationId',Auth::user()->organizationId)
+			->get();
+			
+        return view('admin.users-manage',compact('users'));
+    }
+	
+	public function sharing()
+	{
+		// Get list of Organizations that the User's organization has some sort of sharing status with
+		$sharing = DB::table('faceset_sharing')
+			->where('organization_owner',Auth::user()->organizationId)
+			->get();
+		
+		// Get list of Organizations that are eligible to data share
+		$organizations = DB::table('organizations')
+			->where('id','<>',Auth::user()->organizationId)
+			->get();
+			
+		return view('admin.sharing',compact('sharing','organizations'));
+	}
+	
+	public function sharingedit($id)
+	{
+		// Get the info for this sharing request
+		//$sharing = DB::table('faceset_sharing')
+//			->where('id',$request->id)
+	//		->get();
+	
+		// Get list of Organizations that are eligible to data share
+		$organization = DB::table('organizations')
+			->where('id',$id)
+			->get();
+		
+		return view('admin.sharingedit',compact('organization'));
+		//return view('admin.sharingedit',compact('sharing'));
+	}
 
     public function delete(User $user)
     {

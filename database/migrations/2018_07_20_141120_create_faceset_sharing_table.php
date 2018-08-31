@@ -1,8 +1,10 @@
 <?php
+
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-class CreateCaseSearchesTable extends Migration
+
+class CreateFacesetSharingTable extends Migration
 {
     /**
      * Run the migrations.
@@ -11,15 +13,15 @@ class CreateCaseSearchesTable extends Migration
      */
     public function up()
     {
-        Schema::create('case_searches', function (Blueprint $table) {
+        Schema::create('faceset_sharing', function (Blueprint $table) {
             $table->increments('id');
-            $table->tinyInteger('organizationId');
-            $table->integer('imageId');
-            $table->dateTime('searchedOn');
-            $table->longtext('results');
-            $table->timestamps();
+            $table->tinyInteger('organization_owner');
+			$table->tinyInteger('organization_requestor');
+            $table->dateTime('date_sent');
+			$table->string('status');
         });
     }
+
     /**
      * Reverse the migrations.
      *
@@ -27,6 +29,6 @@ class CreateCaseSearchesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('case_searches');
+        Schema::dropIfExists('faceset_sharing');
     }
 }
