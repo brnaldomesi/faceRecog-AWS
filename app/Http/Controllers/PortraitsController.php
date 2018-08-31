@@ -145,7 +145,7 @@ class PortraitsController extends Controller
 	/*
 	*  Returns the current active Faceset for the specified Gender
 	*  
-	*  Handles the 2000 face limit and creation of new faceset when
+	*  Handles the 500 face limit and creation of new faceset when
 	*  capacity is reached.
 	*/
 	public function getActiveFaceset($gender) {
@@ -157,10 +157,10 @@ class PortraitsController extends Controller
 		// Get our active Faceset for this Organization and Gender
 		$faceset = Faceset::where('organizationId',$organizationId)
 					->where('gender',$gender)
-					->where('faces',"<", "2000")
+					->where('faces',"<", "500")
 					->get();
 					
-		// No matches for this Org/Gender and less than 2000.  Create a new one
+		// No matches for this Org/Gender and less than 500.  Create a new one
 		if($faceset->isEmpty()) 
 		{
 			$facesetIndex = Faceset::where('organizationId',$organizationId)
@@ -187,7 +187,7 @@ class PortraitsController extends Controller
 			// Grab the newly created Faceset data
 			$faceset = Faceset::where('organizationId',$organizationId)
 							->where('gender',$gender)
-							->where('faces',"<", "2000")
+							->where('faces',"<", "500")
 							->get();
 							
 			// Create the directory for the new Faceset Token
