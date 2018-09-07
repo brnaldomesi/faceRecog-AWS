@@ -12,7 +12,13 @@ class UserLog extends Model
    *
    * @var array
    */
+  
   protected $fillable = [
-      'userId', 'date_time', 'event'
+      'userId', 'event', 'ip'
   ];
+
+  public function user()
+  {
+      return $this->belongsTo('App\Models\User', 'userId');
+  }
 }

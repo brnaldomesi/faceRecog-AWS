@@ -18,7 +18,7 @@ class CreateImagesTable extends Migration
             $table->integer('caseId');
             $table->string('filename');
             $table->string('filename_uploaded');
-			$table->string('gender');
+            $table->enum('gender', ['MALE', 'FEMALE'])->default('MALE');
             $table->dateTime('uploaded');
             $table->dateTime('lastSearched')->nullable();
             $table->timestamps();

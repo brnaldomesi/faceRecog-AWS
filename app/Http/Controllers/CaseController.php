@@ -38,8 +38,8 @@ class CaseController extends Controller
 	{
 		$this->middleware('auth');
 		$this->facepp = new Facepp();
-		$this->facepp->api_key = env('FACEPLUS_API_KEY');
-		$this->facepp->api_secret = env('FACEPLUS_API_SECRET');
+		$this->facepp->api_key = config('face.providers.face_plus_plus.api_key');
+		$this->facepp->api_secret = config('face.providers.face_plus_plus.api_secret');
 	}
 
 	/**
@@ -116,10 +116,6 @@ class CaseController extends Controller
 
 	public function addImage(Request $request, Cases $cases)
 	{
-		$organizationId = Auth::user()->organizationId;
-		$organizationName = Organization::find($organizationId)->name;			// Plain text name of account
-		$organizationAccount = Organization::find($organizationId)->account;
-		
 		$file = null;
 
 		if ($cases->status != 'ACTIVE') {
@@ -145,16 +141,13 @@ class CaseController extends Controller
 		$image->uploaded = now();
 		$image->lastSearched = null;
 		$image->save();
-		
-		$path = 'public/cases/images/';
-		$thumbPath = 'public/cases/thumbnails/';
 
-		if (! $file->storeAs($path,$name_upload)) {
+		if (! $file->storeAs('public/case/images', $name_upload)) {
 			return abort(500);
 		}
 
-		Storage::makeDirectory($thumbPath);
-		ImageResize::work('../storage/app/' . $path . $name_upload, 256, 0, '../storage/app/' . $thumbPath . $name_upload);
+		Storage::makeDirectory('public/case/thumbnails');
+		ImageResize::work('../storage/app/' . $image->file_path, 256, 0, '../storage/app/' . $image->thumbnail_path);
 
 		$result = array(
 			'deleteType'    => 'DELETE',
@@ -162,8 +155,8 @@ class CaseController extends Controller
 			'name'          => $name_client,
 			'size'          => $file->getClientSize(),
 			'type'          => $file->getClientMimeType(),
-			'thumbnailUrl'  => '../storage/cases/thumbnails/' .  $name_upload,
-			'url'           => '../storage/cases/images/' . $name_upload
+			'thumbnailUrl'  => asset($image->thumbnail_url),
+			'url'           => asset($image->file_url)
 		);
 		
 		return response()->json(['files' => [$result]]);
@@ -188,8 +181,8 @@ class CaseController extends Controller
 
 		$result = $cases->images->map(function ($item, $key) {
 			return [
-				asset('/storage/cases/images/'.$item->file_url),
-				asset('/storage/cases/thumbnails/'.$item->thumbnail_url),
+				asset($item->file_url),
+				asset($item->thumbnail_url),
 				$item->filename,
 				$item->lastSearched,
 				$item->id
@@ -209,9 +202,8 @@ class CaseController extends Controller
 		}
 
 		$gender = $image->gender;
-			
 		$organ_id = Auth::user()->organizationId;
-		$result = FaceSearch::search('../storage/app/public/cases/images/' . $image->file_path, $organ_id, $gender);
+		$result = FaceSearch::search('../storage/app/' . $image->file_path, $organ_id, $gender);
 
 		$image->lastSearched = now();
 		$image->save();
