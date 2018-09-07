@@ -17,4 +17,9 @@ class Cases extends Model
     {
     	return $this->hasManyThrough('App\Models\CaseSearch', 'App\Models\Image', 'caseId', 'imageId');
     }
+
+    public function organization()
+    {
+        return $this->belongsTo('App\Models\Organization', 'organizationId');
+    }
 }

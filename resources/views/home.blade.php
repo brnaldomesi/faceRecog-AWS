@@ -24,6 +24,15 @@
           Dashboard
         </li>
       </ul>
+  @if (Auth::user()->permission->isAdmin() && $appCount > 0)
+    @if ($appCount == 1)
+      <div class="alert alert-danger">
+        <strong>You received new sharing application. </strong> Click <a href="{{ url('/admin/sharing') }}">here</a> to go see and approve / decline it.</div>
+    @else
+      <div class="alert alert-danger">
+        <strong>You received {{ $appCount }} new sharing applications. </strong> Click <a href="{{ url('/admin/sharing') }}">here</a> to go see and approve / decline them.</div>
+    @endif
+  @endif
       <div class="row">
 		    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 margin-bottom-10">
           <a class="dashboard-stat dashboard-stat-light blue-madison" href="javascript:;">

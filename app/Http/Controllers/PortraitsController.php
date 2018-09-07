@@ -34,8 +34,8 @@ class PortraitsController extends Controller
     {
         $this->middleware('auth');
         $this->facepp = new Facepp();
-        $this->facepp->api_key = env('FACEPLUS_API_KEY');
-        $this->facepp->api_secret = env('FACEPLUS_API_SECRET');
+        $this->facepp->api_key = config('face.providers.face_plus_plus.api_key');
+		$this->facepp->api_secret = config('face.providers.face_plus_plus.api_secret');
     }
 
     /**
@@ -50,7 +50,7 @@ class PortraitsController extends Controller
 	  // Get the organizationID for the logged in user
       $organizationId = Auth::user()->organizationId;
       
-      $result = FaceSearch::search($request->searchPortraitInput->getPathName(), $organizationId, 'MANUAL_SEARCH');
+      $result = FaceSearch::search($request->searchPortraitInput->getPathName(), $organizationId, null, 'MANUAL_SEARCH');
       return json_encode($result);
     }
 
@@ -394,7 +394,9 @@ class PortraitsController extends Controller
 					$lineCount++;
 					
 					// Checks to make sure there is at least one row of data before we process.
-					if(count($csvLine) > 1 && ($csvLine[2] == 'M' || $csvLine[2] == 'F')) 
+					$csvLine[2] = ($csvLine[2] == "M") ? "MALE" : "FEMALE";
+
+					if (count($csvLine) > 1 && ($csvLine[2] == 'MALE' || $csvLine[2] == 'FEMALE')) 
 					{
 						fwrite($log,"Importing mugshot [Line " . $lineCount . " @ " . date("h:i:sa") . "]...\n");
 						
@@ -449,7 +451,7 @@ class PortraitsController extends Controller
 								
 								// Store the image to the file system until it is processed and assigned
 								// a Faceset
-								$path = 'face/' . $organizationAccount . "/" . $csvLine[2] . "/" . $faceToken . "." . $ext;
+								$path = 'face/' . $organizationAccount . "/" . $csvLine[2] . "/" . $faceToken;
 								
 								fwrite($log,"Face Token " . $faceToken . "\n");
 								fwrite($log,"Storing at " . $path . "\n");

@@ -2,9 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use Auth;
 use Closure;
 
-class Admin
+class Authen
 {
     /**
      * Handle an incoming request.
@@ -15,10 +16,12 @@ class Admin
      */
     public function handle($request, Closure $next)
     {
-        $user = $request->user();
-        if ($user && $user->permission->isAdmin()) {
-            return $next($request);
-        }
-        return redirect()->route('root');
+        if (!Auth::check()) {
+			
+            $request->session()->flash('message', 'inactive');
+            return redirect()->route('login');
+          
+          }
+        return $next($request);
     }
 }
