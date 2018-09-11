@@ -37,7 +37,7 @@ class Facepp
     public function execute($method, array $params)
     {
         if( ! $this->apiPropertiesAreSet()) {
-            throw new Exception('API properties are not set');
+            throw new \Exception('API properties are not set');
         }
 
         $params['api_key']      = $this->api_key;
@@ -61,20 +61,20 @@ class Facepp
 		$concurrencyErrorMsg = 'CONCURRENCY_LIMIT_EXCEEDED';
         $response = false;
         
-		while($response === false || $concurrencyErrorMsg === 'CONCURRENCY_LIMIT_EXCEEDED' || $err) 
+		while ($response === false || $concurrencyErrorMsg === 'CONCURRENCY_LIMIT_EXCEEDED' || $err) 
 		{
 			$response = curl_exec($curl);
 			$err = curl_error($curl);
           
 			$jsonRes = json_decode( $response );
 			
-			if(isset($jsonRes->error_message)) 
+			if (isset($jsonRes->error_message)) 
 			{
 				$concurrencyErrorMsg = $jsonRes->error_message;
 			}
 			else 
 			{
-				if($response){
+				if ($response) {
 					$concurrencyErrorMsg = 'No Concurrency error';
 				}
 			}

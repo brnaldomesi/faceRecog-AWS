@@ -10,22 +10,22 @@ class Image extends Model
 
     public function getFilePathAttribute()
     {
-    	return $this->filename_uploaded;
+    	return 'public/case/images/' . $this->filename_uploaded;
     }
 
     public function getThumbnailPathAttribute()
     {
-    	return $this->filename_uploaded;
+    	return 'public/case/thumbnails/' . $this->filename_uploaded;
     }
 
     public function getFileUrlAttribute()
     {
-        return $this->filename_uploaded;
+        return 'storage/case/images/' . $this->filename_uploaded;
     }
 
     public function getThumbnailUrlAttribute()
     {
-        return $this->filename_uploaded;
+        return 'storage/case/thumbnails/' . $this->filename_uploaded;
     }
 
     public function cases()

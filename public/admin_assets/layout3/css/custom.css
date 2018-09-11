@@ -17,3 +17,31 @@ Rounded Portlets
 	border-radius: 0px 0px 4px 4px !important;
 }
 */
+
+.center-tile {
+	margin-top: 100px;
+	display: inline-flex;
+}
+
+.center-tile .tile {
+	display: inline-block;
+}
+
+.center-tile .tile .tile-object {
+	color: white;
+}
+
+.label-default.hover:hover {
+	cursor: pointer;
+	background-color: grey;
+}
+
+.label-info.hover:hover {
+	cursor: pointer;
+	background-color: rgb(28, 125, 163);
+}
+
+.label-danger.hover:hover {
+	cursor: pointer;
+	background-color: rgb(204, 6, 6);
+}

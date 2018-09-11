@@ -98,11 +98,7 @@
 									{{ $user->loginCount }}
               					</td>
               					<td>
-								@php
-									$date = DateTime::createFromFormat("Y-m-d H:i:s",$user->lastlogin);
-									$date = $date->format('d/m/Y H:i:s');
-									echo $date;
-								@endphp
+                  {{ Carbon\Carbon::parse($user->lastlogin)->format("d/m/Y H:i:s") }}
               					</td>
 								<td>
 									@if (Auth::user()->id != $user->id)

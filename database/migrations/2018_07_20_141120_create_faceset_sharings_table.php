@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFacesetSharingTable extends Migration
+class CreateFacesetSharingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateFacesetSharingTable extends Migration
      */
     public function up()
     {
-        Schema::create('faceset_sharing', function (Blueprint $table) {
+        Schema::create('faceset_sharings', function (Blueprint $table) {
             $table->increments('id');
             $table->tinyInteger('organization_owner');
 			$table->tinyInteger('organization_requestor');
-            $table->dateTime('date_sent');
-			$table->string('status');
+            $table->enum('status', ['ACTIVE', 'PENDING', 'DECLINED'])->default('PENDING');
+            $table->timestamps();
         });
     }
 
@@ -29,6 +29,6 @@ class CreateFacesetSharingTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('faceset_sharing');
+        Schema::dropIfExists('faceset_sharings');
     }
 }

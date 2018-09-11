@@ -3,6 +3,7 @@
 @section('extracss')
 	<link href="{{ asset('global/plugins/select2/select2.css') }}" rel="stylesheet">
   <link href="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css') }}" rel="stylesheet">
+  <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -73,20 +74,16 @@
 					
 					<!-- INSERT FOR/EACH STATEMENT TO SHOW ACTIVITY LOG -->
 					@foreach ($activity as $key => $event)
-							<tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }}">
+							<tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }} {{ strtoupper($event->event) == 'LOGIN FAILED' ? 'text-danger text-bold' : 'text-normal' }}">
 								<td>{{ $key + 1 }}</td>
               					<td>
-									{{ $event->name }}
+									{{ $event->user->name }}
               					</td>
               					<td>
 									{{ $event->event }}
               					</td>
               					<td>
-								@php
-									$date = DateTime::createFromFormat("Y-m-d H:i:s",$event->date_time);
-									$date = $date->format('d/m/Y H:i:s');
-									echo $date;
-								@endphp
+									{{ $event->updated_at->format("d/m/Y H:i:s") }}
               					</td>
 							</tr>
 						@endforeach
