@@ -29,21 +29,11 @@ class DatabaseSeeder extends Seeder
           'can_create_case' => 1,
           'can_edit_case' => 1,
           'can_view_case' => 1
-      ], [
-        'can_edit_all_users' => 0,
-        'can_manage_organization_agreements' => 0,
-        'can_view_logs' => 0,
-        'can_create_case' => 1,
-        'can_edit_case' => 1,
-        'can_view_case' => 1
       ]]);
 
       DB::table('user_groups')->insert([[
           'name' => 'Admin',
           'permissionId' => 1,
-        ], [
-          'name' => 'User',
-          'permissionId' => 2,
       ]]);
 
       DB::table('stats')->insert([[

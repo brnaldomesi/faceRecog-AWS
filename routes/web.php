@@ -26,7 +26,7 @@ Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 Route::get('register', 'Auth\RegisterController@showRegisterForm')->name('register');
 Route::post('register', 'Auth\RegisterController@register');
 
-Route::group(['middleware' => ['authen']], function () {
+Route::group(['middleware' => ['auth']], function () {
 
 	// Password Reset Routes...
 	Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
@@ -39,9 +39,8 @@ Route::group(['middleware' => ['authen']], function () {
 		Route::post('/admin', 'AdminController@create')->name('admin.create');
 		Route::get('/admin/manageusers', 'AdminController@manageUsers')->name('admin.manageusers.show');
 		Route::get('/admin/activity','AdminController@activityLog')->name('admin.activity.show');
-		Route::get('/admin/sharing','AdminController@sharingForm')->name('admin.sharing.show');
-		Route::put('/admin/sharing','AdminController@sharing')->name('admin.sharing.update');
-		// Route::get('/admin/sharing/edit/{organization}','AdminController@sharingedit')->name('admin.sharingedit.show');
+		Route::get('/admin/sharing','AdminController@sharing')->name('admin.sharing.show');
+		Route::get('/admin/sharing/edit/{organization}','AdminController@sharingedit')->name('admin.sharingedit.show');
 		Route::get('/admin/create', 'AdminController@createForm')->name('admin.create.show');
 		Route::get('/admin/{user}', 'AdminController@user')->name('admin.id.show');
 		Route::put('/admin/{user}', 'AdminController@update')->name('admin.id.update');
@@ -54,7 +53,7 @@ Route::group(['middleware' => ['authen']], function () {
 	Route::post('/portraits', 'PortraitsController@store');
 	Route::post('/portraits/search', 'PortraitsController@search')->name('search.file');
 
-	// Case
+	//Case
 
 	Route::get('/cases', 'CaseController@index')->name('cases.show');
 

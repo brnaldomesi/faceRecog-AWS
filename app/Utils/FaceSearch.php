@@ -4,8 +4,8 @@ namespace App\Utils;
 
 use App\Models\Face as FaceModel;
 use App\Models\Organization;
-use App\Models\FacesetSharing;
 use App\Models\Faceset;
+
 
 use Illuminate\Support\Facades\Crypt;
 
@@ -13,6 +13,7 @@ use App\Utils\Facepp;
 
 define ('MIN_CONFIDENCE', 65);
 define ('TOP_COUNT', 5);
+
 
 class FaceSearch
 {
@@ -24,14 +25,11 @@ class FaceSearch
 	 * @param  string $response_type
 	 *				'MANUAL_SEARCH' : used in Search(Legacy) page which searches for manually uploaded file (LEGACY)
 	 *				'CASE_SEARCH' : used in Case page which searches for case image file
-	 * @param  bool $faceset_after
-	 * 				null : performs search for all facesets for organization
-	 * 				not null : performs search for facesets that was updated after $last_search_date 
 	 *
 	 * @return void
 	 */
 
-	public static function search($search_file_path, $organ_id, $gender, $response_type = 'CASE_SEARCH', $faceset_after = null) {
+	public static function search($search_file_path, $organ_id, $gender, $response_type = 'CASE_SEARCH') {
 
 		// Increment our search count for the organization
 		$log = fopen("debug.txt","a");
@@ -43,8 +41,8 @@ class FaceSearch
 		ini_set('max_execution_time', 300);
 		
 		$facepp = new Facepp();
-		$facepp->api_key = config('face.providers.face_plus_plus.api_key');
-        $facepp->api_secret = config('face.providers.face_plus_plus.api_secret');
+		$facepp->api_key = env('FACEPLUS_API_KEY');
+        $facepp->api_secret = env('FACEPLUS_API_SECRET');
 
 		$noError = false;
 		
@@ -56,16 +54,7 @@ class FaceSearch
 		// **NOTE:
 		// We will need to expand this so the search will also grab Facesets for other organizations that opted-in to sharing their Faceset data.
 
-		$organization = FacesetSharing::where([
-				['organization_owner', $organ_id], ['status', 'ACTIVE']
-			])
-			->get()->pluck('organization_requestor')->push($organ_id);
-
-		$faceSets = Faceset::whereIn('organizationId', $organization)
-			->when(!is_null($gender), function ($query, $gender) {
-				return $query->where('gender', $gender);
-			})
-			->get();
+		$faceSets = Faceset::select('id', 'facesetToken')->where('organizationId', $organ_id)->where('gender',$gender)->get();
 		
 		fwrite($log,"**FaceSets**\n".$faceSets ."\n\n");
 
@@ -74,10 +63,8 @@ class FaceSearch
 		$results = [];
 		
 		// Loop through our facesets and find matches
+
 		for ($i = 0; $i < count($faceSets); $i++) {
-			if (!is_null($faceset_after) && $faceSets[$i]->updated_at < $faceset_after) {
-				continue;
-			}
 
 			$faceSetId = $faceSets[$i]->id;
 			$facesCount = FaceModel::where('facesetId', $faceSetId)->count();
@@ -87,7 +74,7 @@ class FaceSearch
 			
 			fwrite($log,"Checking Faceset " . $faceSets[$i]->facesetToken ."\n\n");
 			
-			$return_result_count = min($facesCount, TOP_COUNT);
+			$return_result_count = $facesCount < TOP_COUNT ? $facesCount : TOP_COUNT;
 
 			$params['return_result_count'] = $return_result_count;
 			$params['faceset_token'] = $faceSets[$i]->facesetToken;
@@ -161,7 +148,7 @@ class FaceSearch
 					}
 				}
 			
-				if ($response_type == 'CASE_SEARCH' && count($resultPer_faceSet) > 0) {
+				if ($response_type == 'CASE_SEARCH') {
 					array_push($results, $resultPer_faceSet);
 				}
 				// $res['status'] = 200;

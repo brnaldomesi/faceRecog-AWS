@@ -30,6 +30,18 @@ var FormFileUpload = function () {
                 }
             });
 
+            // Upload server status check for browsers with CORS support:
+            if ($.support.cors) {
+                $.ajax({
+                    type: 'HEAD'
+                }).fail(function () {
+                    $('<div class="alert alert-danger"/>')
+                        .text('Upload server currently unavailable - ' +
+                                new Date())
+                        .appendTo('#enrollForm');
+                });
+            }
+
             // Load & display existing files:
             $('#enrollForm').addClass('fileupload-processing');
             $.ajax({

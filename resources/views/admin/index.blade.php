@@ -30,15 +30,17 @@
 			<div class="container text-center">
 			{!! Form::open(['method' => 'DELETE', 'class' => 'form-delete form-horizontal']) !!}
             {!! Form::close() !!}
-
-				<div class="tiles center-tile">
+            <div class="col-lg-12 text-center">
+				<div class="tiles">
 					<div class="tile bg-blue">
 						<a href="{{ route('admin.manageusers.show') }}">
 						<div class="tile-body">
 							<i class="fa fa-users"></i>
 						</div>
 						<div class="tile-object">
+							<div class="name">
 								<center>Users</center>
+							</div>
 						</div>
 						</a>
 					</div>
@@ -49,7 +51,9 @@
 							<i class="fa fa-sitemap"></i>
 						</div>
 						<div class="tile-object">
+							<div class="name">
 								<center>Data Sharing</center>
+							</div>
 						</div>
 						</a>
 					</div>
@@ -60,12 +64,14 @@
 							<i class="fa fa-file"></i>
 						</div>
 						<div class="tile-object">
+							<div class="name">
 								<center>Activity Log</center>
+							</div>
 						</div>
 						</a>
 					</div>
 				</div>
-
+				</div>
 			  </div>
 				
 			

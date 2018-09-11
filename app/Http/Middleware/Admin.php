@@ -16,7 +16,7 @@ class Admin
     public function handle($request, Closure $next)
     {
         $user = $request->user();
-        if ($user && $user->permission->isAdmin()) {
+        if ($user && $user->permission->can_edit_all_users) {
             return $next($request);
         }
         return redirect()->route('root');

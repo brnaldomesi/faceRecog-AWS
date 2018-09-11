@@ -3,14 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 
 use App\Models\Organization;
-use App\Models\FacesetSharing;
 use App\Models\User;
 use App\Models\UserLog;
-
-use App\Mail\Notify;
 
 use Auth;
 use Hash;
@@ -19,9 +15,31 @@ use DB;
 
 class AdminController extends Controller
 {
+    //
+
+	public function __construct()
+	{
+/*		dd(Auth::user());
+		if (!Auth::user()->permission->can_edit_all_users) {
+			return abort(401);
+		}*/
+	}
+
     public function index(Request $request)
-    {		
-		return view('admin.index');
+    {
+		// Build our list of users for this organization
+		$users = DB::table('users')
+			->orderBy('name','asc')
+			->where('organizationId',Auth::user()->organizationId)
+			->get();
+			
+		// Build our list of activity log for this organization
+		$activity = DB::table('user_logs')
+			->orderBy('date_time','desc')
+			->join('users','userId', '=', 'users.id')
+			->get();
+		
+		return view('admin.index',compact('users','activity'));
     }
 
     public function user(User $user)
@@ -42,87 +60,38 @@ class AdminController extends Controller
 	public function activityLog()
 	{
 		// Build our list of activity log for this organization
-		$activity = UserLog::whereHas('user', function ($query) {
-			$query->where('organizationId', Auth::user()->organizationId);
-		})->with('user')->orderBy('updated_at', 'desc')->get();
-
+		$activity = DB::table('user_logs')
+			->orderBy('date_time','desc')
+			->join('users','userId', '=', 'users.id')
+			->get();
+			
 		return view('admin.activity',compact('activity'));
 	}
 	
 	public function manageUsers()
     {
 		// Build our list of users for this organization
-		$users = User::orderBy('name', 'asc')
-			->where('organizationId', Auth::user()->organizationId)
+		$users = DB::table('users')
+			->orderBy('name','asc')
+			->where('organizationId',Auth::user()->organizationId)
 			->get();
+			
         return view('admin.users-manage',compact('users'));
     }
 	
-	public function sharing(Request $request)
-	{
-		if (Organization::find($request->organization)) {
-			switch ($request->action_type) {
-				case 'action-apply':
-					$sharing = FacesetSharing::where([
-						['organization_owner', $request->user()->organizationId],
-						['organization_requestor', $request->organization]
-					])->first();
-					if (!$sharing) {
-						$sharing = new FacesetSharing();
-						$sharing->organization_owner = $request->user()->organizationId;
-						$sharing->organization_requestor = $request->organization;
-					}
-					$sharing->status = 'PENDING';
-					$sharing->save();
-					
-					$organization = Organization::find($request->user()->organizationId);
-					if (isset($organization)) {
-						$link = url('/admin/sharing');
-						$text = $organization->name . " has requested to share mug shot data to you.";
-						$text .= "<br>Please go see and approve or decline the request.";
-						$text .= "<br>Time : " . now();
-						$text .= "<br><a href='{$link}'>{$link}</a>";
-						$from = $request->user()->email;
-						$subject = "New sharing application";
-						
-						Mail::to($organization->contactEmail)
-							->queue(new Notify($from, $subject, $text));
-					}
-					break;
-
-				case 'action-approve':
-				case 'action-decline':
-					$sharing = FacesetSharing::where([
-						['organization_requestor', Auth::user()->organizationId],
-						['organization_owner', $request->organization]
-					])->first();
-					if ($sharing) {
-						$sharing->status = $request->action_type == 'action-approve' ? 'ACTIVE' : 'DECLINED';
-						$sharing->save();
-					}
-					break;
-			}
-		}
-		return redirect()->route('admin.sharing.show');
-	}
-
-	public function sharingForm()
+	public function sharing()
 	{
 		// Get list of Organizations that the User's organization has some sort of sharing status with
-		$sharing_out = FacesetSharing::where('organization_owner',Auth::user()->organizationId)
+		$sharing = DB::table('faceset_sharing')
+			->where('organization_owner',Auth::user()->organizationId)
 			->get();
 		
 		// Get list of Organizations that are eligible to data share
-		$organizations = Organization::where('id','<>',Auth::user()->organizationId)
-			->get();
-		
-		// Get list of Organizations who have sent sharing request to the User
-		$sharing_in = FacesetSharing::with(['owner', 'requestor'])
-			->where('organization_requestor', Auth::user()->organizationId)
-			->orderBy('status', 'desc')
+		$organizations = DB::table('organizations')
+			->where('id','<>',Auth::user()->organizationId)
 			->get();
 			
-		return view('admin.sharing',compact('sharing_out', 'organizations', 'sharing_in'));
+		return view('admin.sharing',compact('sharing','organizations'));
 	}
 	
 	public function sharingedit($id)

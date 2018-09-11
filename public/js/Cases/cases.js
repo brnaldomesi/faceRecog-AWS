@@ -8,10 +8,6 @@ function initEvent() {
 		$("#enrollForm table tbody").empty();
 	});
 
-	$('#enrollForm').bind('fileuploadsubmit', function (e, data) {
-		data.formData = data.context.find('select').serializeArray();
-	});
-
 	$.ajaxSetup({
 		headers: {
 		  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
@@ -228,11 +224,10 @@ function initEvent() {
 			cenrerY: true,
 		});
 		
-		$.ajax({
-			url: $("#hidden-search-url").val(),
-			type: 'post',
-			data: { 'image' : $(this).attr('image-no') },
-			success: function (response) {
+		$.post(
+			$("#hidden-search-url").val(),
+			{ 'image' : $(this).attr('image-no') },
+			function (response) {
 
 				var last_index = table_search_history.data().length;
 				var match_count = showSearchResultDialog(response, needle_image_src);
@@ -245,12 +240,8 @@ function initEvent() {
 					response.time,
 					match_count
 				]).draw().node()).attr('history-no', response.history_no);
-			},
-			error: function (jqXHR, status, error) {
-				Metronic.unblockUI();
-				bootbox.alert(status + "<br>" + error);
 			}
-		});
+		);
 	});
 }
 

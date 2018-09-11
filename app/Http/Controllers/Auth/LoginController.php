@@ -5,14 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Mail;
 
 use App\Models\User;
-use App\Models\UserLog;
-use App\Models\Organization;
-
-use App\Mail\Notify;
+use App\Models\UserLog as UserLog;
 
 class LoginController extends Controller
 {
@@ -27,9 +22,7 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers {
-        sendFailedLoginResponse as superSendFailedLoginResponse;
-    }
+    use AuthenticatesUsers;
 
     /**
      * Where to redirect users after login.
@@ -57,35 +50,8 @@ class LoginController extends Controller
 		// Insert this login into the UserLog table
 		UserLog::create([
 		  'userId' => $user->id,
-          'event' => 'Login',
-          'ip' => $request->ip()
+		  'date_time' => now(),
+		  'event' => 'Login'
 		]);
-    }
-
-    public function sendFailedLoginResponse(Request $request)
-    {
-        $user = User::where('email', $request->email)->first();
-        if (!is_null($user)) {
-            UserLog::create([
-                'userId' => $user->id,
-                'event' => 'Login failed',
-                'ip' => $request->ip()
-            ]);
-            
-            $organization = Organization::find($user->organizationId);
-            if (isset($organization)) {
-                $link = url('/admin/activity');
-                $text = $user->email . "({$user->name}) has failed to log in.";
-                $text .= "<br>Please click below link to go see.";
-                $text .= "<br><a href='{$link}'>{$link}</a>";
-                $from = $user->email;
-                $subject = "Login failure";
-                
-                Mail::to($organization->contactEmail)
-                    ->queue(new Notify($from, $subject, $text));
-            }
-        }
-            
-        $this->superSendFailedLoginResponse($request);
     }
 }

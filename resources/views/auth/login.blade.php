@@ -8,9 +8,6 @@
                 <div class="card-header">{{ __('Login') }}</div>
 
                 <div class="card-body">
-                @if (Session::has('inactive'))
-                    <p>Sorry, you are logged out because you have been inactive for 30 minutes.</p>
-                @endif
                     <form method="POST" action="{{ route('login') }}" aria-label="{{ __('Login') }}">
                         @csrf
 
