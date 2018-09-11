@@ -44,7 +44,7 @@
                 <!-- BEGIN LOGO -->
                 <div class="">
                   <a class="navbar-brand" href="{{ url('/') }}">
-						<img src="{{ $_ENV['APP_URL'] }}/img/logo_default.png" style="max-width:150px;">
+						<img src="{{ url('/img/logo_default.png') }}" style="max-width:150px;">
                   </a>
                 </div>
                 <!-- END LOGO -->

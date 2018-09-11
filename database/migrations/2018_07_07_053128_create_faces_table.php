@@ -20,7 +20,7 @@ class CreateFacesTable extends Migration
             $table->integer('facesetId');
             $table->string('imageId');
 			$table->text('identifiers');
-			$table->string('gender');
+            $table->enum('gender', ['MALE', 'FEMALE'])->default('MALE');
             $table->integer('faceMatches')->default(0);
             $table->timestamps();
         });
