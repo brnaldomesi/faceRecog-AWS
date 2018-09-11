@@ -77,8 +77,8 @@
                   <div class="col-md-6">
 					<select class="form-control" name="gender">
 						<option value="">Select One</option>
-						<option value="MALE">Male</option>
-						<option value="FEMALE">Female</option>
+						<option name="M" value="M">Male</option>
+						<option name="F" value="F">Female</option>
 					</select>
                   </div>
                 </div>

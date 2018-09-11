@@ -8,11 +8,9 @@ Home Screen once the user is logged in
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Organization;
 use App\Models\Stat;
 use App\Models\Cases;
-use App\Models\FacesetSharing;
 
 use Auth;
 
@@ -47,16 +45,10 @@ class HomeController extends Controller
 		$cases = Cases::where('userId',$userId)->get();
 		$caseCount = $cases->count();
 		
-        // Retrieve the # of searches that have been performed by this organization
+		// Retrieve the # of searches that have been performed by this organization
 		$searchCount = Organization::find($organizationId)->stat->searches;
-        
-        // Retrieve the # of pending applications that was sent to this user
-        $appCount = FacesetSharing::where([
-            ['organization_requestor', Auth::user()->organizationId],
-            ['status', 'PENDING']
-        ])->count();
-        
-        // Send the totals back to the home view so we can display the data to the user
-        return view('home', compact('caseCount', 'facesCount', 'searchCount', 'appCount'));
+		
+		// Send the totals back to the home view so we can display the data to the user
+        return view('home',['caseCount' => $caseCount, 'facesCount' => $facesCount, 'searchCount' => $searchCount]);
     }
 }

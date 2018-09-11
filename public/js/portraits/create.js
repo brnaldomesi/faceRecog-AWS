@@ -93,10 +93,6 @@ function uploadPortrait() {
       success: function(data) {
         Metronic.unblockUI();
         bootbox.alert(data.msg);
-      },
-      error: function (jqXHR, status, error) {
-        Metronic.unblockUI();
-        bootbox.alert(status + "<br>" + error);
       }
     });
   }

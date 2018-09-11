@@ -228,8 +228,8 @@
 							{{ $key + 1 }}
 						</td>
 						<td>
-							<a href="{{ asset($value->image->file_url) }}" class="fancybox-button" data-rel="fancybox-button">
-								<img src="{{ asset($value->image->thumbnail_url) }}" style="width:96px"/>
+							<a href="{{ asset('storage/cases/images/' . $value->image->file_url) }}" class="fancybox-button" data-rel="fancybox-button">
+								<img src="{{ asset('storage/cases/images/' . $value->image->thumbnail_url) }}" style="width:96px"/>
 								{{-- <div>{{ $value->image->filename }}</div> --}}
 							</a>
 						</td>
@@ -277,23 +277,15 @@
         <td>
             <span class="preview"></span>
         </td>
-        <td>
-            <p class="name">{%=file.name%}</p>
-		<select name="gender" id="gender">
-			<option value="MALE">Male</option>
-			<option value="FEMALE">Female</option>
-		</select>
-            <strong class="error text-danger label label-danger"></strong>
-        </td>
-        <td>
-            <p class="size">Processing...</p>
-            <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-            <div class="progress-bar progress-bar-success" style="width:0%;"></div>
-            </div>
-        </td>
+		<td>
+			<select name="gender" id="gender">
+				<option value="M">Male</option>
+				<option value="F">Female</option>
+			</select>
+		</td>
         <td>
             {% if (!i && !o.options.autoUpload) { %}
-                <button class="btn blue start" disabled>
+                <button class="btn blue start" disabled onclick"">
                     <i class="fa fa-upload"></i>
                     <span>Start</span>
                 </button>
@@ -307,6 +299,8 @@
         </td>
     </tr>
 {% } %}
+
+
 </script>
 <!-- The template to display files available for download -->
 <script id="template-download" type="text/x-tmpl">
@@ -319,6 +313,8 @@
                         {% } %}
                     </span>
                 </td>
+				<td>
+				</td>
                 <td>
                     <p class="name">
                         {% if (file.url) { %}
@@ -376,4 +372,5 @@
 
 <script src="{{ asset('admin_assets/pages/scripts/form-fileupload.js') }}" type="text/javascript"></script>
   <script type="text/javascript" src="{{ asset('js/cases/cases.js') }}"></script>
+
 @endsection

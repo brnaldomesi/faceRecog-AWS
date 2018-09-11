@@ -48,7 +48,7 @@
                 <!-- BEGIN LOGO -->
                 <div class="page-logo">
                   <a class="navbar-brand" href="{{ url('/') }}">
-						<img src="{{ url('/img/logo_default.png') }}" style="max-width:150px;">
+						<img src="{{ $_ENV['APP_URL'] }}/img/logo_default.png" style="max-width:150px;">
                   </a>
                 </div>
                 <!-- END LOGO -->
@@ -124,7 +124,7 @@
                         <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == ''){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/portraits') }}">{{ __('Search') }}</a>
                         </li>
-              @if (Auth::user()->permission->isAdmin())
+              @if (Auth::user()->permission->can_edit_all_users)
                         <li class="nav-item @if(Request::segment(1) == 'admin'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/admin') }}">{{ __('Admin') }}</a>
                         </li>
