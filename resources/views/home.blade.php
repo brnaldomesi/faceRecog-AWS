@@ -27,10 +27,10 @@
   @if (Auth::user()->permission->isAdmin() && $appCount > 0)
     @if ($appCount == 1)
       <div class="alert alert-danger">
-        <strong>You received new sharing application. </strong> Click <a href="{{ url('/admin/sharing') }}">here</a> to go see and approve / decline it.</div>
+        <strong>You have a new request to share mugshot data. Click <a href="{{ url('/admin/sharing') }}">here</a> to manage your requests.</div>
     @else
       <div class="alert alert-danger">
-        <strong>You received {{ $appCount }} new sharing applications. </strong> Click <a href="{{ url('/admin/sharing') }}">here</a> to go see and approve / decline them.</div>
+        <strong>You received {{ $appCount }} new requests to share mugshot data. Click <a href="{{ url('/admin/sharing') }}">here</a> to manage your requests.</div>
     @endif
   @endif
       <div class="row">

@@ -374,6 +374,8 @@ class PortraitsController extends Controller
 			$header = true; // CSV file has a header line
 			$faceInfoArray = [];
 			$faceIdArray = [];
+			$faceArray = [];
+			
 			$lineCount = 0;
 
 			// Open the CSV file
@@ -404,6 +406,7 @@ class PortraitsController extends Controller
 
 						// Grabs the URL for the image out of the CSV row
 						$params['image_url'] = $csvLine[0];
+						$params['return_attributes'] = 'headpose';
 						
 						fwrite($log,$params['image_url'] . "\n");
 
@@ -437,34 +440,48 @@ class PortraitsController extends Controller
 							// The API found a face in the image.  Let's process it
 							if(count($detectApiCallResult->faces) > 0) 
 							{
-								// Unique ID for the uploaded image
-								$imageId =  $detectApiCallResult->image_id;
-						
-								// Face Token for the detected face
-								$faceToken =  $detectApiCallResult->faces[0]->face_token;
+								// Check the yaw_angle to be sure it's  between -25 and 25
+								// Anything else means the person in the mugshot is not looking
+								// very straight resulting in poor quality.
+								$yaw_angle = $detectApiCallResult->faces[0]->attributes->headpose->yaw_angle;
 								
-								$detectedFaceItem = new \stdClass;
-								$detectedFaceItem->imageId = $imageId;
-								$detectedFaceItem->faceToken = $faceToken;
-								$detectedFaceItem->identifiers = $csvLine[1];
-								$detectedFaceItem->gender = $csvLine[2];
+								if ($yaw_angle >= -25 && $yaw_angle <= 25)
+								{
 								
-								// Store the image to the file system until it is processed and assigned
-								// a Faceset
-								$path = 'face/' . $organizationAccount . "/" . $csvLine[2] . "/" . $faceToken;
-								
-								fwrite($log,"Face Token " . $faceToken . "\n");
-								fwrite($log,"Storing at " . $path . "\n");
-								
-								$faceArray[] = $detectedFaceItem;
-								
-								// Store the image on the server
-								Storage::put('public/' . $path, file_get_contents($csvLine[0]));
-								$path = url('/storage/' . $path);
+									// Unique ID for the uploaded image
+									$imageId =  $detectApiCallResult->image_id;
+							
+									// Face Token for the detected face
+									$faceToken =  $detectApiCallResult->faces[0]->face_token;
+									
+									$detectedFaceItem = new \stdClass;
+									$detectedFaceItem->imageId = $imageId;
+									$detectedFaceItem->faceToken = $faceToken;
+									$detectedFaceItem->identifiers = $csvLine[1];
+									$detectedFaceItem->gender = $csvLine[2];
+									
+									// Store the image to the file system until it is processed and assigned
+									// a Faceset
+									$path = 'face/' . $organizationAccount . "/" . $csvLine[2] . "/" . $faceToken;
+									
+									fwrite($log,"Face Token " . $faceToken . "\n");
+									fwrite($log,"Storing at " . $path . "\n");
+									
+									$faceArray[] = $detectedFaceItem;
+									
+									// Store the image on the server
+									Storage::put('public/' . $path, file_get_contents($csvLine[0]));
+									$path = url('/storage/' . $path);
 
-								$detectedFaceItem->path = $path;
-								
-								fwrite($log,"Face detected.  Storing as " . $faceToken . "\n");
+									$detectedFaceItem->path = $path;
+									
+									fwrite($log,"Face detected.  Storing as " . $faceToken . "\n");
+								}
+								else
+								{
+									// Poor quality face shot
+								fwrite($log,"Face detected but yaw_angle was insufficient quality for comparison. [" . $yaw_angle . "]\n");
+								}
 							}
 							else 
 							{
@@ -495,8 +512,13 @@ class PortraitsController extends Controller
 			// close the log file
 			fclose($log);
 			
-			// Process the images and assign Facesets
-			$this->storeSortedFaces($faceArray);
+			
+			if(count($faceArray) > 0) 
+			{
+				// Process the images and assign Facesets
+				$this->storeSortedFaces($faceArray);
+			}
+			
 			$res = new \stdClass;
 			$res->status = 200;
 			$res->msg = 'Uploaded successfully.';
