@@ -78,12 +78,12 @@ class AdminController extends Controller
 					$organization = Organization::find($request->user()->organizationId);
 					if (isset($organization)) {
 						$link = url('/admin/sharing');
-						$text = $organization->name . " has requested to share mug shot data to you.";
-						$text .= "<br>Please go see and approve or decline the request.";
-						$text .= "<br>Time : " . now();
-						$text .= "<br><a href='{$link}'>{$link}</a>";
-						$from = $request->user()->email;
-						$subject = "New sharing application";
+						$text = $organization->name . " has requested to share mugshot data with you. To approve or deny this request, click the link below to log in.";
+						$text .= "<br><br>Time requested: " . now();
+						$text .= "<br><br><a href='{$link}'>{$link}</a><br><br>";
+						$text .= "This email address is not monitored.  Please do not reply.";
+						$from = "notifications@afrengine.com";
+						$subject = "AFR Engine :: Request to share mugshot data from " . $organization->name;
 						
 						Mail::to($organization->contactEmail)
 							->queue(new Notify($from, $subject, $text));
