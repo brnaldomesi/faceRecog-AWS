@@ -67,9 +67,14 @@ class FaceSearch
 		//	})
 		//	->get();
 			
-		$faceSets = Faceset::where('organizationId',$organization)
-		->where('gender',$gender)
-		->get();
+        // when clause is skipped in the case of gender being null
+        // gender is null when this function is called in PortraitsController
+        
+        $faceSets = Faceset::whereIn('organizationId', $organization)
+            ->when(!is_null($gender), function ($query) use ($gender) {
+                return $query->where('gender', $gender);
+            })
+            ->get();
 		
 		fwrite($log,"**FaceSets**\n".$faceSets ."\n\n");
 
