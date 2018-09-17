@@ -110,7 +110,7 @@ class SearchMug implements ShouldQueue
             // Update json result and image search date
             $image->lastSearched = now();
             $image->save();
-            // CaseSearch::where('imageId', $image->id)->delete();
+            CaseSearch::where('imageId', $image->id)->delete();
             $search = CaseSearch::create([
                 'organizationId' => $organ_id,
                 'imageId' => $image->id,
