@@ -131,6 +131,7 @@ function make_compiledResult_table() {
                     '</td>' +
 					'<td>' + record.confidence + '%</td>' +
                     '<td>' + record.identifiers + '</td>' +
+					'<td>' + record.organization + '</td>' +
                   '</tr>'
     }
   }
@@ -158,6 +159,7 @@ function old_make_searchResult_table() {
                     '</td>' +
 					'<td>' + record.confidence + '%</td>' +
                     '<td>' + record.identifiers + '</td>' +
+					'<td>' + record.organization + '</td>' +
                   '</tr>'
     }
   }
@@ -200,6 +202,7 @@ function makeResultsTable(data)
 							'</td>' +
 							'<td>' + record.confidence + '%</td>' +
 							'<td>' + record.identifiers + '</td>' +
+							'<td>' + record.organization + '</td>' +
 						  '</tr>'
 			} 
 		});

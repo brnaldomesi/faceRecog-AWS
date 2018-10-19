@@ -395,18 +395,22 @@ class PortraitsController extends Controller
 				{
 					$lineCount++;
 					
-					// Checks to make sure there is at least one row of data before we process.
-					$csvLine[2] = ($csvLine[2] == "M") ? "MALE" : "FEMALE";
-
-					if (count($csvLine) > 1 && ($csvLine[2] == 'MALE' || $csvLine[2] == 'FEMALE')) 
-					{
+					if (count($csvLine) > 1) 
+					{	
+						// Checks to make sure there is at least one row of data before we process.
+						if ($csvLine[2] == '') {
+							$gender = 'UNKNOWN';
+						} else {
+							$gender = ($csvLine[2] == "M") ? "MALE" : "FEMALE";
+						}
+					
 						fwrite($log,"Importing mugshot [Line " . $lineCount . " @ " . date("h:i:sa") . "]...\n");
 						
 						$params = [];
 
 						// Grabs the URL for the image out of the CSV row
 						$params['image_url'] = $csvLine[0];
-						$params['return_attributes'] = 'headpose';
+						$params['return_attributes'] = 'gender,headpose,facequality';
 						
 						fwrite($log,$params['image_url'] . "\n");
 
@@ -440,12 +444,20 @@ class PortraitsController extends Controller
 							// The API found a face in the image.  Let's process it
 							if(count($detectApiCallResult->faces) > 0) 
 							{
-								// Check the yaw_angle to be sure it's  between -25 and 25
+								// Check the pose of the face to be sure it's sufficient quality
 								// Anything else means the person in the mugshot is not looking
 								// very straight resulting in poor quality.
 								$yaw_angle = $detectApiCallResult->faces[0]->attributes->headpose->yaw_angle;
+								$roll_angle = $detectApiCallResult->faces[0]->attributes->headpose->roll_angle;
+								$pitch_angle = $detectApiCallResult->faces[0]->attributes->headpose->pitch_angle;
 								
-								if ($yaw_angle >= -25 && $yaw_angle <= 25)
+								// Get the face quality rating
+								$quality = $detectApiCallResult->faces[0]->attributes->facequality->value;								
+								
+								if (	($yaw_angle >= -25 && $yaw_angle <= 25) &&
+										($pitch_angle >= -20 && $pitch_angle <= 20) && 
+										($roll_angle >= -20 && $roll_angle <= 20)
+									)
 								{
 								
 									// Unique ID for the uploaded image
@@ -458,14 +470,21 @@ class PortraitsController extends Controller
 									$detectedFaceItem->imageId = $imageId;
 									$detectedFaceItem->faceToken = $faceToken;
 									$detectedFaceItem->identifiers = $csvLine[1];
-									$detectedFaceItem->gender = $csvLine[2];
+									
+									// Gender is not defined in CSV.  Use the detected gender from F++
+									if ($gender == 'UNKNOWN') {
+										$gender = strtoupper($detectApiCallResult->faces[0]->attributes->gender->value);
+									}
+									
+									$detectedFaceItem->gender = $gender;
 									
 									// Store the image to the file system until it is processed and assigned
 									// a Faceset
-									$path = 'face/' . $organizationAccount . "/" . $csvLine[2] . "/" . $faceToken;
+									$path = 'face/' . $organizationAccount . "/" . $gender . "/" . $faceToken;
 									
 									fwrite($log,"Face Token " . $faceToken . "\n");
 									fwrite($log,"Storing at " . $path . "\n");
+									fwrite($log,"Image is " . $gender . " with quality of " . $quality . "\n");
 									
 									$faceArray[] = $detectedFaceItem;
 									
@@ -480,7 +499,7 @@ class PortraitsController extends Controller
 								else
 								{
 									// Poor quality face shot
-								fwrite($log,"Face detected but yaw_angle was insufficient quality for comparison. [" . $yaw_angle . "]\n");
+								fwrite($log,"Face detected but post was insufficient quality for comparison. [yaw: " . $yaw_angle . "], [pitch: " . $pitch_angle . "], [roll: " . $roll_angle . "]\n");
 								}
 							}
 							else 
@@ -498,7 +517,8 @@ class PortraitsController extends Controller
 					}
 					else
 					{
-						fwrite($log,"Row [" . $lineCount . "] gender was invalid. Skipping...\n");
+						// Line was blank
+						fwrite($log,"Row [" . $lineCount . "] was invalid. Skipping...\n");
 					}
 				}
 				
@@ -512,6 +532,8 @@ class PortraitsController extends Controller
 			// close the log file
 			fclose($log);
 			
+			//********************** REMOVE THIS WHEN DONE DEBUGGING ****************
+			//exit(1);
 			
 			if(count($faceArray) > 0) 
 			{
