@@ -166,6 +166,10 @@ function initEvent() {
 				body += '			<div><b>Confidence:</b></div>';
 				body += '			<div>' + value.confidence + '%</div>';
 				body += '		</div>';
+				body += '		<div class="field">';
+				body += '			<div><b>Source:</b></div>';
+				body += '			<div>' + value.organization + '</div>';
+				body += '		</div>';					
 				body += '	</div>';
 				body += '</li>';
 			});

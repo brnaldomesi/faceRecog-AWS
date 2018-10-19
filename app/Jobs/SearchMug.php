@@ -140,15 +140,16 @@ class SearchMug implements ShouldQueue
 
         // Notify auto-search fact to user via mail
         foreach ($mail_list as $mail) {
-            $text = $mail['name'] . ", We have worked hard to get updated search result for mug shot!";
-            $text .= "<br>Please go see and look into who they are just now.<br>";
-            foreach ($mail['cases'] as $c) {
+            $text = $mail['name'] . ", we have automatically re-scanned some of your evidence photos and we found new similar faces.";
+            $text .= "<br>Log in and review them to see if they match your suspects.<br>";
+            
+			foreach ($mail['cases'] as $c) {
                 $link = url('cases/' . $c['id']);
-                $text .= "<br>Case '" . $c['name'] . "' has new search result for " . $c['count'] . " mug shots.";
+                $text .= "<br>Case '" . $c['name'] . "' has " . $c['count'] . " new mug shot results.";
                 $text .= "<br><a href='{$link}'>{$link}</a><br>";
             }
             $from = config('mail.username');
-            $subject = "Found new mug";
+            $subject = "AFR Engine :: Your cases have new mugshots to review";
 
             Mail::to($mail['to'])
                 ->queue(new Notify($from, $subject, $text));

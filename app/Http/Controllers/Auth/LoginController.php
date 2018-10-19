@@ -75,11 +75,11 @@ class LoginController extends Controller
             $organization = Organization::find($user->organizationId);
             if (isset($organization)) {
                 $link = url('/admin/activity');
-                $text = $user->email . "({$user->name}) has failed to log in.";
-                $text .= "<br>Please click below link to go see.";
+                $text = "We detected a failed login for " . $user->email . " ({$user->name})";
+                $text .= "<br>Click the link below to log in and review the logs";
                 $text .= "<br><a href='{$link}'>{$link}</a>";
                 $from = $user->email;
-                $subject = "Login failure";
+                $subject = "Failed login detected";
                 
                 Mail::to($organization->contactEmail)
                     ->queue(new Notify($from, $subject, $text));
