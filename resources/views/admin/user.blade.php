@@ -89,7 +89,7 @@
             <div class="form-group">
               {!! Form::label('organization', 'Organization ', ['class' => 'col-md-4 control-label']) !!}
               <div class="col-md-6">
-                {!! Form::text('organization', $organization, ['class' => 'form-control bs-select', 'disabled' => 'disabled']) !!}
+                {!! Form::text('organization', $organization, ['class' => 'form-control bs-select']) !!}
               </div>
             </div>
   @if (isset($user))

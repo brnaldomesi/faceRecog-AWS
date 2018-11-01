@@ -1,3 +1,4 @@
+/cache
 config.php
 routes.php
 schedule-*
