@@ -22,7 +22,6 @@ use App\Utils\ImageResize;
 use App\Utils\FaceSearch;
 use App\Utils\Facepp;
 
-use Face;
 use Auth;
 use Storage;
 
@@ -34,12 +33,17 @@ class CaseController extends Controller
 	 *
 	 * @return void
 	 */
-	public function __construct()
+	function __construct()
 	{
 		$this->middleware('auth');
 		$this->facepp = new Facepp();
 		$this->facepp->api_key = config('face.providers.face_plus_plus.api_key');
 		$this->facepp->api_secret = config('face.providers.face_plus_plus.api_secret');
+	}
+
+	function __destruct()
+	{
+		unset($this->facepp);
 	}
 
 	/**
@@ -204,10 +208,9 @@ class CaseController extends Controller
 		$gender = $image->gender;
 		$organ_id = Auth::user()->organizationId;
 		$result = FaceSearch::search('../storage/app/' . $image->file_path, $organ_id, $gender);
-
 		$image->lastSearched = now();
 		$image->save();
-
+		
 		$search = CaseSearch::create([
 			'organizationId' => $organ_id,
 			'imageId' => $image->id,
@@ -247,34 +250,4 @@ class CaseController extends Controller
 		return response()->json($result);
 	}
 
-	/**
-	 * Creates a new Faceset for the organization
-	 *
-	 * @param  $filename : file path
-	 *
-	 * @return void
-	 */
-
-	public function createFaceSet($faceSetName, $faceIdArray, $organizationId) {
-		ini_set('max_execution_time', 300);
-		$noError = false;
-	  
-		while($noError === false) 
-		{
-			// Insert new Faceset into DB with detected faces array
-			$album = Face::createAlbum($faceSetName, $faceIdArray, ['tags' => $organizationId]);
-			$noError = $album;
-		}
-		
-		return $album->getId();
-	}
-
-	public function addFacesintoFaceSet($facesetToken, $faceIdArray) {
-		ini_set('max_execution_time', 300);
-		$noError = false;
-		while($noError === false) {
-		  $isAdded = Face::addIntoAlbum($facesetToken, $faceIdArray);
-		  $noError = $isAdded;
-		} 
-	}
 }
