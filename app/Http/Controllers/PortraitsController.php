@@ -32,12 +32,16 @@ class PortraitsController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->facepp = new Facepp();
-        $this->facepp->api_key = config('face.providers.face_plus_plus.api_key');
-		$this->facepp->api_secret = config('face.providers.face_plus_plus.api_secret');
+      $this->middleware('auth');
+      $this->facepp = new Facepp();
+      $this->facepp->api_key = config('face.providers.face_plus_plus.api_key');
+			$this->facepp->api_secret = config('face.providers.face_plus_plus.api_secret');
     }
 
+    function __destruct()
+		{
+			unset($this->facepp);
+		}
     /**
      * Perform a face search and return the results
      *
@@ -118,7 +122,7 @@ class PortraitsController extends Controller
      *
      * @return void
      */
-    public function createFaceSet($faceSetName, $faceIdArray, $organizationId) {
+  public function createFaceSet($faceSetName, $faceIdArray, $organizationId) {
 		ini_set('max_execution_time', 300);
 		$noError = false;
       
@@ -130,17 +134,17 @@ class PortraitsController extends Controller
 		}
 		
 		return $album->getId();
-    }
+  }
 
-     public function addFacesintoFaceSet($facesetToken, $faceIdArray) {
-        ini_set('max_execution_time', 300);
-        $noError = false;
-        while($noError === false) {
-          $isAdded = Face::addIntoAlbum($facesetToken, $faceIdArray);
-          $noError = $isAdded;
-        }
-       
-      }
+ 	public function addFacesintoFaceSet($facesetToken, $faceIdArray) {
+    ini_set('max_execution_time', 300);
+    $noError = false;
+    while($noError === false) {
+      $isAdded = Face::addIntoAlbum($facesetToken, $faceIdArray);
+      $noError = $isAdded;
+    }
+   
+  }
 
 	/*
 	*  Returns the current active Faceset for the specified Gender
@@ -168,7 +172,7 @@ class PortraitsController extends Controller
 									->count() + 1;
 			
 			// Calls F++ and creates a new FaceSet for the organization
-			$album = Face::createAlbum($organizationAccount . "-".$gender."-" . $facesetIndex, [], ['tags' => $organizationId]);		
+			$album = Face::createAlbum($organizationAccount . "-".$gender."-" . $facesetIndex, [], ['tags' => $organizationId]);
 				
 			$log = fopen("debug.txt","a");
 			fwrite($log,$album->getId() ."\n");
@@ -182,7 +186,7 @@ class PortraitsController extends Controller
 				  'facesetToken' => $facesetToken,
 				  'organizationId' => $organizationId,
 				  'gender' => $gender
-			])->id;		
+			])->id;
 
 			// Grab the newly created Faceset data
 			$faceset = Faceset::where('organizationId',$organizationId)
@@ -196,14 +200,14 @@ class PortraitsController extends Controller
 					
 		return $faceset;
 	}
-/**
-     * Stores detected faces into their gender sorted Facesets
-     *
-     * @param  $faceInfoArra : Detected faces info array
-     *         $faceIdArray : Detected faces Id array
-     * @return void
-     */
-    public function storeSortedFaces($faceArray){
+	/**
+   * Stores detected faces into their gender sorted Facesets
+   *
+   * @param  $faceInfoArra : Detected faces info array
+   *         $faceIdArray : Detected faces Id array
+   * @return void
+   */
+  public function storeSortedFaces($faceArray){
       
 		$log = fopen("debug.txt","a");
 		fwrite($log,"Starting storeSortedFaces()\n");
@@ -283,17 +287,17 @@ class PortraitsController extends Controller
 		}
 		
 		fclose($log);
-    }	  
+  }	  
 	  
 	  
-    /**
-     * Create a faceset or add a face in existing faceset and store image on local
-     *
-     * @param  $faceInfoArra : Detected faces info array
-     *         $faceIdArray : Detected faces Id array
-     * @return void
-     */
-    public function createMultipleFacesAndStores($faceInfoArray, $faceIdArray){
+  /**
+   * Create a faceset or add a face in existing faceset and store image on local
+   *
+   * @param  $faceInfoArra : Detected faces info array
+   *         $faceIdArray : Detected faces Id array
+   * @return void
+   */
+  public function createMultipleFacesAndStores($faceInfoArray, $faceIdArray){
       
 		// Get the organizationID and name for the logged in user
 		$organizationId = Auth::user()->organizationId;
@@ -619,7 +623,7 @@ class PortraitsController extends Controller
 			$res->msg = 'Uploaded successfully.';
 			echo json_encode( $res );
 		}
-    }
+  }
 
 	public function retrieve_remote_file_size($url){
      $ch = curl_init($url);

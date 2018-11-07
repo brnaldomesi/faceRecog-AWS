@@ -48,7 +48,7 @@ function search() {
     portraitData = portraitData.split(",")[1]
     let faceSetVal = $('#facesetSelect').val()
     
-	Metronic.blockUI({
+    Metronic.blockUI({
         animate:true,
         overlayColor: 'none'
     });
