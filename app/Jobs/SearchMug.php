@@ -43,7 +43,6 @@ class SearchMug implements ShouldQueue
     public function handle()
     {
         $case_list = array();
-
         // Checks all organizations for any ACTIVE cases that have Images that have not been searched for 30 days or more
         $images = Image::whereHas('cases', function ($query) {
             $query->where('status', 'ACTIVE');
@@ -53,7 +52,7 @@ class SearchMug implements ShouldQueue
                 ->orWhereNull('lastSearched');
         })
         ->get();
-
+        
         foreach ($images as $image) {
             $file_path = '../storage/app/' . $image->file_path;
             $organ = $image->cases->organization;
@@ -65,8 +64,7 @@ class SearchMug implements ShouldQueue
             $organ_id = $organ->id;
             
             // Search image only from facesets that were updated after last search date of the image by setting 5th parameter
-            $result_new = FaceSearch::search($file_path, $organ_id, $gender, 'CASE_SEARCH', $image->lastSearched);
-
+            $result_new = FaceSearch::searchBySimilarityScore($file_path, $organ_id, $gender, 'CASE_SEARCH', $image->lastSearched);
             // Skip image for nothing new
             if (count($result_new['result']) == 0) {
                 continue;
@@ -79,44 +77,53 @@ class SearchMug implements ShouldQueue
                 $case_list[$image->caseId]++;
             }
 
-            // Fetch existing search result for the image from CaseSearch table
-            $result_orig = CaseSearch::where('imageId', $image->id)
-                ->orderBy('updated_at', 'desc')
-                ->first();
-
-            if (!is_null($result_orig)) {
-                $result_orig = $result_orig['results'];
-            }
             $result = $result_new;
+            
+            // Fetch existing search result for the image from CaseSearch table
+            $result_orig_arr = CaseSearch::where('imageId', $image->id)->get();
 
-            // Merge newly searched result with existing searched result
-            if ($result_new['status'] == 200 && !is_null($result_orig) && $result_orig['status'] == 200) {
-                foreach ($result_orig['result'] as $orig) {
-                    if (count($orig) > 0) {
-                        $flag = true;
-                        foreach ($result_new['result'] as $r) {
-                            if (count($r) > 0 && $r[0]['facesetId'] == $orig[0]['facesetId']) {
-                                $flag = false;
-                                break;
-                            }
-                        }
-                        if ($flag) {
-                            array_push($result['result'], $orig);
-                        }
+            if(!$result_orig_arr->isEmpty()) {
+              $result['result'] = [];
+            }
+             
+            foreach ($result_new['result'] as $r) {
+                if (count($r) > 0) {
+                  foreach($result_orig_arr as $result_orig) {
+                    if (!is_null($result_orig)) {
+                        $result_orig = $result_orig['results'];
                     }
+                    if ($result_new['status'] == 200 && !is_null($result_orig) && $result_orig['status'] == 200) {
+                      $diff = [];
+                      foreach ($result_orig['result'] as $orig) {
+                          
+                          $r = array_udiff($r, $orig,
+                            function ($obj_a, $obj_b) {
+                                        return strcmp(((object)$obj_a)->faceToken, ((object)$obj_b)->faceToken);
+                            }
+                          );
+                      }
+                    }
+                  }
+                }
+                if(!empty($r)){
+                    $r = array_values($r);
+                    array_push($result['result'], $r);
                 }
             }
+            // Merge newly searched result with existing searched result
 
             // Update json result and image search date
             $image->lastSearched = now();
             $image->save();
             //CaseSearch::where('imageId', $image->id)->delete();
-            $search = CaseSearch::create([
-                'organizationId' => $organ_id,
-                'imageId' => $image->id,
-                'searchedOn' => now(),
-                'results' => $result
-            ]);
+            if(!empty($result['result'])) {
+                $search = CaseSearch::create([
+                    'organizationId' => $organ_id,
+                    'imageId' => $image->id,
+                    'searchedOn' => now(),
+                    'results' => $result
+                ]);
+            }
         }
 
         // Organize mail data

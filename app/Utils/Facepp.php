@@ -68,16 +68,19 @@ class Facepp
           
 			$jsonRes = json_decode( $response );
 			
-			if (isset($jsonRes->error_message)) 
-			{
-				$concurrencyErrorMsg = $jsonRes->error_message;
-			}
-			else 
-			{
-				if ($response) {
-					$concurrencyErrorMsg = 'No Concurrency error';
-				}
-			}
+            if(!is_null($jsonRes))
+            {
+    			if (isset($jsonRes->error_message)) 
+    			{
+    				$concurrencyErrorMsg = $jsonRes->error_message;
+    			}
+    			else 
+    			{
+    				if ($response) {
+    					$concurrencyErrorMsg = 'No Concurrency error';
+    				}
+    			}
+            }
         }
 
         curl_close($curl);

@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Carbon;
 
 use App\Models\Face as FaceModel;
 use App\Models\User;
@@ -211,7 +212,7 @@ class CaseController extends Controller
 		$image->lastSearched = now();
 		$image->save();
 		
-		$search = CaseSearch::create([
+    $search = CaseSearch::create([
 			'organizationId' => $organ_id,
 			'imageId' => $image->id,
 			'searchedOn' => now(),

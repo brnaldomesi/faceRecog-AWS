@@ -37,12 +37,13 @@ class FaceSearch
       $returnVal['searchResults'] = $searchResults;
 
       $json = json_decode($searchResults);
-      
-      if (!$json->error_message = '') {
-        $returnVal['searchResults'] = $searchResults;
-        return $returnVal;
+      if(!is_null($json))
+      {
+        if (!$json->error_message = '') {
+          $returnVal['searchResults'] = $searchResults;
+          return $returnVal;
+        }
       }
-      
       // Slow it down to prevent Queries Per Second errors
       sleep(1);
     }
@@ -160,7 +161,7 @@ class FaceSearch
               array_push($faceArrPerFaceset, $face_info);
             }
           }
-          $faceTokenArray = array_column($filteredResult_per_faceSet,"face_token");
+          $faceTokenArray = array_column($filteredResult_per_faceSet, "face_token");
           if(!empty($faceTokenArray))
           {
             Face::addIntoAlbum($tempFaceset->getId(), $faceTokenArray);
@@ -201,7 +202,6 @@ class FaceSearch
             // Add the face into the new face set
             Face::addIntoAlbum($facesetToken, $tempFaceArray[$j]);
           }
-          
           Face::removeAlbum($tempFaceset->getId());
         }
 
@@ -463,10 +463,12 @@ class FaceSearch
         
         $json = json_decode($searchResults);
         
-        if (!$json->error_message = '') {
-          break;
+        if(!is_null($json))
+        {
+          if (!$json->error_message = '') {
+            break;
+          }
         }
-        
         // Slow it down to prevent Queries Per Second errors
         sleep(1);
       }
