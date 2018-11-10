@@ -153,7 +153,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|unique:users',
+            'email' => 'required|email|unique:users',
             'password' => 'confirmed'
         ]);
 
@@ -163,7 +163,7 @@ class AdminController extends Controller
         $user->organizationId = Auth::user()->organizationId;
         $user->userGroupId = 2;
 
-        if (empty($user->password)) {
+        if (empty($request->password)) {
             $user->password = Hash::make('123456789');
         } else {
             $user->password = $request->password;

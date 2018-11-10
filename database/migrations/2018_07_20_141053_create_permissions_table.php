@@ -21,6 +21,7 @@ class CreatePermissionsTable extends Migration
             $table->boolean('can_create_case');
             $table->boolean('can_edit_case');
             $table->boolean('can_view_case');
+            $table->boolean('can_manage_organization')->default(0);
             $table->timestamps();
         });
     }

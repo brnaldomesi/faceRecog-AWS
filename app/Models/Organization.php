@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Organization extends Model
 {
-    //
+  protected $fillable = ['name', 'account', 'contactName', 'contactEmail', 'contactPhone'];
+
 	public function stat()
   {
     return $this->hasOne('App\Models\Stat', 'organizationId');
@@ -17,4 +18,8 @@ class Organization extends Model
     return $this->hasManyThrough('App\Models\Face', 'App\Models\Faceset', 'organizationId' ,'facesetId');
   }  
   
+  public function users()
+  {
+  	return $this->hasMany('App\Models\User', 'organizationId');
+  }
 }
