@@ -115,15 +115,23 @@
                         <li class="nav-item @if(Request::segment(1) == 'home'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/home') }}">{{ __('Dashboard') }}</a>
                         </li>
-						            <li class="nav-item @if(Request::segment(1) == 'cases'){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/cases') }}">{{ __('Cases') }}</a>
-                        </li>
-                        <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Enroll') }}</a>
-                        </li>
-                        <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == ''){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/portraits') }}">{{ __('Search') }}</a>
-                        </li>
+
+                        @if (Auth::user()->permission->isSuperAdmin())
+                          <li class="nav-item @if(Request::segment(1) == 'organization'){{ __('active')}}@endif">
+                              <a class="nav-link" href="{{ url('/organization') }}">{{ __('Organization') }}</a>
+                          </li>
+                        @else
+  						            <li class="nav-item @if(Request::segment(1) == 'cases'){{ __('active')}}@endif">
+                              <a class="nav-link" href="{{ url('/cases') }}">{{ __('Cases') }}</a>
+                          </li>
+                          <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
+                              <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Enroll') }}</a>
+                          </li>
+                          <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == ''){{ __('active')}}@endif">
+                              <a class="nav-link" href="{{ url('/portraits') }}">{{ __('Search') }}</a>
+                          </li>
+                        @endif
+
               @if (Auth::user()->permission->isAdmin())
                         <li class="nav-item @if(Request::segment(1) == 'admin'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/admin') }}">{{ __('Admin') }}</a>

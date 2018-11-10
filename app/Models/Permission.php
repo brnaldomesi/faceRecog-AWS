@@ -10,4 +10,9 @@ class Permission extends Model
     {
         return $this->can_edit_all_users || $this->can_manage_organization_aggrements;
     }
+
+    public function isSuperAdmin()
+    {
+        return $this->can_manage_organization;
+    }
 }

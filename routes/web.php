@@ -70,6 +70,12 @@ Route::group(['middleware' => ['authen']], function () {
 		Route::post('/cases/{cases}/imagelist', 'CaseController@imagelist')->name('cases.id.image.show');
 	});
 
+	Route::group(['middleware' => ['can:create,App\Models\Organization']], function () {
+		Route::get('/organization', 'OrganizationController@index')->name('organization');
+		Route::get('/organization/new', 'OrganizationController@new')->name('organization.new');
+		Route::post('/organization', 'OrganizationController@create')->name('organization.create');
+	});
+
 	Route::post('/cases/search', 'CaseController@search')->name('search.case');
 	Route::post('/cases/search-history', 'CaseController@searchHistory')->name('search.history');
 });
