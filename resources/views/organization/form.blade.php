@@ -6,6 +6,14 @@
     </div>
 </div>
 
+<div class="form-group {{ $errors->has('name') ? ' has-error' : ''}}">
+    {!! Form::label('account', 'Account ', ['class' => 'col-md-4 control-label']) !!}
+    <div class="col-md-6">
+        {!! Form::text('account', null, ['class' => 'form-control', 'required' => 'required']) !!}
+        {!! $errors->first('account', '<p class="help-block">:message</p>') !!}
+    </div>
+</div>
+
 <div class="form-group {{ $errors->has('adminName') ? ' has-error' : ''}}">
     {!! Form::label('adminName', 'Administrator ', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
@@ -20,6 +28,14 @@
     {!! Form::email('email', null, ['class' => 'form-control', 'required' => 'required']) !!}
     {!! $errors->first('email', '<p class="help-block">:message</p>') !!}
   </div>
+</div>
+
+<div class="form-group {{ $errors->has('adminName') ? ' has-error' : ''}}">
+    {!! Form::label('contactPhone', 'Phone ', ['class' => 'col-md-4 control-label']) !!}
+    <div class="col-md-6">
+        {!! Form::text('contactPhone', null, ['class' => 'form-control', 'required' => 'required']) !!}
+        {!! $errors->first('contactPhone', '<p class="help-block">:message</p>') !!}
+    </div>
 </div>
 
 <div class="form-group {{ $errors->has('password') ? ' has-error' : ''}}">
