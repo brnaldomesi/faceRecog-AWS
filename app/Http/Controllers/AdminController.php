@@ -85,8 +85,10 @@ class AdminController extends Controller
 						$from = "notifications@afrengine.com";
 						$subject = "AFR Engine :: Request to share mugshot data from " . $organization->name;
 						
-						Mail::to($organization->contactEmail)
-							->queue(new Notify($from, $subject, $text));
+						try {
+							Mail::to($organization->contactEmail)
+								->queue(new Notify($from, $subject, $text));
+						} catch (\Exception $e) {}
 					}
 					break;
 
