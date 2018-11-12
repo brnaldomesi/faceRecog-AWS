@@ -65,10 +65,10 @@ class OrganizationController extends Controller
 
 		$newOrganization = Organization::create([
 			'name' => $request->name,
-			'account' => 'org',
+			'account' => $request->account,
 			'contactName' => $request->adminName,
 			'contactEmail' => $request->email,
-			'contactPhone' => '1111111'
+			'contactPhone' => $request->contactPhone
 		]);
 
 		$organId = $newOrganization->id;
