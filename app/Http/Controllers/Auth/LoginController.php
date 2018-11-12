@@ -81,8 +81,10 @@ class LoginController extends Controller
                 $from = $user->email;
                 $subject = "Failed login detected";
                 
-                Mail::to($organization->contactEmail)
-                    ->queue(new Notify($from, $subject, $text));
+                try {
+                    Mail::to($organization->contactEmail)
+                        ->queue(new Notify($from, $subject, $text));
+                } catch (\Exception $e) {}
             }
         }
             

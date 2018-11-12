@@ -158,8 +158,10 @@ class SearchMug implements ShouldQueue
             $from = config('mail.username');
             $subject = "AFR Engine :: Your cases have new mugshots to review";
 
-            Mail::to($mail['to'])
-                ->queue(new Notify($from, $subject, $text));
+            try {
+                Mail::to($mail['to'])
+                    ->queue(new Notify($from, $subject, $text));
+            } catch (\Exception $e) {}
         }
     }
 }
