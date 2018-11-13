@@ -562,6 +562,8 @@ class PortraitsController extends Controller
         
 			//Detect face
 			$params['image_file'] = new \CURLFile($filename);
+			$params['return_attributes'] = 'gender,headpose,facequality';
+			
 			$detectApiCallResult = $this->facepp->execute('/detect', $params);
 			$detectApiCallResult = json_decode($detectApiCallResult);
 
@@ -580,48 +582,73 @@ class PortraitsController extends Controller
 			  echo json_encode( $res );
 			  return;
 			}
-
-			// Unique ID for the uploaded image
-			$imageId =  $detectApiCallResult->image_id;
 			
-			// Face token for the detected face
-			$faceToken =  $detectApiCallResult->faces[0]->face_token;
+			// Check the pose of the face to be sure it's sufficient quality
+			// Anything else means the person in the mugshot is not looking
+			// very straight resulting in poor quality.
+			$yaw_angle = $detectApiCallResult->faces[0]->attributes->headpose->yaw_angle;
+			$roll_angle = $detectApiCallResult->faces[0]->attributes->headpose->roll_angle;
+			$pitch_angle = $detectApiCallResult->faces[0]->attributes->headpose->pitch_angle;
 			
-			// Get the active FaceSet Token
-			$activeFaceset = $this->getActiveFaceset($request->gender);
-			$active_facesetToken = $activeFaceset[0]->facesetToken;
+			// Get the face quality rating
+			$quality = $detectApiCallResult->faces[0]->attributes->facequality->value;
 
-			$originalFileName = $request->portraitInput->getClientOriginalName();
-			$ext = explode(".", $originalFileName);
-			$ext = $ext[count($ext) - 1];
-
-			$facesetIndex = $activeFaceset[0]->id;
-
-			$path = 'face/' . $organizationAccount . "/" . $request->gender . "/" . $active_facesetToken . "/";
-								
-			$filename = $faceToken . "." . $ext;
-			$request->portraitInput->storeAs('public/' . $path, $filename);
-			$path = url('/storage/' . $path . $filename);
-
-			// Manual upload of image.
+			if (	($yaw_angle >= -25 && $yaw_angle <= 25) &&
+					($pitch_angle >= -20 && $pitch_angle <= 20) && 
+					($roll_angle >= -20 && $roll_angle <= 20)
+				)
+			{
+			
+				// Unique ID for the uploaded image
+				$imageId =  $detectApiCallResult->image_id;
 				
-			FaceModel::create([
-			  'faceToken' => $faceToken,
-			  'facesetId' => $activeFaceset[0]->id,
-			  'imageId' => $imageId,
-			  'identifiers' => Crypt::encryptString($request->identifiers),
-			  'gender' => $request->gender,
-			  'savedPath' => $path
-			]);
-			
-			// Increment our faces
-			Faceset::where('id', $activeFaceset[0]->id)->increment('faces');
+				// Face token for the detected face
+				$faceToken =  $detectApiCallResult->faces[0]->face_token;
+				
+				// Get the active FaceSet Token
+				$activeFaceset = $this->getActiveFaceset($request->gender);
+				$active_facesetToken = $activeFaceset[0]->facesetToken;
 
-			Face::addIntoAlbum($active_facesetToken,$faceToken);
-			
-			$res->status = 200;
-			$res->msg = 'Uploaded successfully.';
-			echo json_encode( $res );
+				$originalFileName = $request->portraitInput->getClientOriginalName();
+				$ext = explode(".", $originalFileName);
+				$ext = $ext[count($ext) - 1];
+
+				$facesetIndex = $activeFaceset[0]->id;
+
+				$path = 'face/' . $organizationAccount . "/" . $request->gender . "/" . $active_facesetToken . "/";
+									
+				$filename = $faceToken . "." . $ext;
+				$request->portraitInput->storeAs('public/' . $path, $filename);
+				$path = url('/storage/' . $path . $filename);
+
+				// Manual upload of image.
+					
+				FaceModel::create([
+				  'faceToken' => $faceToken,
+				  'facesetId' => $activeFaceset[0]->id,
+				  'imageId' => $imageId,
+				  'identifiers' => Crypt::encryptString($request->identifiers),
+				  'gender' => $request->gender,
+				  'savedPath' => $path
+				]);
+				
+				// Increment our faces
+				Faceset::where('id', $activeFaceset[0]->id)->increment('faces');
+
+				Face::addIntoAlbum($active_facesetToken,$faceToken);
+				
+				$res->status = 200;
+				$res->msg = 'Uploaded successfully.';
+				echo json_encode( $res );
+			}
+			else
+			{
+				// Poor quality face shot
+				$res->status = 201;
+				$res->msg = 'The angle of the detected face is poor quality and not suitable for facial recognition';
+				echo json_encode( $res );
+				return;
+			}
 		}
   }
 
