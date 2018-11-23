@@ -82,7 +82,7 @@ class OrganizationController extends Controller
     if (empty($request->password)) {
         $newUser->password = Hash::make('123456789');
     } else {
-        $newUser->password = $request->password;
+        $newUser->password = Hash::make($request->password);
     }
     $newUser->save();
 
