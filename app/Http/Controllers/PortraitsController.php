@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Crypt;
 
+use Intervention\Image\ImageManagerStatic as Image;
+
 use luchaninov\CsvFileLoader;
 
 use App\Models\Face as FaceModel;
@@ -242,6 +244,7 @@ class PortraitsController extends Controller
 				// Gender
 				$activeFaceset = $this->getActiveFaceset($faceArray[$i]->gender);
 				fwrite($log,$activeFaceset . "\n");
+                fwrite($log,$faceArray[$i]->path . "\n");
 				
 				fwrite($log,"addFacesintoFaceSet::token=" . $activeFaceset[0]->facesetToken . "::faceArray[$i]->faceToken=" . $faceArray[$i]->faceToken . "\n");
 				
@@ -412,20 +415,41 @@ class PortraitsController extends Controller
 						
 						$params = [];
 
+                        $imgUrl = $csvLine[0];
+
 						// Grabs the URL for the image out of the CSV row
-						$params['image_url'] = $csvLine[0];
+                        $params['image_url'] = $imgUrl;
+
 						$params['return_attributes'] = 'gender,headpose,facequality';
 						
 						fwrite($log,$params['image_url'] . "\n");
 
 						// Check the file size of the mugshot image to ensure it exists.
-						$ch = curl_init($csvLine[0]);
+                        $ch = curl_init($imgUrl);
+						
 						curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 						curl_setopt($ch, CURLOPT_HEADER, TRUE);
 						curl_setopt($ch, CURLOPT_NOBODY, TRUE);
 						$data = curl_exec($ch);
 						$imgSize = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 
+                        // URL failed.  Try the alternate image URL as a fail safe
+                        if ($imgSize <= 0) {
+                            fwrite($log,"Scraped image invalid.  Trying alternate URL as failsafe...\n");
+                            
+                            curl_close($ch);
+                            
+                            $imgUrl = $csvLine[3];
+                            $params['image_url'] = $csvLine[3];    
+
+                            $ch = curl_init($imgUrl);
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                            curl_setopt($ch, CURLOPT_HEADER, TRUE);
+                            curl_setopt($ch, CURLOPT_NOBODY, TRUE);
+                            $data = curl_exec($ch);
+                            $imgSize = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+                        }
+                        
 						curl_close($ch);
 					
 						if ($imgSize > 0)
@@ -484,16 +508,46 @@ class PortraitsController extends Controller
 									
 									// Store the image to the file system until it is processed and assigned
 									// a Faceset
-									$path = 'face/' . $organizationAccount . "/" . $gender . "/" . $faceToken;
+                                    $path = 'face/' . $organizationAccount . "/" . $gender . "/" . $faceToken . "." . $ext;
 									
 									fwrite($log,"Face Token " . $faceToken . "\n");
 									fwrite($log,"Storing at " . $path . "\n");
 									fwrite($log,"Image is " . $gender . " with quality of " . $quality . "\n");
 									
+									$imgData = false;
+                                    $attempts = 0;
+                                    
+                                    // Try 3 times to download the image then quit.
+                                    while ($imgData == false && $attempts < 3)
+                                    {
+                                        $imgData = file_get_contents($imgUrl);
+                                        $attempts++;
+										sleep(1);
+                                    }
+                                    
+                                    // More than 3 attempts made and image couldn't be downloaded.  Break from loop
+                                    // Had to add this because of a timeout when fetching the image via URL
+                                    if ($attempts >= 3) {
+                                        break;
+                                    }
+								
 									$faceArray[] = $detectedFaceItem;
 									
-									// Store the image on the server
-									Storage::put('public/' . $path, file_get_contents($csvLine[0]));
+                                    Storage::put('public/' . $path,$imgData);
+                                    
+                                    //************************************************************
+                                    // **** FOR IMPORTING MARICOPA COUNTY SCRAPED IMAGES ONLY ****
+                                    // **** REMOVE AFTER LARGE IMPORT IS COMPLETE ****
+                                    $dest = public_path("/storage/face/" . $organizationAccount . "/" . $gender . "/" . $faceToken . "." . $ext);
+            
+                                    // Crop out the watermarke at the bottom of all of the scraped images
+                                    $image = Image::make($imgData);
+                                    $height = $image->height();
+                                    $width = $image->width();
+                                    
+                                    $image->crop($width,$height-64)->save($dest);
+                                    //************************************************************
+								
 									$path = url('/storage/' . $path);
 
 									$detectedFaceItem->path = $path;
@@ -509,7 +563,8 @@ class PortraitsController extends Controller
 							else 
 							{
 								// Log to file that no face was found
-								$errorUrlList[] = $csvLine[0];
+                                $errorUrlList[] = $imgUrl;
+
 								fwrite($log,"No face detected\n");
 							}
 						}
@@ -527,7 +582,7 @@ class PortraitsController extends Controller
 				}
 				
 				// Sleep for a half second to prevent Concurrency issues.  REMOVE WHEN USING PAID KEY
-				time_nanosleep(0, 500000000);
+				time_nanosleep(0, 400000000);
 			}
 
 			// Close the CSV file

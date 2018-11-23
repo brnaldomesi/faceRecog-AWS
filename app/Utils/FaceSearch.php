@@ -261,7 +261,7 @@ class FaceSearch
     // Increment our search count for the organization
     $self = new self;
     $log = fopen("debug.txt","a");
-    fwrite($log,"Search started on gender " . $gender . " for " . $search_file_path ."\\nn");
+    fwrite($log,"Search started at " . date("h:i:sa") . " on gender " . $gender . " for " . $search_file_path ."\\nn");
     
     Organization::find($organ_id)->stat->increment('searches');
 
@@ -391,7 +391,7 @@ class FaceSearch
   {
     // Increment our search count for the organization
     $log = fopen("debug.txt","a");
-    fwrite($log,"Search started on gender " . $gender . " for " . $search_file_path ."\\nn");
+    fwrite($log,"Search started at " . date("h:i:sa") . " on gender " . $gender . " for " . $search_file_path ."\\nn");
     
     Organization::find($organ_id)->stat->increment('searches');
 
@@ -470,7 +470,8 @@ class FaceSearch
           }
         }
         // Slow it down to prevent Queries Per Second errors
-        sleep(1);
+        //sleep(1);
+		time_nanosleep(0, 400000000);
       }
       
       fwrite($log,"***Results***\n\n" . $searchResults ."\n");
@@ -542,6 +543,8 @@ class FaceSearch
         fwrite($log,"No similar faces found in Faceset " . $faceSets[$i]->facesetToken . "\n");
       }
     }
+	
+	fwrite($log,"Search completed at " . date("h:i:sa") . "\n");
     fclose($log);
     
     if ($response_type == 'MANUAL_SEARCH') {
