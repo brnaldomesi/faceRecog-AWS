@@ -427,6 +427,10 @@ class PortraitsController extends Controller
 						// Check the file size of the mugshot image to ensure it exists.
                         $ch = curl_init($imgUrl);
 						
+						// Proxy for importing scraped images
+						curl_setopt($ch, CURLOPT_PROXY, "172.245.77.41:80");
+						curl_setopt($ch, CURLOPT_PROXYUSERPWD, "afrengine:afrengineproxy");
+						
 						curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 						curl_setopt($ch, CURLOPT_HEADER, TRUE);
 						curl_setopt($ch, CURLOPT_NOBODY, TRUE);
