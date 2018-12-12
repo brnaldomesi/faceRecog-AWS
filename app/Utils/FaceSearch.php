@@ -13,7 +13,7 @@ use App\Utils\Facepp;
 use App\Utils\FaceSetManage;
 use Face;
 
-define ('MIN_CONFIDENCE', 65);
+define ('MIN_CONFIDENCE', 70);
 define ('TOP_COUNT', 5);
 
 class FaceSearch
@@ -435,6 +435,7 @@ class FaceSearch
     // Loop through our facesets and find matches
     for ($i = 0; $i < count($faceSets); $i++) 
     {
+	  
       if (!is_null($faceset_after) && $faceSets[$i]->updated_at < $faceset_after) {
         continue;
       }
@@ -444,8 +445,8 @@ class FaceSearch
       $searchResults = '';
       $noError = false;
       $isFaceDetected = '';
-      
-      fwrite($log,"Checking Faceset " . $faceSets[$i]->facesetToken ."\n\n");
+
+      fwrite($log,"Checking Faceset " . $faceSets[$i]->facesetToken ." [" . date("h:i:sa") . "]\n\n");
       
       $return_result_count = min($facesCount, TOP_COUNT);
 
@@ -472,6 +473,7 @@ class FaceSearch
         // Slow it down to prevent Queries Per Second errors
         //sleep(1);
 		time_nanosleep(0, 400000000);
+		fwrite($log,"FPP->Search...\n");
       }
       
       fwrite($log,"***Results***\n\n" . $searchResults ."\n");
@@ -498,6 +500,8 @@ class FaceSearch
         $originator = Organization::where('id',$faceSets[$i]->organizationId)->get();
         fwrite($log,"Organization for this faceset is " . $faceSets[$i]->organizationId ."\n");
       
+		$hitCount = 0;
+	  
         for ($j = 0; $j < $filteredCount_per_faceSet; $j++) {
           $faceToken = $filteredResult_per_faceSet[$j]->face_token;
           $confidence = $filteredResult_per_faceSet[$j]->confidence;
@@ -505,6 +509,8 @@ class FaceSearch
           // If detected face is >= the minimum confidence level, get the face information from the DB
           if ($confidence >= MIN_CONFIDENCE) {
               
+			$hitCount++;
+			
             // Get our Face object
             $face = FaceModel::where('faceToken', $faceToken)->first();
                
@@ -530,6 +536,10 @@ class FaceSearch
             }
           }
         }
+
+		fwrite($log,"Completed at [" . date("h:i:sa") . "]. Faceset had " . $hitCount . " hits above " . MIN_CONFIDENCE . "%\n");
+		
+		$hitCount = 0;
       
         if ($response_type == 'CASE_SEARCH' && count($resultPer_faceSet) > 0) {
           array_push($results, $resultPer_faceSet);
