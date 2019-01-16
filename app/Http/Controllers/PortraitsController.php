@@ -428,7 +428,7 @@ class PortraitsController extends Controller
                         $ch = curl_init($imgUrl);
 						
 						// Proxy for importing scraped images
-						curl_setopt($ch, CURLOPT_PROXY, "172.245.77.41:80");
+						curl_setopt($ch, CURLOPT_PROXY, "172.245.242.222:80");
 						curl_setopt($ch, CURLOPT_PROXYUSERPWD, "afrengine:afrengineproxy");
 						
 						curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
