@@ -55,7 +55,6 @@ Route::group(['middleware' => ['authen']], function () {
 	Route::post('/portraits/search', 'PortraitsController@search')->name('search.file');
 
 	// Case
-
 	Route::get('/cases', 'CaseController@index')->name('cases.show');
 
 	Route::group(['middleware' => ['can:create,App\Models\Cases']], function () {
@@ -78,4 +77,11 @@ Route::group(['middleware' => ['authen']], function () {
 
 	Route::post('/cases/search', 'CaseController@search')->name('search.case');
 	Route::post('/cases/search-history', 'CaseController@searchHistory')->name('search.history');
+
+	// aws test
+	Route::get('/awstest', 'TestController@index')->name('aws.test');
+	Route::post('/awstest_createCollection', 'TestController@createCollection');
+	Route::post('/awstest_faceindexing', 'TestController@awstestFaceindexing');
+	Route::post('/awstest_searchface', 'TestController@awstestSearchface');
+	Route::post('/awstest_delete_face', 'TestController@awstestDeleteFace');
 });
