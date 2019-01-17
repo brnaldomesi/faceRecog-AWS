@@ -91,8 +91,8 @@ class AwsFaceIndexing extends Command
         // -	FaceIndexing with the aws Rekognition api.
         // -	Update the db faces table/ aws_face_id
 
-        Organization::where('id',3)->update(['contactName'=>'Brian Marlow '. strtotime(date('Y-m-d H:i:s'))]);
-        return;
+//        Organization::where('id',3)->update(['contactName'=>'Brian Marlow '. strtotime(date('Y-m-d H:i:s'))]);
+//        return;
 
         $face = Face::where('aws_face_id', '')->first();
         if(isset($face->facesetId)){
