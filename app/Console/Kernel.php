@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
     {
         //$schedule->job(new SearchMug)->daily();
         //$schedule->job(new AwsFaceIndexing)->cron('*/6 * * * *');
-        $schedule->command('aws:faceindexing')->everyMinute();
+        //$schedule->command('aws:faceindexing')->everyMinute();
     }
 
     /**

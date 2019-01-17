@@ -76,7 +76,7 @@ class TestController extends Controller
 	 */
 	public function index()
 	{
-        $this->handle_1();
+        //$this->handle_1();
 
         // getting the collection list.
         $collections = [];
