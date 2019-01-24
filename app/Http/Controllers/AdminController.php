@@ -19,6 +19,11 @@ use DB;
 
 class AdminController extends Controller
 {
+    function __construct()
+    {
+        parent::__construct();
+    }
+
     public function index(Request $request)
     {		
 		return view('admin.index');

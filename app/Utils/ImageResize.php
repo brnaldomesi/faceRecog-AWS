@@ -4,8 +4,9 @@ namespace App\Utils;
 
 class ImageResize
 {
-	public static function work($orig_file_path, $width, $height, $save_file_path)
+	public static function work($orig_file_path, $width, $height, $save_file_path = '')
 	{
+
 		$source = NULL;
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 
@@ -22,8 +23,7 @@ class ImageResize
 		default:
 			return;
 		}
-
-		finfo_close($finfo);
+        finfo_close($finfo);
 		list($src_w, $src_h) = getimagesize($orig_file_path);
 		$tw = $src_w;
 		$th = $src_h;
@@ -48,14 +48,51 @@ class ImageResize
 				$tw = $src_w;
 			}
 		}
-
-		$thumb = imagecreatetruecolor($width, $height);
+        $thumb = imagecreatetruecolor($width, $height);
 		imagecopyresized($thumb, $source,
 						0, 0,
 						($src_w - $tw) / 2, ($src_h - $th) / 2,
 						$width, $height,
 						$tw, $th);
-		imagejpeg($thumb, $save_file_path);
-		imagedestroy($thumb);
+		if($save_file_path != ''){
+            imagejpeg($thumb, $save_file_path);
+            imagedestroy($thumb);
+		}
+
+        return $thumb;
+
 	}
+
+	public static function work1($file, $w, $h=0, $crop=FALSE){
+        list($width, $height) = getimagesize($file);
+        $r = $width / $height;
+        if ($crop) {
+            if ($width > $height) {
+                $width = ceil($width-($width*abs($r-$w/$h)));
+            } else {
+                $height = ceil($height-($height*abs($r-$w/$h)));
+            }
+            $newwidth = $w;
+            $newheight = $h;
+        } else {
+            if($h == 0){
+                $newwidth = $w;
+                $newheight = $w / $r;
+            }else{
+                if ($w/$h > $r) {
+                    $newwidth = $h*$r;
+                    $newheight = $h;
+                } else {
+                    $newheight = $w/$r;
+                    $newwidth = $w;
+                }
+            }
+
+        }
+        $src = imagecreatefromjpeg($file);
+        $dst = imagecreatetruecolor($newwidth, $newheight);
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+
+        return $dst;
+    }
 }

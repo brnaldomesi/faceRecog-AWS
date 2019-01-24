@@ -23,6 +23,13 @@ use App\Utils\ImageResize;
 use App\Utils\FaceSearch;
 use App\Utils\Facepp;
 
+// aws package.
+use Aws\Rekognition\RekognitionClient;
+use Aws\Rekognition\Exception\RekognitionException;
+use Aws\S3\S3Client;
+use Aws\S3\Exception\S3Exception;
+
+
 use Auth;
 use Storage;
 
@@ -36,6 +43,7 @@ class CaseController extends Controller
 	 */
 	function __construct()
 	{
+        parent::__construct();
 		$this->middleware('auth');
 		$this->facepp = new Facepp();
 		$this->facepp->api_key = config('face.providers.face_plus_plus.api_key');
@@ -119,11 +127,17 @@ class CaseController extends Controller
 		return redirect()->route('cases.id.show', $cases);
 	}
 
+    // Start upload button on the cases detail page..
 	public function addImage(Request $request, Cases $cases)
 	{
-		$file = null;
+        // s3 image upload get the image url. on the "cases" directory.
+        // s3 bucket/storage/case/images, and s3 bucket/storage/case/thumbnails
+        // aws rekognition : image indexing. and get the aws_face_id for this image.
+        // add new row on the images table.
 
-		if ($cases->status != 'ACTIVE') {
+        $file = null;
+
+        if ($cases->status != 'ACTIVE') {
 			return abort(403);
 		}
 
@@ -135,36 +149,109 @@ class CaseController extends Controller
 			return abort(500);
 		}
 
+        // check organiztion collection
+        $organization_id = $cases->organizationId;
+        $organization = Organization::where('id','=',$organization_id)->first();
+        if(!isset($organization->aws_collection_cases_id)){
+            return abort(500);
+        }
+        if($organization->aws_collection_cases_id == ''){
+            // create a new collection for aws rekognition.
+            $aws_collection_id = $this->createAwsCollection($organization->account . '_cases');
+            $organization->aws_collection_cases_id = $aws_collection_id;
+            $organization->save();
+        }
+
+        $aws_collection_id = $organization->aws_collection_cases_id;
+
+
+
 		$name_client = $file->getClientOriginalName();
 		$name_upload = str_random(15) . "." . $file->guessClientExtension();
 
-		$image = new Image;
-		$image->caseId = $cases->id;
-		$image->filename = $name_client;
-		$image->filename_uploaded = $name_upload;
-		$image->gender = $request->gender;
-		$image->uploaded = now();
-		$image->lastSearched = null;
-		$image->save();
 
-		if (! $file->storeAs('public/case/images', $name_upload)) {
-			return abort(500);
-		}
+		// save image to the s3 directory : storage/case/images/ : and get the s3 image url. *****
+        $keyname = 'storage/case/images/' . $name_upload;
+        try {
+            // Upload data.
+            $result = $this->aws_s3_client->putObject([
+                'Bucket' => $this->aws_s3_bucket,
+                'Key' => $keyname,
+                'Body' => file_get_contents($file),
+                'ACL' => 'public-read'
+            ]);
 
-		Storage::makeDirectory('public/case/thumbnails');
-		ImageResize::work('../storage/app/' . $image->file_path, 256, 0, '../storage/app/' . $image->thumbnail_path);
+            // Print the URL to the object.
+            $s3_image_url_tmp = $result['ObjectURL'];
+            $a = env('AWS_S3_UPLOAD_URL_DOMAIN');
+            $b = env('AWS_S3_REAL_OBJECT_URL_DOMAIN');
+            $s3_image_key = explode($a, $s3_image_url_tmp)[1];
+            $s3_image_url = $b . explode($a, $s3_image_url_tmp)[1];
 
-		$result = array(
-			'deleteType'    => 'DELETE',
-			'deleteUrl'     => asset('foobar'),
-			'name'          => $name_client,
-			'size'          => $file->getClientSize(),
-			'type'          => $file->getClientMimeType(),
-			'thumbnailUrl'  => asset($image->thumbnail_url),
-			'url'           => asset($image->file_url)
-		);
-		
-		return response()->json(['files' => [$result]]);
+            // save the thumbnail image.
+            //$thumb_image = ImageResize::work1($file, 256, 0);
+
+            $keyname = 'storage/case/thumbnails/'. $name_upload;
+            try{
+                // upload thumbnails
+                $result1 = $this->aws_s3_client->putObject([
+                    'Bucket' => $this->aws_s3_bucket,
+                    'Key' => $keyname,
+                    'Body' => file_get_contents($file),
+                    'ACL' => 'public-read'
+                ]);
+                $s3_thumb_url_tmp = $result1['ObjectURL'];
+
+                // image indexing for the aws rekognition. with the collection : $aws_collection_id
+                $face_indexing_res = $this->awsFaceIndexing($this->aws_s3_bucket, $s3_image_key,$s3_image_url,$aws_collection_id);
+
+                $aws_face_id = '';
+                if(isset($face_indexing_res['face_id']) && $face_indexing_res['face_id'] != ''){
+                    $aws_face_id = $face_indexing_res['face_id'];
+                }else{
+                    // return false : image not rekognized.
+                    echo 'face not recognized from the image.';
+                    return abort(500);
+                }
+
+
+                // images table save part
+                $image = new Image;
+                $image->caseId = $cases->id;
+                $image->filename = $name_client;
+                $image->filename_uploaded = $name_upload;
+                $image->gender = $request->gender;
+                $image->uploaded = now();
+                $image->lastSearched = null;
+
+                // save the aws_face_id on images table.
+                $image->aws_face_id = $aws_face_id;
+                $image->save();
+
+
+                $result = array(
+                    'deleteType'    => 'DELETE',
+                    'deleteUrl'     => asset('foobar'),
+                    'name'          => $name_client,
+                    'size'          => $file->getClientSize(),
+                    'type'          => $file->getClientMimeType(),
+                    'thumbnailUrl'  => $s3_thumb_url_tmp,
+                    'url'           => $s3_image_url_tmp
+                );
+
+                return response()->json(['files' => [$result]]);
+
+
+            }catch (S3Exception $e) {
+                echo $e->getMessage() . PHP_EOL;
+                return abort(500);
+            }
+
+        }catch (S3Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+            return abort(500);
+        }
+
 	}
 
 	public function imagelist(Request $request, Cases $cases)
@@ -186,8 +273,8 @@ class CaseController extends Controller
 
 		$result = $cases->images->map(function ($item, $key) {
 			return [
-				asset($item->file_url),
-				asset($item->thumbnail_url),
+				env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/images/'.$item->filename_uploaded, //asset($item->file_url),
+                env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/thumbnails/'.$item->filename_uploaded,//asset($item->thumbnail_url),
 				$item->filename,
 				$item->lastSearched,
 				$item->id
@@ -207,29 +294,45 @@ class CaseController extends Controller
 		}
 
 		$gender = $image->gender;
-		$organ_id = Auth::user()->organizationId;
-		$result = FaceSearch::search('../storage/app/' . $image->file_path, $organ_id, $gender);
+        $organ_id = Auth::user()->organizationId;
+        $organization = Organization::find($organ_id);
+
+        if(!isset($organization->aws_collection_male_id)){
+            return response('Incorrect parameter', 400);
+        }
+
+        $collection_id = $organization->aws_collection_male_id;
+        if($gender != 'MALE'){
+            $collection_id = $organization->aws_collection_female_id;
+        }
+
+        // face_search from aws rekognition.
+        $key = $this->aws_s3_case_image_key_header. $image->filename_uploaded;
+        $search_res = $this->awsFaceSearch($key,$collection_id);
+
+        //$result = FaceSearch::search('../storage/app/' . $image->file_path, $organ_id, $gender);
 		$image->lastSearched = now();
 		$image->save();
 		
-    $search = CaseSearch::create([
-			'organizationId' => $organ_id,
-			'imageId' => $image->id,
-			'searchedOn' => now(),
-			'results' => $result
-		]);
-
-		if ($result['status'] == 204) {
-		//	return response($result, 204);
+		if(isset($search_res['status']) && $search_res['status'] != 'faild'){
+            $search = CaseSearch::create([
+                'organizationId' => $organ_id,
+                'imageId' => $image->id,
+                'searchedOn' => now(),
+                'results' => $search_res
+            ]);
+            return response()->json(
+                array_merge($search_res, [
+                        'time' => date('Y-m-d h:m:s'),
+                        'history_no' => $search->id
+                    ]
+                )
+            );
+        }else{
+		    return response()->json(array('status'=>'faild','msg'=>'Search result faild.'));
 		}
 		
-		return response()->json(
-			array_merge($result, [
-					'time' => date('Y-m-d h:m:s'),
-					'history_no' => $search->id
-				]
-			)
-		);
+
 	}
 
 	public function searchHistory(Request $request)
