@@ -190,6 +190,10 @@
     <script src="{{ asset('global/plugins/uniform/jquery.uniform.min.js') }}" type="text/javascript"></script>
     <!-- END CORE PLUGINS -->
     <!-- BEGIN PAGE LEVEL PLUGINS -->
+    <script type="text/javascript">
+        var base_url = '{{$base_url}}';
+        var s3_base_image_url = '{{env('AWS_S3_REAL_OBJECT_URL_DOMAIN')}}';
+    </script>
     @yield('extrajs')
     <!-- END PAGE LEVEL PLUGINS -->
     <!-- BEGIN PAGE LEVEL SCRIPTS -->

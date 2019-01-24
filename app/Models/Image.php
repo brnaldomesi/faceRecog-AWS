@@ -10,22 +10,22 @@ class Image extends Model
 
     public function getFilePathAttribute()
     {
-    	return 'public/case/images/' . $this->filename_uploaded;
+    	return env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/images/' . $this->filename_uploaded;
     }
 
     public function getThumbnailPathAttribute()
     {
-    	return 'public/case/thumbnails/' . $this->filename_uploaded;
+    	return env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/thumbnails/' . $this->filename_uploaded;
     }
 
     public function getFileUrlAttribute()
     {
-        return 'storage/case/images/' . $this->filename_uploaded;
+        return env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/images/' . $this->filename_uploaded;
     }
 
     public function getThumbnailUrlAttribute()
     {
-        return 'storage/case/thumbnails/' . $this->filename_uploaded;
+        return env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/thumbnails/' . $this->filename_uploaded;
     }
 
     public function cases()

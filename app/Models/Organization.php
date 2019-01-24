@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Organization extends Model
 {
-  protected $fillable = ['name', 'account', 'contactName', 'contactEmail', 'contactPhone'];
+  protected $fillable = ['name', 'account', 'contactName', 'contactEmail', 'contactPhone','aws_collection_male_id','aws_collection_female_id','aws_collection_cases_id'];
 
 	public function stat()
   {

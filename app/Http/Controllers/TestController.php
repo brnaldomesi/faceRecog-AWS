@@ -45,20 +45,20 @@ class TestController extends Controller
 	 */
 	function __construct()
 	{
+        parent::__construct();
 		$this->middleware('auth');
 		$this->rekognitionClient = new RekognitionClient([
-            'region'    => 'us-west-2',
+            'region'    => env('AWS_REGION_NAME'),
             'version'   => 'latest'
         ]);
 
         $this->s3client = new S3Client([
             'version' => 'latest',
-            'region'  => 'us-west-2'
+            'region'  => env('AWS_REGION_NAME')
         ]);
         
-        $this->s3_bucket = 'afrengine-images';
-
-        $this->test_collection_id = 'maricopacountyjail_male_1547611307';
+        $this->s3_bucket = env('AWS_S3_BUCKET_NAME');
+        $this->test_collection_id = 'maricopacountyjail_male_1547784083';
         
 	}
 
@@ -76,14 +76,14 @@ class TestController extends Controller
 	 */
 	public function index()
 	{
-        //$this->handle_1();
-
+        //$this->handle_one(0);
+        //$this->putimages3();
         // getting the collection list.
         $collections = [];
         try{
             
             $results = $this->rekognitionClient->ListCollections([
-                "MaxResults" => 100
+                "MaxResults" => 10
             ]);
             
             if(isset($results['CollectionIds'])){
@@ -101,7 +101,7 @@ class TestController extends Controller
         try {
             $results = $this->rekognitionClient->ListFaces([
                 "CollectionId"=> $this->test_collection_id,
-                "MaxResults"=> 100
+                "MaxResults"=> 10
                 //"NextToken"=> "string"
             ]);
             
@@ -111,13 +111,31 @@ class TestController extends Controller
             }
         }catch (RekognitionException $e){
             echo $e->getMessage() . PHP_EOL;
-            exit;
+            //exit;
         }
-        
-        
 
         return view('test.index')->with('collections', $collections)->with('faces', $faces);
 	}
+
+	//
+    public function putimages3(){
+	    $keyname = '1.jpg';
+	    $image_source = 'https://arre.st/Jails/AZJails.info/images2/LEON-BOONE-T225179.jpg';
+        $result = $this->s3client ->putObject([
+            'Bucket' => $this->s3_bucket,
+            'Key'    => $keyname,
+            'Body'   => file_get_contents($image_source),
+            'ACL'    => 'public-read'
+        ]);
+        $url = $result['ObjectURL'];
+        //change the url.
+        // https://afrengine-storage.s3.us-gov-west-1.amazonaws.com/ =>
+        // https://s3-us-gov-west-1.amazonaws.com/afrengine-storage/
+        $a = env('AWS_S3_UPLOAD_URL_DOMAIN');
+        $b = env('AWS_S3_REAL_OBJECT_URL_DOMAIN');
+        $url = $b . explode($a, $url)[1];
+        var_dump($url); exit;
+    }
 
 
     /* 
@@ -140,7 +158,7 @@ class TestController extends Controller
     public function awstestFaceindexing(Request $request){
         $key = $request->input('key');
 
-        $bucket = 'afrengine-images';
+        $bucket = $this->s3_bucket;
         if($key == ''){
             $key = 'storage/face/maricopacountyjail/MALE/00d826f9134f01668937143d2a0473ef/12929c30f0ec7a40c06afd647427a5b6.jpg';
         }
@@ -191,8 +209,9 @@ class TestController extends Controller
         Search Face form aws ReKognition.
     */ 
     public function awstestSearchface(Request $request){
-        $bucket = 'afrengine-images';
+        $bucket = $this->s3_bucket;
         $key = 'storage/face/maricopacountyjail/MALE/00d826f9134f01668937143d2a0473ef/12929c30f0ec7a40c06afd647427a5b6.jpg';
+		
         try {
             // Get the object.
             $result = $this->s3client->getObject([
@@ -208,7 +227,7 @@ class TestController extends Controller
             try {
                 $results = $this->rekognitionClient->SearchFacesByImage([
                     "CollectionId"=> $this->test_collection_id,
-                    "FaceMatchThreshold" => 0,
+                    "FaceMatchThreshold" => 60,
                     "Image"=> [ 
                         "Bytes"=> $bytes
                     ], 
@@ -257,19 +276,7 @@ class TestController extends Controller
 
 
 
-    public function handle_1()
-    {
-        // -	Check the faces that has the empty aws_face_id field.
-        // -	If one face is selected.
-        // -	Check the Faceset_id, and gender of the faceset.
-        // -	If gender is male and aws_collection_male_id is empty =>  
-        // create the new collection on aws Rekognition.
-        // -	FaceIndexing with the aws Rekognition api.
-        // -	Update the db faces table/ aws_face_id
-
-        // Organization::where('id',3)->update(['contactName'=>'Brian Marlow '. strtotime(date('Y-m-d H:i:s'))]);
-        // return;
-
+    public function handle_one($index){
         $face = Face::where('aws_face_id', '')->first();
         if(isset($face->facesetId)){
             $facesetId = $face->facesetId;
@@ -281,7 +288,7 @@ class TestController extends Controller
 
                 $organization = Organization::where('id', $organization_id)->first();
                 if(isset($organization->aws_collection_male_id) && isset($organization->aws_collection_female_id)){
-                    
+
                     // check the collection id.
                     $male_collection_id  = '';
                     $female_collection_id = '';
@@ -295,7 +302,7 @@ class TestController extends Controller
                         if($male_collection_id !== 'faild' && $female_collection_id !== 'faild'){
                             // update the collection_id on the database.
                             Organization::where('id',$organization_id)->update(['aws_collection_male_id'=>$male_collection_id,'aws_collection_female_id'=>$female_collection_id]);
-                        } 
+                        }
                     }else{
                         $male_collection_id = $organization->aws_collection_male_id;
                         $female_collection_id = $organization->aws_collection_female_id;
@@ -310,10 +317,67 @@ class TestController extends Controller
                         $external_image_url = $face->savedPath;
                         $aws_bucket = $this->s3_bucket;
                         $img_key = explode($this->s3_bucket.'/', $face->savedPath)[1];
-                        $face_id = $this->awsFaceIndexing($aws_bucket, $img_key,$external_image_url,$collection_id);
-                        if($face_id !== '' && $face_id !== 'faild'){
+
+                        // face indexing by using aws rekoginition.
+                        $indexed_face = $this->awsFaceIndexing($aws_bucket, $img_key,$external_image_url,$collection_id);
+                        Log::emergency('$indexed_face_id] =>'.$indexed_face['face_id']);
+
+                        if(isset($indexed_face['face_id']) && $indexed_face['face_id'] != 0 && $indexed_face !== 'faild'){
+
+                            // checking the gender response from the aws rekognition and
+                            // update the facesetId and gender on the faces table.
+                            $aws_gender = $indexed_face['gender'];
+                            $aws_gender_confidence = $indexed_face['gender_confidence'];
+                            Log::emergency('aws rekognition face indexing: Gender Confidence => '. $aws_gender_confidence);
+                            $aws_face_id = $indexed_face['face_id'];
+
+                            if($aws_gender != $gender){
+                                // check the $aws_gender_confidence
+
+                                // get the faceset id from the aws_gender and organization_id.
+                                $faceset_new = Faceset::where('organizationId','=',$organization_id)->where('gender','=',$aws_gender)->first();
+                                $faceset_new_id = 0;
+                                if(isset($faceset_new->id)){
+                                    $faceset_new_id = $faceset_new->id;
+                                }else{
+                                    // create new faceset_new
+                                    $faceset_token = md5(strtotime(date('Y-m-d H:i:s')). $index);
+                                    $faceset_new_id = Faceset::create([
+                                        'facesetToken' => $faceset_token,
+                                        'organizationId' => $organization_id,
+                                        'gender' => $aws_gender
+                                    ])->id;
+                                }
+
+                                // update the faceset_id, and gender on the faces table.
+                                Face::where('id',$face->id)->update(['facesetId'=>$faceset_new_id,'gender'=>$aws_gender]);
+
+
+                                // remove this face from rekognition.
+                                try{
+                                    $results1 = $this->rekognitionClient->DeleteFaces([
+                                        "CollectionId"=> $collection_id,
+                                        "FaceIds"=> [ $aws_face_id ]
+                                    ]);
+                                }catch(ReKognitionException $e){
+                                    echo $e->getMessage(). PHP_EOL;
+                                }
+
+                                // and  add the right face indexing again with the right gender.
+                                // face indexing by using aws rekoginition.
+                                $collection_id = $male_collection_id;
+                                if($aws_gender == 'FEMALE'){
+                                    $collection_id = $female_collection_id;
+                                }
+                                $indexed_face1 = $this->awsFaceIndexing($aws_bucket, $img_key,$external_image_url,$collection_id);
+                                if(isset($indexed_face1['face_id'])&& $indexed_face1['face_id'] != 0 && $indexed_face1 !== 'faild'){
+                                    $aws_face_id = $indexed_face1['face_id'];
+                                }
+                            }
+
                             // save the aws_face_id on  faces table.
-                            Face::where('id',$face->id)->update(['aws_face_id'=>$face_id]);
+                            Face::where('id',$face->id)->update(['aws_face_id'=>$aws_face_id]);
+
                         }
                     }
 
@@ -330,40 +394,54 @@ class TestController extends Controller
             ]);
             return $collection_id;
         }catch(RekognitionException $e){
+            Log::emergency($e->getMessage());
             return 'faild';
         }
     }
 
     public function awsFaceIndexing($aws_bucket, $img_key,$external_image_url,$collection_id){
+        var_dump($aws_bucket . '=>'. $img_key. '=>'.$external_image_url. '=>'.$collection_id); exit;
         $bucket = $aws_bucket;
         $key = $img_key;
         $external_image_id = str_replace("/",":",$external_image_url);
-        
         try {
             // Get the object.
             $result = $this->s3client->getObject([
                 'Bucket' => $bucket,
                 'Key'    => $key
             ]);
-        
+
             // Display the object in the browser.
-            $bytes = $result['Body']; 
-            
-            $results = $this->rekognitionClient->indexFaces([
-                "CollectionId"=> $collection_id,
-                //"DetectionAttributes"=> [ "DEFAULT" ],
-                "ExternalImageId"=> $external_image_id,
-                "Image"=> [ 
-                    "Bytes"=> $bytes
-                ],
-                "MaxFaces"=> 1,
-                "QualityFilter"=> "AUTO"
-            ]);
-            $face_id = '';
-            if(isset($results['FaceRecords']) && count($results['FaceRecords']) > 0){
-                $face_id = $results['FaceRecords'][0]['Face']['FaceId'];
+            $bytes = $result['Body'];
+
+            try{
+                $results = $this->rekognitionClient->indexFaces([
+                    "CollectionId"=> $collection_id,
+                    //"DetectionAttributes"=> [ "DEFAULT" ],
+                    "ExternalImageId"=> $external_image_id,
+                    "Image"=> [
+                        "Bytes"=> $bytes
+                    ],
+                    "MaxFaces"=> 1,
+                    "QualityFilter"=> "AUTO"
+                ]);
+
+                $face_id = '';
+                $gender = "";
+                $gender_confidence = 0;
+                if(isset($results['FaceRecords']) && count($results['FaceRecords']) > 0){
+                    $face_id = $results['FaceRecords'][0]['Face']['FaceId'];
+                    $gender = $result['FaceRecords'][0]['FaceDetail']['Gender']['Value'];
+                    $gender_confidence = $result['FaceRecords'][0]['FaceDetail']['Gender']['Confidence'];
+                }
+                $res = array('face_id' => $face_id, 'gender' => $gender, 'gender_confidence'=>$gender_confidence);
+
+                return $res;
+
+            }catch(Rekognition $e){
+                return 'faild';
             }
-            return $face_id;
+
         } catch (S3Exception $e) {
             return 'faild';
         }

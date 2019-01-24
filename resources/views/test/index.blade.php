@@ -59,7 +59,7 @@
                         </label>
                     </div>
                 </div>
-                <input  type="button" id="id_btn_create_collection" disabled class="btn btn-success" value="create a collection">    
+                <input  type="button" id="id_btn_create_collection" disabled class="btn btn-success" value="create a collection">
                 
             </form>
 
@@ -116,7 +116,7 @@
                     <div class="col-md-12">
                         <label>
                             Delete Face From this Collection:
-                            <input type="text" id="id_txt_del_collection_id"  class="form-control input-inline" value="maricopacountyjail_male_1547499969" size="100" readonly>
+                            <input type="text" id="id_txt_del_collection_id"  class="form-control input-inline" value="maricopacountyjail_male_1547784083" size="100" readonly>
                         </label>
                     </div>
                 </div>
@@ -129,7 +129,7 @@
                     </div>
                 </div>
 
-                <input type="button" id="id_btn_delete_face" class="btn btn-success" value="Delete Face from Collection">
+                <input type="button" disabled id="id_btn_delete_face" class="btn btn-success" value="Delete Face from Collection">
             </form>
 
 
@@ -141,7 +141,7 @@
                     <div class="col-md-12">
                         <label>
                             Search Image:
-                            <input type="text" id="id_collection_name"  class="form-control input-inline" value="https://s3-us-west-2.amazonaws.com/afrengine-images/storage/face/maricopacountyjail/MALE/00d826f9134f01668937143d2a0473ef/12929c30f0ec7a40c06afd647427a5b6.jpg" size="100" readonly>
+                            <input type="text" id="id_collection_name"  class="form-control input-inline" value="https://s3-us-gov-west-1.amazonaws.com/afrengine-storage/storage/face/maricopacountyjail/MALE/00d826f9134f01668937143d2a0473ef/12929c30f0ec7a40c06afd647427a5b6.jpg" size="100" readonly>
                         </label>
                     </div>
                 </div>
@@ -149,7 +149,7 @@
                     <div class="col-md-5">
                         <label>
                             Search Image:
-                            <img width="200px" height="auto" src="https://s3-us-west-2.amazonaws.com/afrengine-images/storage/face/maricopacountyjail/MALE/00d826f9134f01668937143d2a0473ef/12929c30f0ec7a40c06afd647427a5b6.jpg">
+                            <img width="200px" height="auto" src="https://s3-us-gov-west-1.amazonaws.com/afrengine-storage/storage/face/maricopacountyjail/MALE/00d826f9134f01668937143d2a0473ef/12929c30f0ec7a40c06afd647427a5b6.jpg">
                         </label>
                     </div>
                     <div class="col-md-1">

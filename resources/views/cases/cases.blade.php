@@ -121,10 +121,11 @@
 				  </div>
 				  <div class="tab-pane" id="portlet_images">
 				  	<input type="hidden" id="hidden-cases-status" value="{{ $cases->status }}">
-		@if ($cases->status == 'ACTIVE')
-				  	<form id="enrollForm" action="{{ route('cases.id.image.add', $cases->id) }}" method="POST" class="form-horizontal" > 
 
-                        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+				  @if ($cases->status == 'ACTIVE')
+				  	<form id="enrollForm" action="{{ route('cases.id.image.add', $cases->id) }}" method="POST" class="form-horizontal" >
+						{{ csrf_field() }}
+                        <!-- The fileupload-button bar contains buttons to add/delete files and start/cancel the upload -->
                         <div class="row fileupload-buttonbar">
                             <div class="col-lg-12 text-center">
                                 <!-- The fileinput-button span is used to style the file input field as button -->
@@ -132,7 +133,7 @@
                                     <i class="fa fa-plus"></i>
                                     <span> Add files... </span>
                                     <input type="file" name="files[]" multiple=""> </span>
-                                <button type="submit" class="btn blue start">
+                                <button type="submit" id="id_btn_start_upload1" class="btn blue start">
                                     <i class="fa fa-upload"></i>
                                     <span> Start upload </span>
                                 </button>
@@ -163,7 +164,7 @@
                         </table>
                     </form>
 					<hr>
-@endif
+				@endif
 					<input type="hidden" id="hidden-image-list-url" value="{{ route('cases.id.image.show', $cases->id) }}">
 					<input type="hidden" id="hidden-search-url" value="{{ route('search.case') }}">
 					<input type="hidden" id="hidden-search-history-url" value="{{ route('search.history') }}">
@@ -350,16 +351,18 @@
                 </td>
             </tr>
         {% } %}
+
+        var cases_id = {{$cases->id}};
     </script>
 
 
 	<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
-  <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
-  <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
-  <script type="text/javascript" src="{{ asset('admin_assets/pages/scripts/table-managed.js') }}"></script>
+  	<script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
+  	<script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
+  	<script type="text/javascript" src="{{ asset('admin_assets/pages/scripts/table-managed.js') }}"></script>
 
 <script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/jquery.ui.widget.js') }}" type="text/javascript"></script>
-<script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/tmpl.min.js') }}"" type="text/javascript"></script>
+<script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/tmpl.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/load-image.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/canvas-to-blob.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('global/plugins/jquery-file-upload/blueimp-gallery/jquery.blueimp-gallery.min.js') }}" type="text/javascript"></script>
@@ -375,5 +378,5 @@
 
 
 <script src="{{ asset('admin_assets/pages/scripts/form-fileupload.js') }}" type="text/javascript"></script>
-  <script type="text/javascript" src="{{ asset('js/cases/cases.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('js/Cases/cases.js') }}"></script>
 @endsection

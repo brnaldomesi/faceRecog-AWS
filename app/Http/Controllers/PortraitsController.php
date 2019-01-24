@@ -16,9 +16,17 @@ use App\Models\Face as FaceModel;
 use App\Models\User;
 use App\Models\Faceset;
 use App\Models\Organization;
+use App\Models\FaceTmp;
 
 use App\Utils\Facepp;
 use App\Utils\FaceSearch;
+
+// aws package.
+use Aws\Rekognition\RekognitionClient;
+use Aws\Rekognition\Exception\RekognitionException;
+use Aws\S3\S3Client;
+use Aws\S3\Exception\S3Exception;
+
 
 use Auth;
 use Face;
@@ -34,10 +42,11 @@ class PortraitsController extends Controller
      */
     public function __construct()
     {
-      $this->middleware('auth');
-      $this->facepp = new Facepp();
-      $this->facepp->api_key = config('face.providers.face_plus_plus.api_key');
-			$this->facepp->api_secret = config('face.providers.face_plus_plus.api_secret');
+        parent::__construct();
+        $this->middleware('auth');
+        $this->facepp = new Facepp();
+        $this->facepp->api_key = config('face.providers.face_plus_plus.api_key');
+        $this->facepp->api_secret = config('face.providers.face_plus_plus.api_secret');
     }
 
     function __destruct()
@@ -369,13 +378,15 @@ class PortraitsController extends Controller
      */
     public function store(Request $request)
     {
+
 		$organizationId = Auth::user()->organizationId;
 		$organizationName = Organization::find($organizationId)->name;			// Plain text name of account
 		$organizationAccount = Organization::find($organizationId)->account;	// account name used for data storage, etc.
 			
 		if($request->isCsv == true)
-		{ // UPLOADING A CSV FILE
-        
+		{
+		    // UPLOADING A CSV FILE, and insert the contents to the face_tmps table.
+
 			$log = fopen("debug.txt","a");
 			
 			$header = true; // CSV file has a header line
@@ -406,177 +417,25 @@ class PortraitsController extends Controller
 					{	
 						// Checks to make sure there is at least one row of data before we process.
 						if ($csvLine[2] == '') {
-							$gender = 'UNKNOWN';
+							$gender = 'MALE';
 						} else {
 							$gender = ($csvLine[2] == "M") ? "MALE" : "FEMALE";
 						}
 					
 						fwrite($log,"Importing mugshot [Line " . $lineCount . " @ " . date("h:i:sa") . "]...\n");
 						
-						$params = [];
+						$imgUrl = $csvLine[0];
+                        $identifiers = $csvLine[1];
+                        fwrite($log,"Importing info : face_tmps => " . $organizationId . " @ " . $imgUrl. "@" .$identifiers . "@" . $gender);
+                        // insert new row to the face_tmps table.
 
-                        $imgUrl = $csvLine[0];
+                        $facetmp_id = FaceTmp::create([
+                            'organizationId'=> $organizationId,
+                            'image_url' => $imgUrl,
+                            'identifiers' => $identifiers,
+                            'gender' => $gender
+                        ])->id;
 
-						// Grabs the URL for the image out of the CSV row
-                        $params['image_url'] = $imgUrl;
-
-						$params['return_attributes'] = 'gender,headpose,facequality';
-						
-						fwrite($log,$params['image_url'] . "\n");
-
-						// Check the file size of the mugshot image to ensure it exists.
-                        $ch = curl_init($imgUrl);
-						
-						// Proxy for importing scraped images
-						curl_setopt($ch, CURLOPT_PROXY, "172.245.242.222:80");
-						curl_setopt($ch, CURLOPT_PROXYUSERPWD, "afrengine:afrengineproxy");
-						
-						curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-						curl_setopt($ch, CURLOPT_HEADER, TRUE);
-						curl_setopt($ch, CURLOPT_NOBODY, TRUE);
-						$data = curl_exec($ch);
-						$imgSize = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
-
-                        // URL failed.  Try the alternate image URL as a fail safe
-                        if ($imgSize <= 0) {
-                            fwrite($log,"Scraped image invalid.  Trying alternate URL as failsafe...\n");
-                            
-                            curl_close($ch);
-                            
-                            $imgUrl = $csvLine[3];
-                            $params['image_url'] = $csvLine[3];    
-
-                            $ch = curl_init($imgUrl);
-                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                            curl_setopt($ch, CURLOPT_HEADER, TRUE);
-                            curl_setopt($ch, CURLOPT_NOBODY, TRUE);
-                            $data = curl_exec($ch);
-                            $imgSize = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
-                        }
-                        
-						curl_close($ch);
-					
-						if ($imgSize > 0)
-						{
-							// Call API face detect and pass the image URL
-							$detectApiCallResult = $this->facepp->execute('/detect', $params);
-							$detectApiCallResult = json_decode($detectApiCallResult);
-							
-							// Get the file extension
-							$ext = explode(".", $params['image_url']);
-							$ext = $ext[count($ext) - 1];
-							
-							if(isset($detectApiCallResult->error_message)) 
-							{
-								fwrite($log,$detectApiCallResult->error_message . "\n");
-								
-								continue;
-							}
-
-							// The API found a face in the image.  Let's process it
-							if(count($detectApiCallResult->faces) > 0) 
-							{
-								// Check the pose of the face to be sure it's sufficient quality
-								// Anything else means the person in the mugshot is not looking
-								// very straight resulting in poor quality.
-								$yaw_angle = $detectApiCallResult->faces[0]->attributes->headpose->yaw_angle;
-								$roll_angle = $detectApiCallResult->faces[0]->attributes->headpose->roll_angle;
-								$pitch_angle = $detectApiCallResult->faces[0]->attributes->headpose->pitch_angle;
-								
-								// Get the face quality rating
-								$quality = $detectApiCallResult->faces[0]->attributes->facequality->value;								
-								
-								if (	($yaw_angle >= -25 && $yaw_angle <= 25) &&
-										($pitch_angle >= -20 && $pitch_angle <= 20) && 
-										($roll_angle >= -20 && $roll_angle <= 20)
-									)
-								{
-								
-									// Unique ID for the uploaded image
-									$imageId =  $detectApiCallResult->image_id;
-							
-									// Face Token for the detected face
-									$faceToken =  $detectApiCallResult->faces[0]->face_token;
-									
-									$detectedFaceItem = new \stdClass;
-									$detectedFaceItem->imageId = $imageId;
-									$detectedFaceItem->faceToken = $faceToken;
-									$detectedFaceItem->identifiers = $csvLine[1];
-									
-									// Gender is not defined in CSV.  Use the detected gender from F++
-									if ($gender == 'UNKNOWN') {
-										$gender = strtoupper($detectApiCallResult->faces[0]->attributes->gender->value);
-									}
-									
-									$detectedFaceItem->gender = $gender;
-									
-									// Store the image to the file system until it is processed and assigned
-									// a Faceset
-                                    $path = 'face/' . $organizationAccount . "/" . $gender . "/" . $faceToken . "." . $ext;
-									
-									fwrite($log,"Face Token " . $faceToken . "\n");
-									fwrite($log,"Storing at " . $path . "\n");
-									fwrite($log,"Image is " . $gender . " with quality of " . $quality . "\n");
-									
-									$imgData = false;
-                                    $attempts = 0;
-                                    
-                                    // Try 3 times to download the image then quit.
-                                    while ($imgData == false && $attempts < 3)
-                                    {
-                                        $imgData = file_get_contents($imgUrl);
-                                        $attempts++;
-										sleep(1);
-                                    }
-                                    
-                                    // More than 3 attempts made and image couldn't be downloaded.  Break from loop
-                                    // Had to add this because of a timeout when fetching the image via URL
-                                    if ($attempts >= 3) {
-                                        break;
-                                    }
-								
-									$faceArray[] = $detectedFaceItem;
-									
-                                    Storage::put('public/' . $path,$imgData);
-                                    
-                                    //************************************************************
-                                    // **** FOR IMPORTING MARICOPA COUNTY SCRAPED IMAGES ONLY ****
-                                    // **** REMOVE AFTER LARGE IMPORT IS COMPLETE ****
-                                    $dest = public_path("/storage/face/" . $organizationAccount . "/" . $gender . "/" . $faceToken . "." . $ext);
-            
-                                    // Crop out the watermarke at the bottom of all of the scraped images
-                                    $image = Image::make($imgData);
-                                    $height = $image->height();
-                                    $width = $image->width();
-                                    
-                                    $image->crop($width,$height-64)->save($dest);
-                                    //************************************************************
-								
-									$path = url('/storage/' . $path);
-
-									$detectedFaceItem->path = $path;
-									
-									fwrite($log,"Face detected.  Storing as " . $faceToken . "\n");
-								}
-								else
-								{
-									// Poor quality face shot
-								fwrite($log,"Face detected but post was insufficient quality for comparison. [yaw: " . $yaw_angle . "], [pitch: " . $pitch_angle . "], [roll: " . $roll_angle . "]\n");
-								}
-							}
-							else 
-							{
-								// Log to file that no face was found
-                                $errorUrlList[] = $imgUrl;
-
-								fwrite($log,"No face detected\n");
-							}
-						}
-						else
-						{
-							// Image did not exist at remote URL.  Log to file
-							fwrite($log,"Image URL was invalid.  Skipping...\n");
-						}
 					}
 					else
 					{
@@ -584,9 +443,7 @@ class PortraitsController extends Controller
 						fwrite($log,"Row [" . $lineCount . "] was invalid. Skipping...\n");
 					}
 				}
-				
-				// Sleep for a half second to prevent Concurrency issues.  REMOVE WHEN USING PAID KEY
-				time_nanosleep(0, 400000000);
+
 			}
 
 			// Close the CSV file
@@ -596,14 +453,6 @@ class PortraitsController extends Controller
 			fclose($log);
 			
 			//********************** REMOVE THIS WHEN DONE DEBUGGING ****************
-			//exit(1);
-			
-			if(count($faceArray) > 0) 
-			{
-				// Process the images and assign Facesets
-				$this->storeSortedFaces($faceArray);
-			}
-			
 			$res = new \stdClass;
 			$res->status = 200;
 			$res->msg = 'Uploaded successfully.';
@@ -612,102 +461,80 @@ class PortraitsController extends Controller
 		else
 		{ 
 			//****** Image is a single image uploaded by the user *******//
+            // image upload to the s3 storage and faceindexing the image to the aws rekognition.
 			ini_set('max_execution_time', 300);
 			
 			$res = new \stdClass;
 
-			// Get image filename
-			$filename = $request->portraitInput->getPathName();
-        
-			//Detect face
-			$params['image_file'] = new \CURLFile($filename);
-			$params['return_attributes'] = 'gender,headpose,facequality';
-			
-			$detectApiCallResult = $this->facepp->execute('/detect', $params);
-			$detectApiCallResult = json_decode($detectApiCallResult);
+            $gender = $request->gender;
+            $identifiers = $request->identifiers;
 
-			if(isset($detectApiCallResult->error_message)) {
-			  $res->status = 300;
-			  $res->msg = $detectApiCallResult->error_message;
-			  
-			  echo json_encode( $res );
-			  return;
-			}
+            // Get image filename
+			$filename = $request->portraitInput->getClientOriginalName();
+            // get the file type.
+            $file_type_tmp = explode(".",$filename);
+            $file_type = $file_type_tmp[count($file_type_tmp) -1];
 
-			// No face was detected in the image they tried to manually add
-			if(count($detectApiCallResult->faces) == 0) {
-			  $res->status = 201;
-			  $res->msg = 'No faces were detected in this image';
-			  echo json_encode( $res );
-			  return;
-			}
-			
-			// Check the pose of the face to be sure it's sufficient quality
-			// Anything else means the person in the mugshot is not looking
-			// very straight resulting in poor quality.
-			$yaw_angle = $detectApiCallResult->faces[0]->attributes->headpose->yaw_angle;
-			$roll_angle = $detectApiCallResult->faces[0]->attributes->headpose->roll_angle;
-			$pitch_angle = $detectApiCallResult->faces[0]->attributes->headpose->pitch_angle;
-			
-			// Get the face quality rating
-			$quality = $detectApiCallResult->faces[0]->attributes->facequality->value;
+            // Get image filecontent
+            $file = $request->portraitInput->getPathName();
+            $image_file = file_get_contents($file);
 
-			if (	($yaw_angle >= -25 && $yaw_angle <= 25) &&
-					($pitch_angle >= -20 && $pitch_angle <= 20) && 
-					($roll_angle >= -20 && $roll_angle <= 20)
-				)
-			{
-			
-				// Unique ID for the uploaded image
-				$imageId =  $detectApiCallResult->image_id;
-				
-				// Face token for the detected face
-				$faceToken =  $detectApiCallResult->faces[0]->face_token;
-				
-				// Get the active FaceSet Token
-				$activeFaceset = $this->getActiveFaceset($request->gender);
-				$active_facesetToken = $activeFaceset[0]->facesetToken;
+            // Manual upload of image.
+            $new_face_token = md5(strtotime(date('Y-m-d H:i:s')). 'manual_upload');
+            $faceset = FaceSet::where('organizationId','=', $organizationId)->where('gender','=',$gender)->first();
+            // getting the facesetId.
+            $facesetId = 0;
+            if(isset($faceset->organizationId) && $faceset->organizationId == $organizationId){
+                $facesetId = $faceset->id;
+            }else{
+                // create new faceset;
+                $faceset_token = md5(strtotime(date('Y-m-d H:i:s')).'manual_upload'. rand(0,9));
+                $facesetId = Faceset::create([
+                    'facesetToken' => $faceset_token,
+                    'organizationId' => $organizationId,
+                    'gender' => $gender
+                ])->id;
+            }
 
-				$originalFileName = $request->portraitInput->getClientOriginalName();
-				$ext = explode(".", $originalFileName);
-				$ext = $ext[count($ext) - 1];
+            // s3 image upload.
+            $keyname = 'storage/face/'. $organizationAccount .'/' . $new_face_token .'.'. $file_type;
+            try {
+                // Upload data.
+                $result = $this->aws_s3_client->putObject([
+                    'Bucket' => $this->aws_s3_bucket,
+                    'Key' => $keyname,
+                    'Body' => $image_file,
+                    'ACL' => 'public-read'
+                ]);
 
-				$facesetIndex = $activeFaceset[0]->id;
+                // Print the URL to the object.
+                $s3_image_url_tmp = $result['ObjectURL'];
+                $a = env('AWS_S3_UPLOAD_URL_DOMAIN');
+                $b = env('AWS_S3_REAL_OBJECT_URL_DOMAIN');
+                $s3_image_url = $b . explode($a, $s3_image_url_tmp)[1];
 
-				$path = 'face/' . $organizationAccount . "/" . $request->gender . "/" . $active_facesetToken . "/";
-									
-				$filename = $faceToken . "." . $ext;
-				$request->portraitInput->storeAs('public/' . $path, $filename);
-				$path = url('/storage/' . $path . $filename);
+                FaceModel::create([
+                    'faceToken' => $new_face_token,
+                    'facesetId' => $facesetId,
+                    'imageId' => '',
+                    'identifiers' => Crypt::encryptString($identifiers),
+                    'gender' => $gender,
+                    'savedPath' => $s3_image_url,
+                    'aws_face_id' => ''
+                ]);
 
-				// Manual upload of image.
-					
-				FaceModel::create([
-				  'faceToken' => $faceToken,
-				  'facesetId' => $activeFaceset[0]->id,
-				  'imageId' => $imageId,
-				  'identifiers' => Crypt::encryptString($request->identifiers),
-				  'gender' => $request->gender,
-				  'savedPath' => $path
-				]);
-				
-				// Increment our faces
-				Faceset::where('id', $activeFaceset[0]->id)->increment('faces');
+                // Increment our faces
+                Faceset::where('id', $facesetId)->increment('faces');
+            }catch (S3Exception $e) {
+                $res->status = 300;
+                $res->msg = $e->getMessage();
+                echo json_encode( $res );
+                return;
+            }
 
-				Face::addIntoAlbum($active_facesetToken,$faceToken);
-				
-				$res->status = 200;
-				$res->msg = 'Uploaded successfully.';
-				echo json_encode( $res );
-			}
-			else
-			{
-				// Poor quality face shot
-				$res->status = 201;
-				$res->msg = 'The angle of the detected face is poor quality and not suitable for facial recognition';
-				echo json_encode( $res );
-				return;
-			}
+            $res->status = 200;
+            $res->msg = 'Uploaded successfully.';
+            echo json_encode( $res );
 		}
   }
 

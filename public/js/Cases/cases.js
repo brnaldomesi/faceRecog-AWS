@@ -1,5 +1,6 @@
 $(document).ready(function () {
 	initEvent();
+
 });
 
 function initEvent() {
@@ -134,16 +135,13 @@ function initEvent() {
 			body += '		<img src="' + needle_image_src + '" class="img-thumbnail fanc1ybox-button" data-rel="fancybox-button">';
 			body += '	</div>';
 			
-			for (var i = 0, len = data.result.length; i < len; i++) {
-				var l = data.result[i].length;
-				for (var j = 0; j < l; j++) {
-					flat.push(data.result[i][j]);
-				}
-				match_count += l;
+			for (var i = 0, len = data.data_list.length; i < len; i++) {
+				flat.push(data.data_list[i]);
+				match_count += 1;
 			}
 
 			flat.sort(function (a, b) {
-		        var x = a['confidence']; var y = b['confidence'];
+		        var x = a['similarity']; var y = b['similarity'];
        			return ((x > y) ? -1 : ((x < y) ? 1 : 0));
 			});
 
@@ -151,25 +149,28 @@ function initEvent() {
 			body += '<ul class="list-new ext1">';
 
 			$.each(flat, function (index, value) {
-
+				let image_url = value.image;
+                if(image_url.substr(0, 7) == 'storage'){
+                	image_url = s3_base_image_url + image_url;
+				}
 				body += '<li style="margin: 10px 0;">';
 				body += '	<div>';
-				body += '		<a href="' + value.savedPath + '" class="fancybox-button" data-rel="fancybox-button">';
-				body += '		<img src="' + value.savedPath + '" class="img-thumbnail" alt="Can not load image"></a>';
+				body += '		<a href="' + image_url + '" class="fancybox-button" data-rel="fancybox-button">';
+				body += '		<img src="' + image_url + '" class="img-thumbnail" alt="Can not load image"></a>';
 				body += '	</div>';
 				body += '	<div style="margin-top:20px; line-height:20px">'
+				// body += '		<div class="field">';
+				// body += '			<div><b>Identifiers:</b></div>';
+				// body += '			<div>' + 'value.identifiers' + '</div>';
+				// body += '		</div>';
 				body += '		<div class="field">';
-				body += '			<div><b>Identifiers:</b></div>';
-				body += '			<div>' + value.identifiers + '</div>';
+				body += '			<div><b>Similiarity:</b></div>';
+				body += '			<div>' + value.similarity + '%</div>';
 				body += '		</div>';
-				body += '		<div class="field">';
-				body += '			<div><b>Confidence:</b></div>';
-				body += '			<div>' + value.confidence + '%</div>';
-				body += '		</div>';
-				body += '		<div class="field">';
-				body += '			<div><b>Source:</b></div>';
-				body += '			<div>' + value.organization + '</div>';
-				body += '		</div>';					
+				// body += '		<div class="field">';
+				// body += '			<div><b>Source:</b></div>';
+				// body += '			<div>' + 'value.organization' + '</div>';
+				// body += '		</div>';
 				body += '	</div>';
 				body += '</li>';
 			});
@@ -237,11 +238,15 @@ function initEvent() {
 			type: 'post',
 			data: { 'image' : $(this).attr('image-no') },
 			success: function (response) {
+                Metronic.unblockUI();
+				if(response.status == 'faild'){
+					bootbox.alert(response.msg);
+					return;
+				}
 
 				var last_index = table_search_history.data().length;
 				var match_count = showSearchResultDialog(response, needle_image_src);
 	
-				Metronic.unblockUI();
 				table_image_list.cell(updateCol).data(response.time).draw();
 				$(table_search_history.row.add([
 					last_index + 1,
@@ -257,4 +262,5 @@ function initEvent() {
 		});
 	});
 }
+
 

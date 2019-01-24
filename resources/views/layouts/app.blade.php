@@ -174,7 +174,10 @@
         Layout.init(); // init current layout
         Demo.init(); // init demo features
       });
+
+      var base_url = '{{$base_url}}';
    </script>
+
    @yield('extrajs')
 </body>
 </html>
