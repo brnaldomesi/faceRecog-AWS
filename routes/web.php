@@ -77,6 +77,7 @@ Route::group(['middleware' => ['authen']], function () {
 
 	Route::post('/cases/search', 'CaseController@search')->name('search.case');
 	Route::post('/cases/search-history', 'CaseController@searchHistory')->name('search.history');
+    Route::post('/cases/getDetailFaceInfo','CaseController@getDetailFaceInfo');
 
 	// aws test
 	Route::get('/awstest', 'TestController@index')->name('aws.test');

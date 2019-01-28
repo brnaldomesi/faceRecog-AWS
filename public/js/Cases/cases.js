@@ -3,6 +3,31 @@ $(document).ready(function () {
 
 });
 
+function showFaceDetail(aws_face_id){
+    Metronic.blockUI({
+        animate: true,
+        overlayColor: 'none',
+        cenrerY: true,
+    });
+    $.ajax({
+        url: base_url + 'cases/getDetailFaceInfo',
+        type: 'post',
+        data: { 'aws_face_id' : aws_face_id },
+        success: function (response) {
+        	console.log(response);
+            Metronic.unblockUI();
+
+            $('#id_dv_face_detail_'+aws_face_id).removeClass('hidden');
+            $('#id_dv_face_detail_'+aws_face_id + ' .txt-identifiers').html(response.identifiers);
+
+        },
+        error: function (jqXHR, status, error) {
+            Metronic.unblockUI();
+            bootbox.alert(status + "<br>" + error);
+        }
+    });
+}
+
 function initEvent() {
 
 	$(".fileupload-buttonbar button.clean").click(function () {
@@ -159,14 +184,15 @@ function initEvent() {
 				body += '		<img src="' + image_url + '" class="img-thumbnail" alt="Can not load image"></a>';
 				body += '	</div>';
 				body += '	<div style="margin-top:20px; line-height:20px">'
-				// body += '		<div class="field">';
-				// body += '			<div><b>Identifiers:</b></div>';
-				// body += '			<div>' + 'value.identifiers' + '</div>';
-				// body += '		</div>';
 				body += '		<div class="field">';
 				body += '			<div><b>Similiarity:</b></div>';
 				body += '			<div>' + value.similarity + '%</div>';
+				body += '			<div><a href="#" onclick="showFaceDetail(\''+value.face_id+'\')">Detail</a></div>';
 				body += '		</div>';
+                body += '		<div class="field hidden" id="id_dv_face_detail_'+value.face_id+'">';
+                body += '			<div><b>Identifiers:</b></div>';
+                body += '			<div class="txt-identifiers"></div>';
+                body += '		</div>';
 				// body += '		<div class="field">';
 				// body += '			<div><b>Source:</b></div>';
 				// body += '			<div>' + 'value.organization' + '</div>';
@@ -261,6 +287,7 @@ function initEvent() {
 			}
 		});
 	});
+
 }
 
 

@@ -85,7 +85,7 @@ class TestController extends Controller
             $results = $this->rekognitionClient->ListCollections([
                 "MaxResults" => 10
             ]);
-            
+
             if(isset($results['CollectionIds'])){
                 $collections = $results['CollectionIds'];
             }
@@ -113,6 +113,14 @@ class TestController extends Controller
             echo $e->getMessage() . PHP_EOL;
             //exit;
         }
+
+
+        // collection model version.
+//        $res = $this->rekognitionClient->DescribeCollection([
+//            "CollectionId"=> 'maricopacountyjail_male_1547784083'
+//        ]);
+
+        //var_dump($res); exit;
 
         return view('test.index')->with('collections', $collections)->with('faces', $faces);
 	}

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Console\Commands;
 
+use Illuminate\Console\Command;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -20,25 +21,38 @@ use App\Models\Organization;
 use App\Utils\FaceSearch;
 use App\Mail\Notify;
 
-
-class SearchMug implements ShouldQueue
+class AwsAutoSearch extends Command
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * Create a new job instance.
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'aws:autosearch';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'AWS Auto Search function.';
+
+    /**
+     * Create a new command instance.
      *
      * @return void
      */
     public function __construct()
     {
-        //
+        parent::__construct();
     }
 
     /**
-     * Execute the job.
+     * Execute the console command.
      *
-     * @return void
+     * @return mixed
      */
     public function handle()
     {
@@ -47,22 +61,22 @@ class SearchMug implements ShouldQueue
         $images = Image::whereHas('cases', function ($query) {
             $query->where('status', 'ACTIVE');
         })
-        ->where(function ($query) {
-            $query->where('lastSearched', '<', Carbon::now()->subDays(30))
-                ->orWhereNull('lastSearched');
-        })
-        ->get();
-        
+            ->where(function ($query) {
+                $query->where('lastSearched', '<', Carbon::now()->subDays(30))
+                    ->orWhereNull('lastSearched');
+            })
+            ->get();
+
         foreach ($images as $image) {
             $file_path = '../storage/app/' . $image->file_path;
             $organ = $image->cases->organization;
-            
+
             if (is_null($organ)) {
                 continue;
             }
             $gender = $image->gender;
             $organ_id = $organ->id;
-            
+
             // Search image only from facesets that were updated after last search date of the image by setting 5th parameter
             // - get the search result from the aws rekoginition.
             // - get the face_id list from the search results
@@ -88,32 +102,32 @@ class SearchMug implements ShouldQueue
             }
 
             $result = $result_new;
-            
+
             // Fetch existing search result for the image from CaseSearch table
             $result_orig_arr = CaseSearch::where('imageId', $image->id)->get();
 
             if(!$result_orig_arr->isEmpty()) {
-              $result['result'] = [];
+                $result['result'] = [];
             }
-             
+
             foreach ($result_new['result'] as $r) {
                 if (count($r) > 0) {
-                  foreach($result_orig_arr as $result_orig) {
-                    if (!is_null($result_orig)) {
-                        $result_orig = $result_orig['results'];
-                    }
-                    if ($result_new['status'] == 200 && !is_null($result_orig) && $result_orig['status'] == 200) {
-                      $diff = [];
-                      foreach ($result_orig['result'] as $orig) {
-                          
-                          $r = array_udiff($r, $orig,
-                            function ($obj_a, $obj_b) {
+                    foreach($result_orig_arr as $result_orig) {
+                        if (!is_null($result_orig)) {
+                            $result_orig = $result_orig['results'];
+                        }
+                        if ($result_new['status'] == 200 && !is_null($result_orig) && $result_orig['status'] == 200) {
+                            $diff = [];
+                            foreach ($result_orig['result'] as $orig) {
+
+                                $r = array_udiff($r, $orig,
+                                    function ($obj_a, $obj_b) {
                                         return strcmp(((object)$obj_a)->faceToken, ((object)$obj_b)->faceToken);
+                                    }
+                                );
                             }
-                          );
-                      }
+                        }
                     }
-                  }
                 }
                 if(!empty($r)){
                     $r = array_values($r);
@@ -159,8 +173,8 @@ class SearchMug implements ShouldQueue
         foreach ($mail_list as $mail) {
             $text = $mail['name'] . ", we have automatically re-scanned some of your evidence photos and we found new similar faces.";
             $text .= "<br>Log in and review them to see if they match your suspects.<br>";
-            
-			foreach ($mail['cases'] as $c) {
+
+            foreach ($mail['cases'] as $c) {
                 $link = url('cases/' . $c['id']);
                 $text .= "<br>Case '" . $c['name'] . "' has " . $c['count'] . " new mug shot results.";
                 $text .= "<br><a href='{$link}'>{$link}</a><br>";
@@ -174,6 +188,4 @@ class SearchMug implements ShouldQueue
             } catch (\Exception $e) {}
         }
     }
-
-
 }

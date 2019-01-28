@@ -238,7 +238,7 @@
 							{{ $value->searchedOn }}
 						</td>
 						<td>
-							{{ $value->match_count }}
+							{{count($value->results['data_list'])}}
 						</td>
 					</tr>
 @endforeach

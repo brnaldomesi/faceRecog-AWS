@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Crypt;
 
 use App\Models\Face as FaceModel;
 use App\Models\User;
@@ -22,6 +23,7 @@ use App\Utils\UploadHandler;
 use App\Utils\ImageResize;
 use App\Utils\FaceSearch;
 use App\Utils\Facepp;
+
 
 // aws package.
 use Aws\Rekognition\RekognitionClient;
@@ -84,7 +86,7 @@ class CaseController extends Controller
 
 	public function cases(Cases $cases)
 	{
-		return view('cases.cases', [
+	    return view('cases.cases', [
 			'cases' => $cases,
 			'search_history' => $cases->caseSearches()->with('image')->orderBy('created_at', 'asc')->get()
 		]);
@@ -313,7 +315,7 @@ class CaseController extends Controller
         //$result = FaceSearch::search('../storage/app/' . $image->file_path, $organ_id, $gender);
 		$image->lastSearched = now();
 		$image->save();
-		
+
 		if(isset($search_res['status']) && $search_res['status'] != 'faild'){
             $search = CaseSearch::create([
                 'organizationId' => $organ_id,
@@ -353,5 +355,22 @@ class CaseController extends Controller
 		
 		return response()->json($result);
 	}
+
+
+	public function getDetailFaceInfo(Request $request){
+	    if(is_null($request->aws_face_id)){
+	        return response('Incorrect parameter', 400);
+        }
+        $face = FaceModel::where('aws_face_id','=',$request->aws_face_id)->first();
+	    if(is_null($face)){
+	        return response('Incorrect parameter',400);
+        }
+
+        $face->identifiers = Crypt::decryptString($face->identifiers);
+
+        return response()->json($face);
+
+    }
+
 
 }
