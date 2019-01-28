@@ -53,6 +53,7 @@ class Controller extends BaseController
             return $collection_id;
         }catch(RekognitionException $e){
             Log::emergency($e->getMessage());
+            echo $e->getMessage();
             return 'faild';
         }
     }
@@ -104,7 +105,7 @@ class Controller extends BaseController
     }
 
 
-    public function awsFaceSearch($key,$collection_id,$matchthreshold=70, $maxfaces=100){
+    public function awsFaceSearch($key,$collection_id,$matchthreshold=30, $maxfaces=100){
         try {
             // Get the object.
             $result = $this->aws_s3_client->getObject([
@@ -127,8 +128,7 @@ class Controller extends BaseController
                     'MaxFaces' => $maxfaces,
                 ]);
 
-
-
+                
                 $faces_matched = $results['FaceMatches'];
                 $matched_images = [];
                 foreach($faces_matched as $face){

@@ -99,7 +99,7 @@ class AwsFaceIndexing extends Command
 //        Organization::where('id',3)->update(['contactName'=>'Brian Marlow '. strtotime(date('Y-m-d H:i:s'))]);
 //        return;
 
-        for($i = 0; $i < 25; $i ++){
+        for($i = 0; $i < 30; $i ++){
             $this->handle_one($i);
         }
 
@@ -125,9 +125,10 @@ class AwsFaceIndexing extends Command
                         // create the aws_collection.
                         $male_name = $organization->account . '_' . 'male';
                         $female_name = $organization->account . '_' . 'female';
-
+                        echo $male_name;
                         $male_collection_id  = $this->createAwsCollection($male_name);
                         $female_collection_id = $this->createAwsCollection($female_name);
+
                         if($male_collection_id !== 'faild' && $female_collection_id !== 'faild'){
                             // update the collection_id on the database.
                             Organization::where('id',$organization_id)->update(['aws_collection_male_id'=>$male_collection_id,'aws_collection_female_id'=>$female_collection_id]);
