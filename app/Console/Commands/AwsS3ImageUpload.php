@@ -99,13 +99,14 @@ class AwsS3ImageUpload extends Command
          *
          * */
 
-
-        for($i = 0; $i < 1; $i ++){
+        for($i = 0; $i < 20; $i ++){
             $this->handle_one($i);
         }
+		
     }
 
     public function handle_one($index){
+		
         // getting the face_tmp one row
         $face_tmp = FaceTmp::first();
 
@@ -124,83 +125,143 @@ class AwsS3ImageUpload extends Command
                 return;
             }
 
-            // image source url.
-            $image_source =  $face_tmp->image_url;
+			$downloadFailed = false;
+			
+			if ($og_account_name == 'maricopacountyjail')
+			{
+				// Proxy for importing scraped images
+				$ch = curl_init($face_tmp->image_url);
+				curl_setopt($ch, CURLOPT_PROXY, "172.245.242.222:80");
+				curl_setopt($ch, CURLOPT_PROXYUSERPWD, "afrengine:afrengineproxy");
+				curl_setopt($ch, CURLOPT_BINARYTRANSFER,TRUE);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
+				curl_setopt($ch, CURLOPT_HEADER, 0);
+				$im = curl_exec($ch);
+				
+				// Check if the Image URl was a redirect from the original URL
+				// If it was, there was an error.  Delete the temp record
+				$lastUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+				
+				if ($lastUrl == $face_tmp->image_url)
+				{
+				
+					if (file_exists("temp.jpg")) {
+						unlink("temp.jpg");
+					}
+					
+					$fp = fopen("temp.jpg","x");
+					fwrite($fp,$im);
+					fclose($fp);
+					curl_close($ch);
+					
+					// Load our image resource
+					$im = imagecreatefromjpeg("temp.jpg");
+					
+					// Get our width/height
+					$width = imagesx($im);
+					$height = imagesy($im);
+					
+					// Crop the watermark
+					$im2 = imagecrop($im,['x'=>0,'y'=>0,'width'=>$width,'height'=>$height-61]);
+					
+					// Save the cropped image
+					imagejpeg($im2,"temp.jpg");
+					
+					// Load our newly cropped image into image_source
+					$image_source = file_get_contents("temp.jpg");
+				} 
+				else 
+				{
+					$downloadFailed = true;
+					
+					// Unable to download the image.  Delete it
+					$face_tmp_id = $face_tmp->id;
+					FaceTmp::where('id', '=', $face_tmp_id)->delete();
+				}
+			}
+			else
+			{
+				// image source url.
+				$image_source =  file_get_contents($face_tmp->image_url);
+			}
 
-            // generate new token for the image to upload on s3.
-            $new_face_token = md5(strtotime(date('Y-m-d H:i:s')). $index);
+			if ($downloadFailed == false)
+			{
+				// generate new token for the image to upload on s3.
+				$new_face_token = md5(strtotime(date('Y-m-d H:i:s')). $index);
+				
+				// get the file type.
+				$file_type_tmp = explode(".",$face_tmp->image_url);
+				$file_type = $file_type_tmp[count($file_type_tmp) -1];
 
-            // get the file type.
-            $file_type_tmp = explode(".",$image_source);
-            $file_type = $file_type_tmp[count($file_type_tmp) -1];
+				//upload image to s3 from the original image.
+				$keyname = 'storage/face/'. $og_account_name .'/' . $new_face_token .'.'. $file_type;
+				//Log::emergency($keyname); return;
+				try {
+					// Upload data.
+					$result = $this->s3client ->putObject([
+						'Bucket' => $this->s3_bucket,
+						'Key'    => $keyname,
+						'Body'   => $image_source,
+						'ACL'    => 'public-read'
+					]);
 
-            //upload image to s3 from the original image.
-            $keyname = 'storage/face/'. $og_account_name .'/' . $new_face_token .'.'. $file_type;
-            //Log::emergency($keyname); return;
-            try {
-                // Upload data.
-                $result = $this->s3client ->putObject([
-                    'Bucket' => $this->s3_bucket,
-                    'Key'    => $keyname,
-                    'Body'   => file_get_contents($image_source),
-                    'ACL'    => 'public-read'
-                ]);
+					// Print the URL to the object.
+					$s3_image_url_tmp = $result['ObjectURL'];
+					$a = env('AWS_S3_UPLOAD_URL_DOMAIN');
+					$b = env('AWS_S3_REAL_OBJECT_URL_DOMAIN');
+					$s3_image_url = $b . explode($a, $s3_image_url_tmp)[1];
 
-                // Print the URL to the object.
-                $s3_image_url_tmp = $result['ObjectURL'];
-                $a = env('AWS_S3_UPLOAD_URL_DOMAIN');
-                $b = env('AWS_S3_REAL_OBJECT_URL_DOMAIN');
-                $s3_image_url = $b . explode($a, $s3_image_url_tmp)[1];
+					// get the default facesetid from the organization and gender "MALE"
+					$gender = "MALE";
+					$faceset = FaceSet::where('organizationId','=', $og_id)->where('gender','=',$gender)->first();
+					$facesetId = '';
+					if(isset($faceset->organizationId) && $faceset->organizationId == $og_id){
+						$facesetId = $faceset->id;
+					}else{
+						// create new faceset;
+						$faceset_token = md5(strtotime(date('Y-m-d H:i:s')). $index . rand(0,9));
+						$facesetId = Faceset::create([
+							'facesetToken' => $faceset_token,
+							'organizationId' => $og_id,
+							'gender' => $gender
+						])->id;
+					}
 
-                // get the default facesetid from the organization and gender "MALE"
-                $gender = "MALE";
-                $faceset = FaceSet::where('organizationId','=', $og_id)->where('gender','=',$gender)->first();
-                $facesetId = '';
-                if(isset($faceset->organizationId) && $faceset->organizationId == $og_id){
-                    $facesetId = $faceset->id;
-                }else{
-                    // create new faceset;
-                    $faceset_token = md5(strtotime(date('Y-m-d H:i:s')). $index . rand(0,9));
-                    $facesetId = Faceset::create([
-                        'facesetToken' => $faceset_token,
-                        'organizationId' => $og_id,
-                        'gender' => $gender
-                    ])->id;
-                }
+					// add the new row on the faces table.
+					$imageId = '';
+					$identifiers =  Crypt::encryptString($face_tmp->identifiers);
+					$face_matches = 0;
+					$aws_face_id = '';
 
-                // add the new row on the faces table.
-                $imageId = '';
-                $identifiers =  Crypt::encryptString($face_tmp->identifiers);
-                $face_matches = 0;
-                $aws_face_id = '';
-
-                Face::create([
-                    'faceToken' => $new_face_token,
-                    'savedPath' => $s3_image_url,
-                    'facesetId' => $facesetId,
-                    'imageId' => $imageId,
-                    'identifiers' => $identifiers,
-                    'gender' => $gender,
-                    'faceMatches' => $face_matches,
-                    'aws_face_id' => $aws_face_id
-                ]);
-
-
-                // remove the current row from the face_tmps
-                $face_tmp_id = $face_tmp->id;
-                FaceTmp::where('id', '=', $face_tmp_id)->delete();
+					Face::create([
+						'faceToken' => $new_face_token,
+						'savedPath' => $s3_image_url,
+						'facesetId' => $facesetId,
+						'imageId' => $imageId,
+						'identifiers' => $identifiers,
+						'gender' => $gender,
+						'faceMatches' => $face_matches,
+						'aws_face_id' => $aws_face_id
+					]);
 
 
+					// remove the current row from the face_tmps
+					$face_tmp_id = $face_tmp->id;
+					FaceTmp::where('id', '=', $face_tmp_id)->delete();
 
-            } catch (S3Exception $e) {
-                Log::emergency($e->getMessage() . PHP_EOL);
 
-                // remove the row from face_table
-                $face_tmp_id = $face_tmp->id;
-                FaceTmp::where('id', '=', $face_tmp_id)->delete();
-                reutrn;
-            }
 
+				} catch (S3Exception $e) {
+					Log::emergency($e->getMessage() . PHP_EOL);
+					// remove the row from face_table
+					$face_tmp_id = $face_tmp->id;
+					FaceTmp::where('id', '=', $face_tmp_id)->delete();
+
+					return;
+				}
+			}
         }
 
         //Log::emergency($a);

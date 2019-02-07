@@ -176,6 +176,13 @@
       });
 
       var base_url = '{{$base_url}}';
+      /* it is used to do azax function in laravel. */
+
+      $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+      });
    </script>
 
    @yield('extrajs')

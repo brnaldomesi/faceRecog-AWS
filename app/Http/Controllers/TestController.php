@@ -58,7 +58,7 @@ class TestController extends Controller
         ]);
         
         $this->s3_bucket = env('AWS_S3_BUCKET_NAME');
-        $this->test_collection_id = 'maricopacountyjail_male_1547784083';
+        $this->test_collection_id = 'maricopacountyjail_female_1548469685';
         
 	}
 
@@ -453,6 +453,45 @@ class TestController extends Controller
         } catch (S3Exception $e) {
             return 'faild';
         }
+    }
+
+
+    public function awsDeleteFemaleFaces(){
+        $faces = Face::where('gender','=','FEMALE')->where('aws_face_id','!=','')->get();
+        $face_ids = [];
+
+        foreach ($faces as $face){
+            if($face->gender == 'FEMALE')
+                $face_ids[] = $face->aws_face_id;
+            if(count($face_ids) == 600){
+                try{
+                    $results = $this->rekognitionClient->DeleteFaces([
+                        "CollectionId"=> 'maricopacountyjail_male_1548469684',
+                        "FaceIds"=> $face_ids
+                    ]);
+                    var_dump($results);
+                }catch(ReKognitionException $e){
+                    echo $e->getMessage(). PHP_EOL;
+                }
+                $face_ids = [];
+                sleep(30);
+            }
+        }
+
+        sleep(15);
+        try{
+            $results = $this->rekognitionClient->DeleteFaces([
+                "CollectionId"=> 'maricopacountyjail_male_1548469684',
+                "FaceIds"=> $face_ids
+            ]);
+            var_dump($results);
+
+        }catch(ReKognitionException $e){
+            echo $e->getMessage(). PHP_EOL;
+        }
+
+
+
     }
     
 	

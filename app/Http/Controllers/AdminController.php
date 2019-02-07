@@ -65,7 +65,7 @@ class AdminController extends Controller
 	
 	public function sharing(Request $request)
 	{
-		if (Organization::find($request->organization)) {
+	    if (Organization::find($request->organization)) {
 			switch ($request->action_type) {
 				case 'action-apply':
 					$sharing = FacesetSharing::where([

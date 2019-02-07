@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use App\Models\Face as FaceModel;
 use App\Models\User;
 use App\Models\Faceset;
+use App\Models\FacesetSharing;
 use App\Models\Cases;
 use App\Models\Image;
 use App\Models\CaseSearch;
@@ -33,6 +34,7 @@ use Aws\S3\Exception\S3Exception;
 
 
 use Auth;
+use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use Storage;
 
 class CaseController extends Controller
@@ -285,6 +287,8 @@ class CaseController extends Controller
 		return response()->json(['data' => $result]);
 	}
 
+
+
 	public function search(Request $request)
 	{
 		if (is_null($request->image)) {
@@ -304,17 +308,61 @@ class CaseController extends Controller
         }
 
         $collection_id = $organization->aws_collection_male_id;
+        $collection_field =  'aws_collection_male_id';
         if($gender != 'MALE'){
             $collection_id = $organization->aws_collection_female_id;
+            $collection_field =  'aws_collection_female_id';
         }
 
         // face_search from aws rekognition.
         $key = $this->aws_s3_case_image_key_header. $image->filename_uploaded;
         $search_res = $this->awsFaceSearch($key,$collection_id);
 
-        //$result = FaceSearch::search('../storage/app/' . $image->file_path, $organ_id, $gender);
-		$image->lastSearched = now();
+        // check the shared organization.
+        // if this og has shared organization, then it search with the shared organization also.
+        $organizations = FacesetSharing::where([
+                ['organization_owner', $organ_id], ['status', 'ACTIVE']
+            ])
+            ->get()->pluck('organization_requestor');
+        $owner = FacesetSharing::where([
+                ['organization_requestor', $organ_id], ['status', 'ACTIVE']
+            ])
+            ->get()->pluck('organization_owner');
+        $organizations = $organizations->merge($owner);
+        $organizations = $organizations->unique();
+        $collection_ids = Organization::whereIn('id', $organizations)->get()->pluck($collection_field);
+
+        // if there is the shared collections, search collections.
+        if(count($collection_ids) > 0){
+            foreach ($collection_ids as $collection_id_tmp){
+                $search_res_tmp = $this->awsFaceSearch($key, $collection_id_tmp);
+                if($search_res_tmp['status'] !== 200){
+                    continue;
+                }
+                $search_res['data_list'] = array_merge($search_res['data_list'],$search_res_tmp['data_list']);
+                if($search_res['status'] != 200){
+                    $search_res['status'] = 200;
+                }
+            }
+
+            // rearrange data_list according to the similarity
+            if(isset($search_res['data_list']) && count($search_res['data_list']) > 0 && $search_res['data_list'] != null){
+                usort($search_res['data_list'],function($first,$second){
+                    return $first['similarity'] < $second['similarity'];
+                });
+            }
+
+
+            if(isset($search_res['data_list']) && count($search_res['data_list']) > $this->aws_search_max_cnt){
+                $search_res['data_list'] = array_slice($search_res['data_list'], 0, $this->aws_search_max_cnt);
+            }
+
+        }
+
+        // save the last searched date on the images table.
+        $image->lastSearched = now();
 		$image->save();
+
 
 		if(isset($search_res['status']) && $search_res['status'] != 'faild'){
             $search = CaseSearch::create([
@@ -367,6 +415,20 @@ class CaseController extends Controller
         }
 
         $face->identifiers = Crypt::decryptString($face->identifiers);
+
+	    $faceset = Faceset::find($face->facesetId);
+	    if(!isset($faceset->organizationId) || $faceset->organizationId == ''){
+	        return response('Incorrect Parameter', 400);
+        }
+
+        $organ = Organization::find($faceset->organizationId);
+	    $organ_name = '';
+	    if(isset($organ->name)){
+	        $organ_name = $organ->name;
+        }
+
+        $face->organ_name = $organ_name;
+
 
         return response()->json($face);
 

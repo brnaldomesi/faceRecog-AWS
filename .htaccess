@@ -1,6 +1,12 @@
 
 RewriteEngine on
 
+RewriteCond %{HTTPS} off
+# First rewrite to HTTPS:
+# Don't put www. here. If it is already there it will be included, if not
+# the subsequent rule will catch it.
+RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
 # php -- BEGIN cPanel-generated handler, do not edit
 # Set the “ea-php71” package as the default “PHP” programming language.
 <IfModule mime_module>
@@ -9,5 +15,5 @@ RewriteEngine on
 # php -- END cPanel-generated handler, do not edit
 RewriteCond %{HTTP_HOST} ^engine1\.afrengine\.com$ [OR]
 RewriteCond %{HTTP_HOST} ^www\.engine1\.afrengine\.com$
-RewriteRule ^/?$ "http\:\/\/www\.afrengine\.com\/engine1\/" [R=301,L]
+RewriteRule ^/?$ "https\:\/\/www\.afrengine\.com\/engine1\/" [R=301,L]
 

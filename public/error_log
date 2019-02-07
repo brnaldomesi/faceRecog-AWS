@@ -662,3 +662,43 @@ Stack trace:
 #3 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/afrengine...', Array)
 #4 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(125): Illuminate\View\View->getContents()
 #5 /home/afrengine/engine1/vendor/laravel/fram in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php on line 2
+[31-Jan-2019 22:35:36 UTC] PHP Fatal error:  Uncaught ErrorException: Undefined variable: exception in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php:2
+Stack trace:
+#0 /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php(2): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError(8, 'Undefined varia...', '/home/afrengine...', 2, Array)
+#1 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(43): include('/home/afrengine...')
+#2 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/afrengine...', Array)
+#3 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/afrengine...', Array)
+#4 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(125): Illuminate\View\View->getContents()
+#5 /home/afrengine/engine1/vendor/laravel/fram in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php on line 2
+[01-Feb-2019 02:21:12 UTC] PHP Fatal error:  Uncaught ErrorException: Undefined variable: exception in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php:2
+Stack trace:
+#0 /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php(2): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError(8, 'Undefined varia...', '/home/afrengine...', 2, Array)
+#1 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(43): include('/home/afrengine...')
+#2 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/afrengine...', Array)
+#3 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/afrengine...', Array)
+#4 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(125): Illuminate\View\View->getContents()
+#5 /home/afrengine/engine1/vendor/laravel/fram in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php on line 2
+[01-Feb-2019 02:34:04 UTC] PHP Fatal error:  Uncaught ErrorException: Undefined variable: exception in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php:2
+Stack trace:
+#0 /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php(2): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError(8, 'Undefined varia...', '/home/afrengine...', 2, Array)
+#1 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(43): include('/home/afrengine...')
+#2 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/afrengine...', Array)
+#3 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/afrengine...', Array)
+#4 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(125): Illuminate\View\View->getContents()
+#5 /home/afrengine/engine1/vendor/laravel/fram in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php on line 2
+[01-Feb-2019 02:35:57 UTC] PHP Fatal error:  Uncaught ErrorException: Undefined variable: exception in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php:2
+Stack trace:
+#0 /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php(2): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError(8, 'Undefined varia...', '/home/afrengine...', 2, Array)
+#1 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(43): include('/home/afrengine...')
+#2 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/afrengine...', Array)
+#3 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/afrengine...', Array)
+#4 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(125): Illuminate\View\View->getContents()
+#5 /home/afrengine/engine1/vendor/laravel/fram in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php on line 2
+[03-Feb-2019 23:16:11 UTC] PHP Fatal error:  Uncaught ErrorException: Undefined variable: exception in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php:2
+Stack trace:
+#0 /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php(2): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError(8, 'Undefined varia...', '/home/afrengine...', 2, Array)
+#1 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php(43): include('/home/afrengine...')
+#2 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/afrengine...', Array)
+#3 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/afrengine...', Array)
+#4 /home/afrengine/engine1/vendor/laravel/framework/src/Illuminate/View/View.php(125): Illuminate\View\View->getContents()
+#5 /home/afrengine/engine1/vendor/laravel/fram in /home/afrengine/engine1/storage/framework/views/e4ebce58a8d9222ff45a36fb0d4d8eb688201bff.php on line 2
