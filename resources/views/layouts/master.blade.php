@@ -209,6 +209,12 @@
         Layout.init(); // init current layout
         Demo.init(); // init demo features
       });
+
+      $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+      });
    </script>
    <!-- END PAGE LEVEL SCRIPTS -->
 </body>

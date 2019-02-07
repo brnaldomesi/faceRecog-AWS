@@ -22,6 +22,8 @@ class Controller extends BaseController
     protected $aws_s3_client;
     protected $aws_s3_bucket;
     protected $aws_s3_case_image_key_header;
+    protected $aws_search_max_cnt;
+    protected $aws_search_min_similarity;
 
     function __construct()
     {
@@ -40,6 +42,9 @@ class Controller extends BaseController
         $this->aws_s3_bucket = env('AWS_S3_BUCKET_NAME');
 
         $this->aws_s3_case_image_key_header = 'storage/case/images/';
+
+        $this->aws_search_max_cnt = env('AWS_SEARCH_MAX_CNT');
+        $this->aws_search_min_similarity = env('AWS_SEARCH_MIN_SIMILARITY');
 
         view()->share('base_url', $this->site_baseurl);
     }
@@ -91,7 +96,7 @@ class Controller extends BaseController
                     $gender = $results['FaceRecords'][0]['FaceDetail']['Gender']['Value'];
                     $gender_confidence = $results['FaceRecords'][0]['FaceDetail']['Gender']['Confidence'];
                 }
-                $res = array('face_id' => $face_id, 'gender' => $gender, 'gender_confidence'=>$gender_confidence);
+                $res = array('face_id' => $face_id, 'gender' => strtoupper($gender), 'gender_confidence'=>$gender_confidence);
 
                 return $res;
 
@@ -105,7 +110,14 @@ class Controller extends BaseController
     }
 
 
-    public function awsFaceSearch($key,$collection_id,$matchthreshold=30, $maxfaces=100){
+    public function awsFaceSearch($key,$collection_id,$matchthreshold=null, $maxfaces=null){
+        if($matchthreshold == null){
+            $matchthreshold = (int)$this->aws_search_min_similarity;
+        }
+        if($maxfaces == null){
+            $maxfaces = (int)$this->aws_search_max_cnt;
+        }
+
         try {
             // Get the object.
             $result = $this->aws_s3_client->getObject([

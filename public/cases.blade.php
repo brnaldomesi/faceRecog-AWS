@@ -379,7 +379,7 @@
 
 <script src="{{ asset('admin_assets/pages/scripts/form-fileupload.js') }}" type="text/javascript"></script>
 <script>
-	var url_getfacedetailinfo = '{{ route('search.detailfaceinfo') }}';
+	var url_getfacedetailinfo = '{{route('search.detailfaceinfo')}}';
 </script>
 <script type="text/javascript" src="{{ asset('js/Cases/cases.js') }}"></script>
 @endsection

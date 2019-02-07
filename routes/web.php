@@ -41,7 +41,7 @@ Route::group(['middleware' => ['authen']], function () {
 		Route::get('/admin/activity','AdminController@activityLog')->name('admin.activity.show');
 		Route::get('/admin/sharing','AdminController@sharingForm')->name('admin.sharing.show');
 		Route::put('/admin/sharing','AdminController@sharing')->name('admin.sharing.update');
-		// Route::get('/admin/sharing/edit/{organization}','AdminController@sharingedit')->name('admin.sharingedit.show');
+		//Route::get('/admin/sharing/edit/{organization}','AdminController@sharingedit')->name('admin.sharingedit.show');
 		Route::get('/admin/create', 'AdminController@createForm')->name('admin.create.show');
 		Route::get('/admin/{user}', 'AdminController@user')->name('admin.id.show');
 		Route::put('/admin/{user}', 'AdminController@update')->name('admin.id.update');
@@ -77,7 +77,7 @@ Route::group(['middleware' => ['authen']], function () {
 
 	Route::post('/cases/search', 'CaseController@search')->name('search.case');
 	Route::post('/cases/search-history', 'CaseController@searchHistory')->name('search.history');
-    Route::post('/cases/getDetailFaceInfo','CaseController@getDetailFaceInfo');
+    Route::post('/cases/getDetailFaceInfo','CaseController@getDetailFaceInfo')->name('search.detailfaceinfo');
 
 	// aws test
 	Route::get('/awstest', 'TestController@index')->name('aws.test');

@@ -99,18 +99,22 @@ class AwsFaceIndexing extends Command
 //        Organization::where('id',3)->update(['contactName'=>'Brian Marlow '. strtotime(date('Y-m-d H:i:s'))]);
 //        return;
 
-        for($i = 0; $i < 30; $i ++){
+        for($i = 0; $i < 20; $i ++){
             $this->handle_one($i);
         }
 
     }
 
     public function handle_one($index){
+		
+	
         $face = Face::where('aws_face_id', '')->first();
         if(isset($face->facesetId)){
             $facesetId = $face->facesetId;
             $gender = $face->gender;
 
+			
+			
             $faceset = Faceset::where('id',$facesetId)->first();
             if(isset($faceset->gender) && $faceset->gender == $gender){
                 $organization_id = $faceset->organizationId;
@@ -148,6 +152,8 @@ class AwsFaceIndexing extends Command
                         $aws_bucket = $this->s3_bucket;
                         $img_key = explode($this->s3_bucket.'/', $face->savedPath)[1];
 
+						
+						
                         // face indexing by using aws rekoginition.
                         $indexed_face = $this->awsFaceIndexing($aws_bucket, $img_key,$external_image_url,$collection_id);
                         //Log::emergency('$indexed_face_id] =>'.$indexed_face['face_id']);
@@ -156,16 +162,17 @@ class AwsFaceIndexing extends Command
 
                             // checking the gender response from the aws rekognition and
                             // update the facesetId and gender on the faces table.
-                            $aws_gender = $indexed_face['gender'];
+                            $aws_gender = strtoupper($indexed_face['gender']);
                             $aws_gender_confidence = $indexed_face['gender_confidence'];
                             //Log::emergency('aws rekognition face indexing: Gender Confidence => '. $aws_gender_confidence);
                             $aws_face_id = $indexed_face['face_id'];
 
-                            if($aws_gender != $gender && $aws_gender != '' && $aws_gender != NULL && $aws_gender_confidence > 50){
+                            var_dump('Compare Gender between aws and original => '. $aws_gender . ' : '. $gender);
+                            if(strtoupper($aws_gender) != strtoupper($gender) && $aws_gender != '' && $aws_gender != NULL && $aws_gender_confidence > 50){
                                 // check the $aws_gender_confidence
 
                                 // get the faceset id from the aws_gender and organization_id.
-                                $faceset_new = Faceset::where('organizationId','=',$organization_id)->where('gender','=',$aws_gender)->first();
+                                $faceset_new = Faceset::where('organizationId','=',$organization_id)->where('gender','=',strtoupper($aws_gender))->first();
                                 $faceset_new_id = 0;
                                 if(isset($faceset_new->id)){
                                     $faceset_new_id = $faceset_new->id;
@@ -180,7 +187,7 @@ class AwsFaceIndexing extends Command
                                 }
 
                                 // update the faceset_id, and gender on the faces table.
-                                Face::where('id',$face->id)->update(['facesetId'=>$faceset_new_id,'gender'=>$aws_gender]);
+                                Face::where('id',$face->id)->update(['facesetId'=>$faceset_new_id,'gender'=>strtoupper($aws_gender)]);
 
 
                                 // remove this face from rekognition.
@@ -196,12 +203,16 @@ class AwsFaceIndexing extends Command
                                 // and  add the right face indexing again with the right gender.
                                 // face indexing by using aws rekoginition.
                                 $collection_id = $male_collection_id;
-                                if($aws_gender == 'FEMALE'){
+                                if(strtoupper($aws_gender) == 'FEMALE'){
                                     $collection_id = $female_collection_id;
                                 }
+                                var_dump('$aws_gender => ' . $aws_gender);
+                                var_dump($collection_id);
+                                var_dump($aws_face_id);
                                 $indexed_face1 = $this->awsFaceIndexing($aws_bucket, $img_key,$external_image_url,$collection_id);
                                 if(isset($indexed_face1['face_id'])&& $indexed_face1['face_id'] != '' && $indexed_face1 !== 'faild'){
                                     $aws_face_id = $indexed_face1['face_id'];
+                                    var_dump($aws_face_id);
                                 }
                             }
 
@@ -267,7 +278,7 @@ class AwsFaceIndexing extends Command
                     $gender = $results['FaceRecords'][0]['FaceDetail']['Gender']['Value'];
                     $gender_confidence = $results['FaceRecords'][0]['FaceDetail']['Gender']['Confidence'];
                 }
-                $res = array('face_id' => $face_id, 'gender' => $gender, 'gender_confidence'=>$gender_confidence);
+                $res = array('face_id' => $face_id, 'gender' => strtoupper($gender), 'gender_confidence'=>$gender_confidence);
 
                 return $res;
 

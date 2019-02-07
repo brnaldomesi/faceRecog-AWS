@@ -3,26 +3,22 @@ $(document).ready(function () {
 
 });
 
-function showFaceDetail(aws_face_id) {
+function showFaceDetail(aws_face_id){
     Metronic.blockUI({
         animate: true,
         overlayColor: 'none',
         cenrerY: true,
     });
-
     $.ajax({
-        url: url_getfacedetailinfo,
+        url: base_url + 'cases/getDetailFaceInfo',
         type: 'post',
         data: { 'aws_face_id' : aws_face_id },
         success: function (response) {
-            console.log(response);
+        	console.log(response);
             Metronic.unblockUI();
 
             $('#id_dv_face_detail_'+aws_face_id).removeClass('hidden');
             $('#id_dv_face_detail_'+aws_face_id + ' .txt-identifiers').html(response.identifiers);
-
-            $('#id_dv_face_detail_organ_'+aws_face_id).removeClass('hidden');
-            $('#id_dv_face_detail_organ_'+aws_face_id + ' .txt-organization').html(response.organ_name);
 
         },
         error: function (jqXHR, status, error) {
@@ -147,8 +143,6 @@ function initEvent() {
 		ajaxParams = {'delete' : $(this).attr('image-no')};
 		table_image_list.ajax.reload();
 	});
-
-
 	
 	var showSearchResultDialog = function (data, needle_image_src) {
 		var match_count = 0;
@@ -191,17 +185,13 @@ function initEvent() {
 				body += '	</div>';
 				body += '	<div style="margin-top:20px; line-height:20px">'
 				body += '		<div class="field">';
-				body += '			<div><b>Similarity:</b></div>';
-				body += '			<div>' + value.similarity.toFixed(2) + '%</div>';
+				body += '			<div><b>Similiarity:</b></div>';
+				body += '			<div>' + value.similarity + '%</div>';
 				body += '			<div><a href="#" onclick="showFaceDetail(\''+value.face_id+'\')">Detail</a></div>';
 				body += '		</div>';
                 body += '		<div class="field hidden" id="id_dv_face_detail_'+value.face_id+'">';
                 body += '			<div><b>Identifiers:</b></div>';
                 body += '			<div class="txt-identifiers"></div>';
-                body += '		</div>';
-                body += '		<div class="field hidden" id="id_dv_face_detail_organ_'+value.face_id+'">';
-                body += '			<div><b>Organization:</b></div>';
-                body += '			<div class="txt-organization"></div>';
                 body += '		</div>';
 				// body += '		<div class="field">';
 				// body += '			<div><b>Source:</b></div>';
