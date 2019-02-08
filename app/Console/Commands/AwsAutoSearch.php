@@ -91,8 +91,8 @@ class AwsAutoSearch extends Command
             })
             ->get();
 
-        // var_dump('$images => '. count($images));
-        // var_dump($images);
+        var_dump('$images => '. count($images));
+        var_dump(count($images));
 
 
         foreach ($images as $image) {
@@ -178,6 +178,18 @@ class AwsAutoSearch extends Command
 
             // save the new searched result to the case_searches table.
             if(count($new_searched_face_ids) > 0) {
+                // check the new faces from the results.
+                // handle ...
+                $res_tmp = $this->filterSearchResultFromDate($result_new,$new_searched_face_ids);
+                if($res_tmp == false){
+                    continue;
+                }else{
+                    $result_new = $res_tmp;
+                }
+
+                var_dump('final_searched_result => ');
+                var_dump($result_new);
+
                 $search = CaseSearch::create([
                     'organizationId' => $organ_id,
                     'imageId' => $image->id,
@@ -207,7 +219,8 @@ class AwsAutoSearch extends Command
         }
 
         // Notify auto-search fact to user via mail
-        var_dump($mail_list);
+        //var_dump('$mail_list => ');
+        //var_dump($mail_list);
         foreach ($mail_list as $mail) {
             $text = $mail['name'] . ", we have automatically re-scanned some of your evidence photos and we found new similar faces.";
             $text .= "<br>Log in and review them to see if they match your suspects.<br>";
@@ -221,19 +234,40 @@ class AwsAutoSearch extends Command
             $subject = "AFR Engine :: Your cases have new mugshots to review";
 
             try {
-                Mail::to('tyang0928@outlook.com') //$mail['to']
+                Mail::to($mail['to']) //
                 ->queue(new Notify($from, $subject, $text));
             } catch (\Exception $e) {}
         }
     }
 
+    public function filterSearchResultFromDate($search_result,$faceids){
+        if(!isset($search_result['data_list']) || count($search_result['data_list']) == 0){
+            return false;
+        }
+        if(count($faceids) == 0){
+            return false;
+        }
+        $data_list = $search_result['data_list'];
+
+        $data_list_new = [];
+        foreach ($data_list as $data){
+            if(in_array($data['face_id'],$faceids)){
+                $data_list_new[] = $data;
+            }
+        }
+
+        $search_result['data_list'] = $data_list_new;
+
+        return $search_result;
+    }
 
     public function searchKeyOnSharedCollections($organ_id,$gender,$key,$collection_id){
         //var_dump('$key => '.$key);
         //var_dump('$collection_id => '. $collection_id);
 
-        $search_res = $this->awsFaceSearch($key,$collection_id);
-
+        $search_res = $this->awsFaceSearch($key,$collection_id,0,100);
+        //var_dump('$search_res => ');
+        //var_dump($search_res);
         $collection_field =  'aws_collection_male_id';
         if($gender != 'MALE'){
             $collection_field =  'aws_collection_female_id';
@@ -339,10 +373,12 @@ class AwsAutoSearch extends Command
                 return array('status'=>$status, 'msg' => $msg, 'data_list'=> $matched_images);
 
             } catch(RekognitionException $e){
+                //var_dump($e->getMessage());
                 return array('status'=>'faild','msg'=>'Search Failed');
             }
 
         } catch (S3Exception $e) {
+            //var_dump($e->getMessage());
             echo $e->getMessage() . PHP_EOL;
         }
     }
