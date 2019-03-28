@@ -63,14 +63,11 @@
                           <li>
                               <a href="{{ route('login') }}">{{ __('Login') }}</a>
                           </li>
-                          <li>
-                              <a href="{{ route('register') }}">{{ __('Register') }}</a>
-                          </li>
                       @else
                         <li class="dropdown dropdown-user dropdown-dark">
 
                           <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre  data-hover="dropdown" data-close-others="true">
-                              <span class="username username-hide-mobile">{{ Auth::user()->name }}</span>
+                              <span class="username">{{ Auth::user()->name }}</span>
                           </a>
                           <ul class="dropdown-menu dropdown-menu-default">
                             <!-- <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> -->
@@ -127,9 +124,6 @@
                           <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
                               <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Enroll') }}</a>
                           </li>
-                          <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == ''){{ __('active')}}@endif">
-                              <a class="nav-link" href="{{ url('/portraits') }}">{{ __('Search') }}</a>
-                          </li>
                         @endif
 
               @if (Auth::user()->permission->isAdmin())
@@ -170,7 +164,7 @@
     <!-- BEGIN FOOTER -->
     <div class="page-footer">
       <div class="container">
-         2018 &copy; Brian Marlow
+         2019 &copy; AFR Engine
       </div>
     </div>
     <div class="scroll-to-top">

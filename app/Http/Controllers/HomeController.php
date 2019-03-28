@@ -50,15 +50,15 @@ class HomeController extends Controller
             $userId = Auth::user()->id;
             
             // Retrieve the # of Detected faces that are in the system for this Organization
-            $faces = Organization::find($organizationId)->faces;
-            $facesCount = $faces->count();
+            //$faces = Organization::find($organizationId)->faces;
+            //$facesCount = $faces->count();
             
             // Retrieve the # of Active cases for the logged in user
             $cases = Cases::where('userId',$userId)->get();
             $caseCount = $cases->count();
             
             // Retrieve the # of searches that have been performed by this organization
-            $searchCount = Organization::find($organizationId)->stat->searches;
+            //$searchCount = Organization::find($organizationId)->stat->searches;
             
             // Retrieve the # of pending applications that was sent to this user
             $appCount = FacesetSharing::where([
@@ -68,6 +68,8 @@ class HomeController extends Controller
         }
         
         // Send the totals back to the home view so we can display the data to the user
-        return view('home', compact('caseCount', 'facesCount', 'searchCount', 'appCount', 'organizationCount', 'faceCount'));
+        //return view('home', compact('caseCount', 'facesCount', 'searchCount', 'appCount', 'organizationCount', 'faceCount'));
+		
+		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount'));
     }
 }

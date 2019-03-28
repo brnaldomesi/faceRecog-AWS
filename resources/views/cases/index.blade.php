@@ -105,9 +105,6 @@
                       <th>
                          Created
                       </th>
-                      <th>
-                         Creator
-                      </th>
 
                     </tr>
                     </thead>
@@ -148,9 +145,6 @@
 						<td class="center">
 						   {{ $c->created_at }}
 						</td>
-						<td>
-						   {{ Auth::user()->name}}
-						</td>
 						</tr>
 @endforeach
                     </tbody>
@@ -176,5 +170,5 @@
 	<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
-  <script type="text/javascript" src="{{ asset('js/cases/caselist.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('js/Cases/caselist.js') }}"></script>
 @endsection
