@@ -62,6 +62,36 @@ function initEvent() {
 	$("a.fancybox-button").fancybox();
 	var cases_status = $("#hidden-cases-status").val();
 	var ajaxParams = {};
+	
+	var datatable_option_search_history = {
+		"language": {
+			"aria": {
+				"sortAscending": ": activate to sort column ascending",
+				"sortDescending": ": activate to sort column descending"
+			},
+			"emptyTable": "No data available in table",
+			"info": "Showing _START_ to _END_ of _TOTAL_ entries",
+			"infoEmpty": "No entries found",
+			"infoFiltered": "(filtered from _MAX_ total entries)",
+			"lengthMenu": "Show _MENU_ entries",
+			"search": "Search : ",
+			"zeroRecords": "No matching records found"
+		},
+
+		"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
+
+		"lengthMenu": [
+			[5, 15, 20, -1],
+			[5, 15, 20, "All"] // change per page values here
+		],
+
+		"pageLength": 5,
+
+		"order" : [[2, 'desc']],
+
+		"dom" : 'lfrt<"row"<"col-xs-12"i><"col-xs-12"p>>'
+	};
+	
 	var datatable_option = {
 		"language": {
 			"aria": {
@@ -91,7 +121,7 @@ function initEvent() {
 		"dom" : 'lfrt<"row"<"col-xs-12"i><"col-xs-12"p>>'
 	};
 
-	var table_search_history = $("#table-search-history").DataTable(datatable_option);
+	var table_search_history = $("#table-search-history").DataTable(datatable_option_search_history);
 
 	var table_image_list = $('#table-image-list').DataTable(
 

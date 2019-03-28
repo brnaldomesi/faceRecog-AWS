@@ -19,12 +19,12 @@ $(document).ready(function () {
 		"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 
         "lengthMenu": [
-            [5, 15, 20, -1],
-            [5, 15, 20, "All"] // change per page values here
+            [10, 15, 20, -1],
+            [10, 15, 20, "All"] // change per page values here
         ],
 
-        "pageLength": 5,
+        "pageLength": 10,
 
-        "order" : [[3, 'desc']]
+        "order" : [[4, 'desc']]
 	});
 });
