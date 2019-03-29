@@ -81,6 +81,7 @@ class AwsAutoSearch extends Command
     public function handle()
     {
         $case_list = array();
+		
         // Checks all organizations for any ACTIVE cases that have Images that have not been searched for 30 days or more
         $images = Image::whereHas('cases', function ($query) {
             $query->where('status', 'ACTIVE');
@@ -91,153 +92,192 @@ class AwsAutoSearch extends Command
             })
             ->get();
 
-        var_dump('$images => '. count($images));
-        var_dump(count($images));
+        //var_dump('$images => '. count($images));
+        //var_dump(count($images));
 
+		if (count($images) > 0) 
+		{
+			foreach ($images as $image) {
+				
+				echo 'Processing image #' . $image['id'] . PHP_EOL;
+				echo '   - Last searched: ' . $image['lastSearched'] . PHP_EOL;
+				
+				$file_path = '../storage/app/' . $image->file_path;
+				$organ = $image->cases->organization;
 
-        foreach ($images as $image) {
-            $file_path = '../storage/app/' . $image->file_path;
-            $organ = $image->cases->organization;
+				if (is_null($organ)) {
+					continue;
+				}
+				
+				$gender = $image->gender;
+				$organ_id = $organ->id;
 
-            if (is_null($organ)) {
-                continue;
-            }
-            $gender = $image->gender;
-            $organ_id = $organ->id;
+				// Search images only from faces that were updated after last search date of the image
+				// - get the search result from the aws rekoginition.
+				// - get the face_id list from the search results
+				// - get the new searched faces from the database by using the aws_face_id list that the updated_date > lastsearched date.
+				// - get the $new_searched_face_ids from the  the date with the real new searched faces
+				// - if the searched face_id is in the new_searched_face_ids, then it would be added to the real new searched faces.
+				// - add new row on the case_search table with the image_id and search result, and last_search date.
+				// - and update the lastSearched date on the images table.
 
-            // Search images only from faces that were updated after last search date of the image
-            // - get the search result from the aws rekoginition.
-            // - get the face_id list from the search results
-            // - get the new searched faces from the database by using the aws_face_id list that the updated_date > lastsearched date.
-            // - get the $new_searched_face_ids from the  the date with the real new searched faces
-            // - if the searched face_id is in the new_searched_face_ids, then it would be added to the real new searched faces.
-            // - add new row on the case_search table with the image_id and search result, and last_search date.
-            // - and update the lastSearched date on the images table.
+				// face search from the image on the face collections
+				$key = 'storage/case/images/'. $image->filename_uploaded;
+				$collection_id = '';
+				if(isset($organ->aws_collection_male_id)){
+					$collection_id = $organ->aws_collection_male_id;
+					if($gender == 'FEMALE'){
+						$collection_id = $organ->aws_collection_female_id;
+					}
+				}
+				if($collection_id == ''){
+					continue;
+				}
+				
+				$result_new = $this->searchKeyOnSharedCollections($organ_id,$gender,$key,$collection_id);
 
+				//var_dump('$result_new => ');
+				//print_r($result_new);
 
-            // face search from the image on the face collections
-            $key = 'storage/case/images/'. $image->filename_uploaded;
-            $collection_id = '';
-            if(isset($organ->aws_collection_male_id)){
-                $collection_id = $organ->aws_collection_male_id;
-                if($gender == 'FEMALE'){
-                    $collection_id = $organ->aws_collection_female_id;
-                }
-            }
-            if($collection_id == ''){
-                continue;
-            }
-            $result_new = $this->searchKeyOnSharedCollections($organ_id,$gender,$key,$collection_id);
+				// Result 204 is empty search results
+				if(isset($result_new['status']) && $result_new['status'] != 200){
 
-            //var_dump('$result_new => ');
-            //var_dump($result_new);
+					// There are no similar faces for this case image. Update lastSearched
+					echo "   - No similar faces were found for this case image" . PHP_EOL;
+					
+					$image->lastSearched = now();
+					$image->save();
+					
+					continue;
+				}
 
-            if(isset($result_new['status']) && $result_new['status'] != 200){
-                continue;
-            }
+				// get the face_id list from the searched faces.
+				$searched_faces = $result_new['data_list'];
+				$face_id_list = [];
+				
+				foreach($searched_faces as $face){
+					$face_id_list[] = $face['face_id'];
+				}
+				
+				if(count($face_id_list) == 0){
+					continue;
+				}
 
-            // get the face_id list from the searched faces.
-            $searched_faces = $result_new['data_list'];
-            $face_id_list = [];
-            foreach($searched_faces as $face){
-                $face_id_list[] = $face['face_id'];
-            }
-            if(count($face_id_list) == 0){
-                continue;
-            }
+				// get the lastSearchedDate.
+				$last_searched_date = $image->lastSearched;
+				
+				if ($last_searched_date == NULL) {
+					$last_searched_date = '1999-01-01 00:00:00';
+				}
+				
+				//var_dump('face_id_list => ' . count($face_id_list));
+				//print_r($face_id_list);
+				
+				// Get a list of similar Faces that have been added to the system AFTER the last time this case image was searched
+				$searched_faces_db = Face::whereIn('aws_face_id',$face_id_list)->where('updated_at','>',$last_searched_date)->get();
+				
+				$new_searched_face_ids = [];
+				
+				foreach ($searched_faces_db as $face){
+					if(isset($face['aws_face_id']))
+						$new_searched_face_ids[] = $face['aws_face_id'];
+				}
+				
+				// There were similar faces but no NEW ones added to the system since the last search.
+				if(count($new_searched_face_ids) == 0){
+					echo "   - Found 0 new similar faces for this case image" . PHP_EOL;
+					
+					// Set the lastSearched date to the current date so we can check it again in 30 days
+					$image->lastSearched = now();
+					$image->save();
+					
+					continue;
+				} else {
+					echo "   - Found " . count($new_searched_face_ids) . " new face matches for this case image" . PHP_EOL;
+				}
+				
+				//var_dump('$new_searched_face_ids => '. count($new_searched_face_ids));
+				//var_dump($new_searched_face_ids);
 
-            // get the lastSearchedDate.
-            $last_searched_date = $image->lastSearched;
-            //var_dump('face_id_list => ' . count($face_id_list));
-            //var_dump($face_id_list);
+				// Count newly detected image for case we come across
+				if (!isset($case_list[$image->caseId])) {
+					$case_list[$image->caseId] = 1;
+				} else {
+					$case_list[$image->caseId]++;
+				}
 
-            // get the created_date from the face_id_list, and faces table.
-            $searched_faces_db = Face::whereIn('aws_face_id',$face_id_list)->where('updated_at','>',$last_searched_date)->get();
-            $new_searched_face_ids = [];
-            foreach ($searched_faces_db as $face){
-                if(isset($face['aws_face_id']))
-                    $new_searched_face_ids[] = $face['aws_face_id'];
-            }
-            if(count($new_searched_face_ids) == 0){
-                continue;
-            }
+				// Update json result and image search date
+				$image->lastSearched = now();
+				$image->save();
 
-            //var_dump('$new_searched_face_ids => '. count($new_searched_face_ids));
-            //var_dump($new_searched_face_ids);
+				// save the new searched result to the case_searches table.
+				if(count($new_searched_face_ids) > 0) {
+					// check the new faces from the results.
+					// handle ...
+					$res_tmp = $this->filterSearchResultFromDate($result_new,$new_searched_face_ids);
+					if($res_tmp == false){
+						continue;
+					}else{
+						$result_new = $res_tmp;
+					}
 
-            // Count newly detected image for case we come across
-            if (!isset($case_list[$image->caseId])) {
-                $case_list[$image->caseId] = 1;
-            } else {
-                $case_list[$image->caseId]++;
-            }
+					//var_dump('final_searched_result => ');
+					//var_dump($result_new);
 
-            // Update json result and image search date
-            $image->lastSearched = now();
-            $image->save();
+					$search = CaseSearch::create([
+						'organizationId' => $organ_id,
+						'imageId' => $image->id,
+						'searchedOn' => now(),
+						'results' => $result_new
+					]);
+				}
+			}
 
-            // save the new searched result to the case_searches table.
-            if(count($new_searched_face_ids) > 0) {
-                // check the new faces from the results.
-                // handle ...
-                $res_tmp = $this->filterSearchResultFromDate($result_new,$new_searched_face_ids);
-                if($res_tmp == false){
-                    continue;
-                }else{
-                    $result_new = $res_tmp;
-                }
+			// Organize mail data
+			$user_list = array();
+			foreach ($case_list as $key => $count) {
+				$user_id = Cases::find($key)->userId;
+				$user_list[$user_id][$key] = $count; // which case has $count images.
+			}
 
-                var_dump('final_searched_result => ');
-                var_dump($result_new);
+			$mail_list = array();
+			foreach ($user_list as $user_id => $cases) {
+				$user = User::find($user_id);
+				if (!is_null($user)) {
+					$mail = array('to' => $user->email, 'name' => $user->name, 'cases' => array());
+					foreach ($cases as $case_id => $count) {
+						array_push($mail['cases'], ['id' => $case_id, 'name' => Cases::find($case_id)->caseNumber, 'count' => $count]);
+					}
+					array_push($mail_list, $mail);
+				}
+			}
 
-                $search = CaseSearch::create([
-                    'organizationId' => $organ_id,
-                    'imageId' => $image->id,
-                    'searchedOn' => now(),
-                    'results' => $result_new
-                ]);
-            }
-        }
+			// Notify auto-search fact to user via mail
+			//var_dump('$mail_list => ');
+			//var_dump($mail_list);
+			
+			foreach ($mail_list as $mail) {
+				$text = $mail['name'] . ", we have automatically re-scanned some of your suspect photos and found some new leads for you.";
+				$text .= "<br>Log in and review them to see if they match your suspects.<br>";
 
-        // Organize mail data
-        $user_list = array();
-        foreach ($case_list as $key => $count) {
-            $user_id = Cases::find($key)->userId;
-            $user_list[$user_id][$key] = $count; // which case has $count images.
-        }
+				foreach ($mail['cases'] as $c) {
+					$link = url('cases/' . $c['id']);
+					$text .= "<br>Case '" . $c['name'] . "' has " . $c['count'] . " new search results.";
+					$text .= "<br><a href='{$link}'>{$link}</a><br>";
+				}
+				$from = config('mail.username');
+				$subject = "AFR Engine :: Your cases have new mugshots to review";
 
-        $mail_list = array();
-        foreach ($user_list as $user_id => $cases) {
-            $user = User::find($user_id);
-            if (!is_null($user)) {
-                $mail = array('to' => $user->email, 'name' => $user->name, 'cases' => array());
-                foreach ($cases as $case_id => $count) {
-                    array_push($mail['cases'], ['id' => $case_id, 'name' => Cases::find($case_id)->caseNumber, 'count' => $count]);
-                }
-                array_push($mail_list, $mail);
-            }
-        }
-
-        // Notify auto-search fact to user via mail
-        //var_dump('$mail_list => ');
-        //var_dump($mail_list);
-        foreach ($mail_list as $mail) {
-            $text = $mail['name'] . ", we have automatically re-scanned some of your evidence photos and we found new similar faces.";
-            $text .= "<br>Log in and review them to see if they match your suspects.<br>";
-
-            foreach ($mail['cases'] as $c) {
-                $link = url('cases/' . $c['id']);
-                $text .= "<br>Case '" . $c['name'] . "' has " . $c['count'] . " new mug shot results.";
-                $text .= "<br><a href='{$link}'>{$link}</a><br>";
-            }
-            $from = config('mail.username');
-            $subject = "AFR Engine :: Your cases have new mugshots to review";
-
-            try {
-                Mail::to($mail['to']) //
-                ->queue(new Notify($from, $subject, $text));
-            } catch (\Exception $e) {}
-        }
+				try {
+					Mail::to($mail['to']) //
+					->queue(new Notify($from, $subject, $text));
+				} catch (\Exception $e) {}
+			}
+		}
+		else
+		{
+			echo 'No images to process' . PHP_EOL;
+		}
     }
 
     public function filterSearchResultFromDate($search_result,$faceids){
