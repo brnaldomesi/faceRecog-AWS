@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Face as FaceModel;
 use App\Models\User;
@@ -134,6 +135,9 @@ class CaseController extends Controller
     // Start upload button on the cases detail page..
 	public function addImage(Request $request, Cases $cases)
 	{
+		
+		Log::info('Uploading new case image');
+		
         // s3 image upload get the image url. on the "cases" directory.
         // s3 bucket/storage/case/images, and s3 bucket/storage/case/thumbnails
         // aws rekognition : image indexing. and get the aws_face_id for this image.
@@ -215,9 +219,10 @@ class CaseController extends Controller
                 }else{
                     // return false : image not rekognized.
                     echo 'face not recognized from the image.';
-                    return abort(500);
+					Log::info('No face found in image');
+                    //return abort(500);
+					return response()->json(['data' => '']);
                 }
-
 
                 // images table save part
                 $image = new Image;
