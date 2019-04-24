@@ -214,6 +214,9 @@ function initEvent() {
                 if(image_url.substr(0, 7) == 'storage'){
                 	image_url = s3_base_image_url + image_url;
 				}
+				
+				similarity = Math.round(value.similarity);
+				
 				body += '<li style="margin: 10px 0;">';
 				body += '	<div>';
 				body += '		<a href="' + image_url + '" class="fancybox-button" data-rel="fancybox-button">';
@@ -222,7 +225,7 @@ function initEvent() {
 				body += '	<div style="margin-top:20px; line-height:20px">'
 				body += '		<div class="field">';
 				body += '			<div><b>Similarity:</b></div>';
-				body += '			<div>' + value.similarity.toFixed(2) + '%</div>';
+				body += '			<div>' + value.similarity.toFixed() + '%</div>';
 				body += '			<div><a href="#" onclick="showFaceDetail(\''+value.face_id+'\')">Detail</a></div>';
 				body += '		</div>';
                 body += '		<div class="field hidden" id="id_dv_face_detail_'+value.face_id+'">';
@@ -233,10 +236,6 @@ function initEvent() {
                 body += '			<div><b>Organization:</b></div>';
                 body += '			<div class="txt-organization"></div>';
                 body += '		</div>';
-				// body += '		<div class="field">';
-				// body += '			<div><b>Source:</b></div>';
-				// body += '			<div>' + 'value.organization' + '</div>';
-				// body += '		</div>';
 				body += '	</div>';
 				body += '</li>';
 			});

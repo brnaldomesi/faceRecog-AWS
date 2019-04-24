@@ -173,7 +173,7 @@ class AdminController extends Controller
         if (empty($request->password)) {
             $user->password = Hash::make('123456789');
         } else {
-            $user->password = $request->password;
+            $user->password = Hash::make($request->password);
         }
         $user->save();
 
