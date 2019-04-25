@@ -17,9 +17,12 @@ class DatabaseSeeder extends Seeder
     	DB::table('organizations')->insert([
           'name' => 'Organization 1',
           'account' => 'org1',
-		      'contactName' => '',
-          'contactEmail' => '',
-          'contactPhone' => ''
+		  'contactName' => 'Contact Person',
+          'contactEmail' => 'test@email.com',
+          'contactPhone' => '555-555-5555',
+		  'aws_collection_male_id' => '',
+		  'aws_collection_female_id' => '',
+		  'aws_collection_cases_id' => ''
         ]);
 
       DB::table('permissions')->insert([[
@@ -28,14 +31,16 @@ class DatabaseSeeder extends Seeder
           'can_view_logs' => 0,
           'can_create_case' => 1,
           'can_edit_case' => 1,
-          'can_view_case' => 1
+          'can_view_case' => 1,
+		  'can_manage_organization' => 0
       ], [
         'can_edit_all_users' => 0,
         'can_manage_organization_agreements' => 0,
         'can_view_logs' => 0,
         'can_create_case' => 1,
         'can_edit_case' => 1,
-        'can_view_case' => 1
+        'can_view_case' => 1,
+		'can_manage_organization' => 0
       ], [
         'can_edit_all_users' => 0,
         'can_manage_organization_agreements' => 0,
@@ -50,7 +55,7 @@ class DatabaseSeeder extends Seeder
           'name' => 'Admin',
           'permissionId' => 1,
         ], [
-          'name' => 'User',
+          'name' => 'Default',
           'permissionId' => 2,
         ],[
           'name' => 'Super Admin',
@@ -63,13 +68,22 @@ class DatabaseSeeder extends Seeder
       ]]);
 
       DB::table('users')->insert([
-          'name' => 'master',
-          'email' => 'master@gmail.com',
-          'organizationId' => 1,
-          'userGroupId' => 1,
+          'name' => 'Super Admin',
+          'email' => 'superadmin@afrengine.com',
+          'organizationId' => 0,
+          'userGroupId' => 3, // Super Admin
           'password' => Hash::make('master'),
           'loginCount' => 0
       ]);
+	  
+      DB::table('users')->insert([
+          'name' => 'Org1 Admin',
+          'email' => 'org1@afrengine.com',
+          'organizationId' => 1,
+          'userGroupId' => 1, // Super Admin
+          'password' => Hash::make('master'),
+          'loginCount' => 0
+      ]);	  
         // $this->call(UsersTableSeeder::class);
     }
 }
