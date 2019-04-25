@@ -340,6 +340,11 @@ class CaseController extends Controller
         // if there is the shared collections, search collections.
         if(count($collection_ids) > 0){
             foreach ($collection_ids as $collection_id_tmp){
+				
+				if ($collection_id_tmp == '') {
+					continue;
+				}
+				
                 $search_res_tmp = $this->awsFaceSearch($key, $collection_id_tmp);
                 if($search_res_tmp['status'] !== 200){
                     continue;
