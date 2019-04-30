@@ -110,7 +110,7 @@
 
 					  <hr>
 					  <div class="form-group">
-						  <div class="col-md-offset-4 col-md-4">
+						  <div class="col-md-offset-3 col-md-6" style="text-align: center;">
 							  {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
 							  <a href="{{ route('cases.show') }}" class="btn btn-default">
 								  Cancel
@@ -278,12 +278,12 @@
         <td>
             <span class="preview"></span>
         </td>
-        <td>
-            <p class="name">{%=file.name%}</p>
-		<select name="gender" id="gender">
-			<option value="MALE">Male</option>
-			<option value="FEMALE">Female</option>
-		</select>
+        <td style="max-width:100px">
+            <p class="name" style="word-wrap:break-word">{%=file.name%}</p>
+			<select name="gender" id="gender">
+				<option value="MALE">Male</option>
+				<option value="FEMALE">Female</option>
+			</select>
             <strong class="error text-danger label label-danger"></strong>
         </td>
         <td>
@@ -294,10 +294,11 @@
         </td>
         <td>
             {% if (!i && !o.options.autoUpload) { %}
-                <button class="btn blue start" disabled>
+                <button class="btn blue start" style="margin-bottom:5px;" disabled>
                     <i class="fa fa-upload"></i>
                     <span>Start</span>
                 </button>
+                <br>
             {% } %}
             {% if (!i) { %}
                 <button class="btn red cancel">
@@ -311,55 +312,41 @@
 </script>
 <!-- The template to display files available for download -->
 <script id="template-download" type="text/x-tmpl">
-        {% for (var i=0, file; file=o.files[i]; i++) { %}
-            <tr class="template-download fade">
-                <td>
-                    <span class="preview">
-                        {% if (file.thumbnailUrl) { %}
-                            <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery><img src="{%=file.thumbnailUrl%}"></a>
-                        {% } %}
-                    </span>
-                </td>
-                <td>
-                    <p class="name">
-                        {% if (file.url) { %}
-                            <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?'data-gallery':''%}>{%=file.name%}</a>
-                        {% } else { %}
-                            <span>{%=file.name%}</span>
-                        {% } %}
-                    </p>
-                    {% if (file.error) { %}
-                        <div><span class="label label-danger">Error</span> {%=file.error%}</div>
-                    {% } %}
-                </td>
-                <td>
-                    <span class="size">{%=o.formatFileSize(file.size)%}</span>
-                </td>
-                <td>
-                    {% if (file.deleteUrl) { %}
-                        <button class="btn red delete btn-sm" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
-                            <i class="fa fa-trash-o"></i>
-                            <span>Delete</span>
-                        </button>
-                        <input type="checkbox" name="delete" value="1" class="toggle">
-                    {% } else { %}
-                        <button class="btn yellow cancel btn-sm">
-                            <i class="fa fa-ban"></i>
-                            <span>Cancel</span>
-                        </button>
-                    {% } %}
-                </td>
-            </tr>
-        {% } %}
+    {% for (var i=0, file; file=o.files[i]; i++) { %}
+    	{% if (file.status=='error') { %}
+    		<tr class="template-download fade">
+	            <td>
+	                <span class="preview">
+	                    {% if (file.imgSrc) { %}
+	                        <img src="{%=file.imgSrc%}">
+	                    {% } %}
+	                </span>
+	            </td>
+	            <td colspan=3>
+	                <p class="name" style="word-wrap:break-word">
+	                    {% if (file.imgSrc) { %}
+	                        <a href="{%=file.imgSrc%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.imgSrc?'data-gallery':''%}>{%=file.name%}</a>
+	                    {% } else { %}
+	                        <span>{%=file.name%}</span>
+	                    {% } %}
+	                </p>
+	                {% if (file.status=='error') { %}
+	                    <div><span class="label label-danger">Error</span> {%=file.msg%}</div>
+	                {% } %}
+	            </td>
 
-        var cases_id = {{$cases->id}};
-    </script>
+	        </tr>
+    	{% } %}
+    {% } %}
+
+    var cases_id = {{$cases->id}};
+</script>
 
 
-	<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
-  	<script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
-  	<script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
-  	<script type="text/javascript" src="{{ asset('admin_assets/pages/scripts/table-managed.js') }}"></script>
+<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
+<script type="text/javascript" src="{{ asset('admin_assets/pages/scripts/table-managed.js') }}"></script>
 
 <script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/jquery.ui.widget.js') }}" type="text/javascript"></script>
 <script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/tmpl.min.js') }}" type="text/javascript"></script>

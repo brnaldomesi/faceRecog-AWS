@@ -539,18 +539,18 @@ class PortraitsController extends Controller
   }
 
 	public function retrieve_remote_file_size($url){
-     $ch = curl_init($url);
+		$ch = curl_init($url);
 
-     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-     curl_setopt($ch, CURLOPT_HEADER, TRUE);
-     curl_setopt($ch, CURLOPT_NOBODY, TRUE);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_HEADER, TRUE);
+		curl_setopt($ch, CURLOPT_NOBODY, TRUE);
 
-     $data = curl_exec($ch);
-     $size = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+		$data = curl_exec($ch);
+		$size = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 
-     curl_close($ch);
-     return $size;
-}
+		curl_close($ch);
+		return $size;
+	}
     /**
      * Display the specified resource.
      *
