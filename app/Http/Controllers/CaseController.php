@@ -95,7 +95,6 @@ class CaseController extends Controller
 		]);
 	}
 
-
 	/**
 	 * Creates new case
 	 *
@@ -172,19 +171,16 @@ class CaseController extends Controller
 
         $aws_collection_id = $organization->aws_collection_cases_id;
 
-
-
 		$name_client = $file->getClientOriginalName();
 		$name_upload = str_random(15) . "." . $file->guessClientExtension();
 
-
 		// save image to the s3 directory : storage/case/images/ : and get the s3 image url. *****
-        $keyname = 'storage/case/images/' . $name_upload;
+        $keyname_origin = 'storage/case/images/' . $name_upload;
         try {
             // Upload data.
             $result = $this->aws_s3_client->putObject([
                 'Bucket' => $this->aws_s3_bucket,
-                'Key' => $keyname,
+                'Key' => $keyname_origin,
                 'Body' => file_get_contents($file),
                 'ACL' => 'public-read'
             ]);
@@ -196,71 +192,86 @@ class CaseController extends Controller
             $s3_image_key = explode($a, $s3_image_url_tmp)[1];
             $s3_image_url = $b . explode($a, $s3_image_url_tmp)[1];
 
-            // save the thumbnail image.
-            //$thumb_image = ImageResize::work1($file, 256, 0);
+            // response result initialization
+            $response_result = [];
 
-            $keyname = 'storage/case/thumbnails/'. $name_upload;
-            try{
-                // upload thumbnails
-                $result1 = $this->aws_s3_client->putObject([
-                    'Bucket' => $this->aws_s3_bucket,
-                    'Key' => $keyname,
-                    'Body' => file_get_contents($file),
-                    'ACL' => 'public-read'
-                ]);
-                $s3_thumb_url_tmp = $result1['ObjectURL'];
+            // image indexing for the aws rekognition. with the collection : $aws_collection_id
+            $face_indexing_res = $this->awsFaceIndexing($this->aws_s3_bucket, $s3_image_key,$s3_image_url,$aws_collection_id);
 
-                // image indexing for the aws rekognition. with the collection : $aws_collection_id
-                $face_indexing_res = $this->awsFaceIndexing($this->aws_s3_bucket, $s3_image_key,$s3_image_url,$aws_collection_id);
+            //  
+            if(isset($face_indexing_res['face_id']) && $face_indexing_res['face_id'] != '') {
+	            // save the thumbnail image.
+	            //$thumb_image = ImageResize::work1($file, 256, 0);
+	            $keyname_thumbnail = 'storage/case/thumbnails/'. $name_upload;
 
-                $aws_face_id = '';
-                if(isset($face_indexing_res['face_id']) && $face_indexing_res['face_id'] != ''){
-                    $aws_face_id = $face_indexing_res['face_id'];
-                }else{
-                    // return false : image not rekognized.
-                    echo 'face not recognized from the image.';
-					Log::info('No face found in image');
-                    //return abort(500);
-					return response()->json(['data' => '']);
-                }
+	            try{
+	                // upload thumbnails
+	                $result1 = $this->aws_s3_client->putObject([
+	                    'Bucket' => $this->aws_s3_bucket,
+	                    'Key' => $keyname_thumbnail,
+	                    'Body' => file_get_contents($file),
+	                    'ACL' => 'public-read'
+	                ]);
+	                $s3_thumb_url_tmp = $result1['ObjectURL'];
 
-                // images table save part
-                $image = new Image;
-                $image->caseId = $cases->id;
-                $image->filename = $name_client;
-                $image->filename_uploaded = $name_upload;
-                $image->gender = $request->gender;
-                $image->uploaded = now();
-                $image->lastSearched = null;
+	                // get aws_face_id
+	                $aws_face_id = $face_indexing_res['face_id'];
 
-                // save the aws_face_id on images table.
-                $image->aws_face_id = $aws_face_id;
-                $image->save();
+	                // images table save part
+	                $image = new Image;
+	                $image->caseId = $cases->id;
+	                $image->filename = $name_client;
+	                $image->filename_uploaded = $name_upload;
+	                $image->gender = $request->gender;
+	                $image->uploaded = now();
+	                $image->lastSearched = null;
 
+	                // save the aws_face_id on images table.
+	                $image->aws_face_id = $aws_face_id;
+	                $image->save();
 
-                $result = array(
-                    'deleteType'    => 'DELETE',
-                    'deleteUrl'     => asset('foobar'),
-                    'name'          => $name_client,
-                    'size'          => $file->getClientSize(),
-                    'type'          => $file->getClientMimeType(),
-                    'thumbnailUrl'  => $s3_thumb_url_tmp,
-                    'url'           => $s3_image_url_tmp
+	                $response_result = array(
+		            	'status'  => 'success',
+	                    'name'    => $name_client,
+	                    'imgSrc'  => $s3_thumb_url_tmp,
+	                    'msg' 	  => 'No face found in the image!'
+	                );
+
+	            } catch (S3Exception $e) {
+	                echo $e->getMessage() . PHP_EOL;
+	                return abort(500);
+	            }
+
+	        } else {
+	        	// face indexing does not work.
+				Log::info('No face found in image');
+                
+                // Remove origin image from S3 bucket
+	           	$result = $this->aws_s3_client->deleteObject([
+	                'Bucket' => $this->aws_s3_bucket,
+	                'Key' => $keyname_origin
+	            ]);
+
+	           	// Read image path, convert to base64 encoding
+				$imageData = base64_encode(file_get_contents($file));
+
+				// Format the image SRC:  data:{mime};base64,{data};
+				$imgSrc = 'data: '. $file->getClientMimeType() . ';base64,' . $imageData;
+
+	            $response_result = array(
+	            	'status'  => 'error',
+                    'name'    => $name_client,
+                    'imgSrc'  => $imgSrc,
+                    'msg' 	  => 'No face found in the image!'
                 );
+	        }
+			
+			return response()->json(['files' => [$response_result]]);
 
-                return response()->json(['files' => [$result]]);
-
-
-            }catch (S3Exception $e) {
-                echo $e->getMessage() . PHP_EOL;
-                return abort(500);
-            }
-
-        }catch (S3Exception $e) {
+        } catch (S3Exception $e) {
             echo $e->getMessage() . PHP_EOL;
             return abort(500);
         }
-
 	}
 
 	public function imagelist(Request $request, Cases $cases)

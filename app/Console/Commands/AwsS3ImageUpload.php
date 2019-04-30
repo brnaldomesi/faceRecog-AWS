@@ -251,11 +251,9 @@ class AwsS3ImageUpload extends Command
 					$face_tmp_id = $face_tmp->id;
 					FaceTmp::where('id', '=', $face_tmp_id)->delete();
 
-
-
 				} catch (S3Exception $e) {
 					Log::emergency($e->getMessage() . PHP_EOL);
-					// remove the row from face_table
+					// remove the row from facetmp_table
 					$face_tmp_id = $face_tmp->id;
 					FaceTmp::where('id', '=', $face_tmp_id)->delete();
 

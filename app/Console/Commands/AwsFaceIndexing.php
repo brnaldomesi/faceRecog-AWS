@@ -107,14 +107,11 @@ class AwsFaceIndexing extends Command
 
     public function handle_one($index){
 		
-	
         $face = Face::where('aws_face_id', '')->first();
         if(isset($face->facesetId)){
             $facesetId = $face->facesetId;
             $gender = $face->gender;
-
-			
-			
+	
             $faceset = Faceset::where('id',$facesetId)->first();
             if(isset($faceset->gender) && $faceset->gender == $gender){
                 $organization_id = $faceset->organizationId;
