@@ -7,7 +7,7 @@
 	<link href="{{ asset('global/plugins/jquery-file-upload/css/jquery.fileupload.css') }}" rel="stylesheet" type="text/css" />
 	<link href="{{ asset('global/plugins/fancybox/source/jquery.fancybox.css') }}" rel="stylesheet" type="text/css"/>
 	<link href="{{ asset('global/plugins/jquery-file-upload/css/jquery.fileupload-ui.css') }}" rel="stylesheet" type="text/css" />
-
+	<link href="{{ asset('css/cases.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('content')
@@ -122,7 +122,7 @@
 				  <div class="tab-pane" id="portlet_images">
 				  	<input type="hidden" id="hidden-cases-status" value="{{ $cases->status }}">
 
-				  @if ($cases->status == 'ACTIVE')
+				  	@if ($cases->status == 'ACTIVE')
 				  	<form id="enrollForm" action="{{ route('cases.id.image.add', $cases->id) }}" method="POST" class="form-horizontal" >
 						{{ csrf_field() }}
                         <!-- The fileupload-button bar contains buttons to add/delete files and start/cancel the upload -->
@@ -164,7 +164,7 @@
                         </table>
                     </form>
 					<hr>
-				@endif
+					@endif
 					<input type="hidden" id="hidden-image-list-url" value="{{ route('cases.id.image.show', $cases->id) }}">
 					<input type="hidden" id="hidden-search-url" value="{{ route('search.case') }}">
 					<input type="hidden" id="hidden-search-history-url" value="{{ route('search.history') }}">
@@ -223,7 +223,7 @@
 				</tr>
 				</thead>
 				<tbody>
-		@foreach ($search_history as $key => $value)
+				@foreach ($search_history as $key => $value)
 					<tr history-no="{{ $value->id }}">
 						<td>
 							{{ $key + 1 }}
@@ -241,7 +241,7 @@
 							{{count($value->results['data_list'])}}
 						</td>
 					</tr>
-@endforeach
+				@endforeach
 				</tbody>
 			</table>
 		  </div>
@@ -278,8 +278,7 @@
         <td>
             <span class="preview"></span>
         </td>
-        <td style="max-width:100px">
-            <p class="name" style="word-wrap:break-word">{%=file.name%}</p>
+        <td style="max-width:100px;">
 			<select name="gender" id="gender">
 				<option value="MALE">Male</option>
 				<option value="FEMALE">Female</option>
@@ -323,18 +322,10 @@
 	                </span>
 	            </td>
 	            <td colspan=3>
-	                <p class="name" style="word-wrap:break-word">
-	                    {% if (file.imgSrc) { %}
-	                        <a href="{%=file.imgSrc%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.imgSrc?'data-gallery':''%}>{%=file.name%}</a>
-	                    {% } else { %}
-	                        <span>{%=file.name%}</span>
-	                    {% } %}
-	                </p>
 	                {% if (file.status=='error') { %}
 	                    <div><span class="label label-danger">Error</span> {%=file.msg%}</div>
 	                {% } %}
 	            </td>
-
 	        </tr>
     	{% } %}
     {% } %}

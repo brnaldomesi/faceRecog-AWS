@@ -232,7 +232,6 @@ class CaseController extends Controller
 
 	                $response_result = array(
 		            	'status'  => 'success',
-	                    'name'    => $name_client,
 	                    'imgSrc'  => $s3_thumb_url_tmp,
 	                    'msg' 	  => 'No face found in the image!'
 	                );
@@ -260,7 +259,6 @@ class CaseController extends Controller
 
 	            $response_result = array(
 	            	'status'  => 'error',
-                    'name'    => $name_client,
                     'imgSrc'  => $imgSrc,
                     'msg' 	  => 'No face found in the image!'
                 );
