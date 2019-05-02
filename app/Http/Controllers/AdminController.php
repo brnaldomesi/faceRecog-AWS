@@ -69,29 +69,42 @@ class AdminController extends Controller
 			switch ($request->action_type) {
 				case 'action-apply':
 					$sharing = FacesetSharing::where([
+						['organization_requestor', $request->user()->organizationId],
+						['organization_owner', $request->organization]
+					])
+					->orWhere([
 						['organization_owner', $request->user()->organizationId],
 						['organization_requestor', $request->organization]
-					])->first();
-					if (!$sharing) {
+					])
+					->first();
+
+					if($sharing) {
+						// If previous sharing request is in Pending or Active status, we return. 
+						// Otherwise, we change status to Pending
+						if($sharing->status == 'PENDING' || $sharing->status == 'ACTIVE')
+							break;
+					} else {
+						// create a new FaceSetSharing request if no sharing request exists
 						$sharing = new FacesetSharing();
-						$sharing->organization_owner = $request->user()->organizationId;
-						$sharing->organization_requestor = $request->organization;
 					}
+					$sharing->organization_requestor = $request->user()->organizationId;
+					$sharing->organization_owner = $request->organization;
 					$sharing->status = 'PENDING';
 					$sharing->save();
 					
-					$organization = Organization::find($request->user()->organizationId);
-					if (isset($organization)) {
+					$organization_requestor = Organization::find($request->user()->organizationId);
+					$organization_owner = Organization::find($request->organization);
+					if (isset($organization_owner)) {
 						$link = url('/admin/sharing');
-						$text = $organization->name . " has requested to share mugshot data with you. To approve or deny this request, click the link below to log in.";
+						$text = $organization_requestor->name . " has requested to share mugshot data with you. To approve or deny this request, click the link below to log in.";
 						$text .= "<br><br>Time requested: " . now();
 						$text .= "<br><br><a href='{$link}'>{$link}</a><br><br>";
 						$text .= "This email address is not monitored.  Please do not reply.";
 						$from = "notifications@afrengine.com";
-						$subject = "AFR Engine :: Request to share mugshot data from " . $organization->name;
+						$subject = "AFR Engine :: Request to share mugshot data from " . $organization_requestor->name;
 						
 						try {
-							Mail::to($organization->contactEmail)
+							Mail::to($organization_owner->contactEmail)
 								->queue(new Notify($from, $subject, $text));
 						} catch (\Exception $e) {}
 					}
@@ -100,8 +113,8 @@ class AdminController extends Controller
 				case 'action-approve':
 				case 'action-decline':
 					$sharing = FacesetSharing::where([
-						['organization_requestor', Auth::user()->organizationId],
-						['organization_owner', $request->organization]
+						['organization_owner', Auth::user()->organizationId],
+						['organization_requestor', $request->organization]
 					])->first();
 					if ($sharing) {
 						$sharing->status = $request->action_type == 'action-approve' ? 'ACTIVE' : 'DECLINED';
@@ -115,29 +128,55 @@ class AdminController extends Controller
 
 	public function sharingForm()
 	{
-		// Get list of Organizations that the User's organization has some sort of sharing status with
-		$sharing_out = FacesetSharing::where('organization_owner',Auth::user()->organizationId)
-			->get();
-		
-		// Get list of Organizations that are eligible to data share
-		$organizations = Organization::where('id','<>',Auth::user()->organizationId)
-			->get();
-		
-		// Get list of Organizations who have sent sharing request to the User
-		$sharing_in = FacesetSharing::with(['owner', 'requestor'])
+		// Get list of Organizations that User's organization has requested to share data with
+		$sharing_out = FacesetSharing::with('owner')
 			->where('organization_requestor', Auth::user()->organizationId)
-			->orderBy('status', 'desc')
+			->where('status', '<>', 'ACTIVE')
 			->get();
-			
-		return view('admin.sharing',compact('sharing_out', 'organizations', 'sharing_in'));
+
+		// Get list of Organizations that have requested data sharing to User's organization
+		$sharing_in = FacesetSharing::with('requestor')
+			->where('organization_owner', Auth::user()->organizationId)
+			->where('status', '<>', 'ACTIVE')
+			->get();
+
+		// Get list of Organizations that share Mugshot data with the User's organization 
+		$sharing_approved = FacesetSharing::with(['owner', 'requestor'])
+			->where('status', '=', 'ACTIVE')
+            ->where(function ($query) {
+                $query->where('organization_owner', Auth::user()->organizationId)
+					  ->orWhere('organization_requestor', Auth::user()->organizationId);
+            })
+			->orderBy('id', 'asc')
+			->get();
+		
+		// Get list of other organizations that are available for data sharing
+		$sharing_all = FacesetSharing::where(function ($query) {
+                $query->where('organization_owner', Auth::user()->organizationId)
+					  ->orWhere('organization_requestor', Auth::user()->organizationId);
+            })
+			->get();
+
+		$organizations_sharing_existing = [Auth::user()->organizationId];
+		foreach ($sharing_all as $sharing) {
+			if($sharing->organization_owner != Auth::user()->organizationId)
+            	$organizations_sharing_existing[] = $sharing->organization_owner;
+            if($sharing->organization_requestor != Auth::user()->organizationId)
+            	$organizations_sharing_existing[] = $sharing->organization_requestor;
+        }
+
+		$organizations_sharing_available = Organization::whereNotIn('id', $organizations_sharing_existing)
+			->get();
+					
+		return view('admin.sharing',compact('sharing_in', 'sharing_out', 'sharing_approved', 'organizations_sharing_available'));
 	}
 	
 	public function sharingedit($id)
 	{
 		// Get the info for this sharing request
 		//$sharing = DB::table('faceset_sharing')
-//			->where('id',$request->id)
-	//		->get();
+		//	->where('id',$request->id)
+		//	->get();
 	
 		// Get list of Organizations that are eligible to data share
 		$organization = DB::table('organizations')

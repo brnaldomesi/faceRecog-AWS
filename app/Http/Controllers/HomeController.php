@@ -62,7 +62,7 @@ class HomeController extends Controller
             
             // Retrieve the # of pending applications that was sent to this user
             $appCount = FacesetSharing::where([
-                ['organization_requestor', Auth::user()->organizationId],
+                ['organization_owner', Auth::user()->organizationId],
                 ['status', 'PENDING']
             ])->count();
         }

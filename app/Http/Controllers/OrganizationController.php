@@ -59,17 +59,20 @@ class OrganizationController extends Controller
 	public function create(Request $request)
 	{
 		$request->validate([
-        'name' => 'required|unique:organizations',
-        'email' => 'required|email|unique:users',
-        'password' => 'confirmed'
-    ]);
+	        'name' => 'required|unique:organizations',
+	        'email' => 'required|email|unique:users',
+	        'password' => 'confirmed'
+	    ]);
 
 		$newOrganization = Organization::create([
 			'name' => $request->name,
 			'account' => $request->account,
 			'contactName' => $request->adminName,
 			'contactEmail' => $request->email,
-			'contactPhone' => $request->contactPhone
+			'contactPhone' => $request->contactPhone,
+			'aws_collection_male_id' => '',
+			'aws_collection_female_id' => '',
+			'aws_collection_cases_id' => ''
 		]);
 
 		$organId = $newOrganization->id;
@@ -78,21 +81,21 @@ class OrganizationController extends Controller
 		$newUser->name = $request->adminName;
 		$newUser->email = $request->email;
 		$newUser->organizationId = $organId;
-    $newUser->userGroupId = 1;
+    	$newUser->userGroupId = 1;
 
-    if (empty($request->password)) {
-        $newUser->password = Hash::make('123456789');
-    } else {
-        $newUser->password = Hash::make($request->password);
-    }
-    $newUser->save();
+	    if (empty($request->password)) {
+	        $newUser->password = Hash::make('123456789');
+	    } else {
+	        $newUser->password = Hash::make($request->password);
+	    }
+	    $newUser->save();
 
-    $newStat = new Stat;
-    $newStat->organizationId = $organId;
-    $newStat->searches = 0;
-    $newStat->save();
+	    $newStat = new Stat;
+	    $newStat->organizationId = $organId;
+	    $newStat->searches = 0;
+	    $newStat->save();
 
-    return redirect()->route('organization');
+	    return redirect()->route('organization');
 	}
 
 }

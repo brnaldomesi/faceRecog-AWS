@@ -335,13 +335,13 @@ class CaseController extends Controller
         // check the shared organization.
         // if this og has shared organization, then it search with the shared organization also.
         $organizations = FacesetSharing::where([
-                ['organization_owner', $organ_id], ['status', 'ACTIVE']
-            ])
-            ->get()->pluck('organization_requestor');
-        $owner = FacesetSharing::where([
                 ['organization_requestor', $organ_id], ['status', 'ACTIVE']
             ])
             ->get()->pluck('organization_owner');
+        $owner = FacesetSharing::where([
+                ['organization_owner', $organ_id], ['status', 'ACTIVE']
+            ])
+            ->get()->pluck('organization_requestor');
         $organizations = $organizations->merge($owner);
         $organizations = $organizations->unique();
         $collection_ids = Organization::whereIn('id', $organizations)->get()->pluck($collection_field);
