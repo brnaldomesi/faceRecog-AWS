@@ -109,44 +109,44 @@
                     </tr>
                     </thead>
                     <tbody>
-@foreach ($cases as $key => $c)
-					  <tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }} gradeX tname" onClick="javascript:location.href='{{ route('cases.id.show', ['id' => $c->id]) }}';">
-						<td class="hidden">
-						  <input type="checkbox" class="checkboxes" value="1"/>
-						</td>
-						<td>
-						  {{ $c->caseNumber }}
-						</td>
-						<td>
-						  {{ $c->type }}
-						</td>
-						<td>
-@switch ($c->status)
-	  @case ('ACTIVE')
-						   	<span class="label label-sm label-danger">
-							  Active
-							</span>
-		@break
+                    @foreach ($cases as $key => $c)
+          					  <tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }} gradeX tname" onClick="javascript:location.href='{{ route('cases.id.show', ['id' => $c->id]) }}';">
+          						<td class="hidden">
+          						  <input type="checkbox" class="checkboxes" value="1"/>
+          						</td>
+          						<td>
+          						  {{ $c->caseNumber }}
+          						</td>
+          						<td>
+          						  {{ $c->type }}
+          						</td>
+          						<td>
+                      @switch ($c->status)
+                      	  @case ('ACTIVE')
+                      						   	<span class="label label-sm label-danger">
+                      							  Active
+                      							</span>
+                      		@break
 
-	  @case ('CLOSED')
-							<span class="label label-sm label-warning">
-							  CLOSED
-							</span>
-		@break
+                      	  @case ('CLOSED')
+                      							<span class="label label-sm label-warning">
+                      							  CLOSED
+                      							</span>
+                      		@break
 
-	  @case ('SOLVED')
-  							<span class="label label-sm label-success">
-							  SOLVED
-							</span>
-		@break
-@endswitch
+                      	  @case ('SOLVED')
+                        							<span class="label label-sm label-success">
+                      							  SOLVED
+                      							</span>
+                      		@break
+                      @endswitch
 
-						</td>
-						<td class="center">
-						   {{ $c->created_at }}
-						</td>
-						</tr>
-@endforeach
+          						</td>
+          						<td class="center">
+          						   {{ $c->created_at }}
+          						</td>
+          						</tr>
+                    @endforeach
                     </tbody>
                     </table>
                   </div>

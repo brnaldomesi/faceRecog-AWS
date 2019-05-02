@@ -271,7 +271,7 @@
 	<ol class="indicator">
 	</ol>
 </div>
-<!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+<!-- Show file loading result -->
 <script id="template-upload" type="text/x-tmpl">
 {% for (var i=0, file; file=o.files[i]; i++) { %}
     <tr class="template-upload fade">
@@ -279,11 +279,13 @@
             <span class="preview"></span>
         </td>
         <td style="max-width:100px;">
-			<select name="gender" id="gender">
+        	<span class="text-warning">Select Gender:</span>
+			<select name="gender" id="gender" style="margin:5px;">
 				<option value="MALE">Male</option>
 				<option value="FEMALE">Female</option>
 			</select>
-            <strong class="error text-danger label label-danger"></strong>
+			<br>
+            <strong class="error text-white label label-danger"></strong>
         </td>
         <td>
             <p class="size">Processing...</p>
@@ -309,28 +311,28 @@
     </tr>
 {% } %}
 </script>
-<!-- The template to display files available for download -->
+<!-- Show errors in uploading to AWS -->
 <script id="template-download" type="text/x-tmpl">
-    {% for (var i=0, file; file=o.files[i]; i++) { %}
-    	{% if (file.status=='error') { %}
-    		<tr class="template-download fade">
-	            <td>
-	                <span class="preview">
-	                    {% if (file.imgSrc) { %}
-	                        <img src="{%=file.imgSrc%}">
-	                    {% } %}
-	                </span>
-	            </td>
-	            <td colspan=3>
-	                {% if (file.status=='error') { %}
-	                    <div><span class="label label-danger">Error</span> {%=file.msg%}</div>
-	                {% } %}
-	            </td>
-	        </tr>
-    	{% } %}
-    {% } %}
+{% for (var i=0, file; file=o.files[i]; i++) { %}
+	{% if (file.status=='error') { %}
+		<tr class="template-download fade">
+            <td>
+                <span class="preview">
+                    {% if (file.imgSrc) { %}
+                        <img src="{%=file.imgSrc%}">
+                    {% } %}
+                </span>
+            </td>
+            <td colspan=3>
+                {% if (file.status=='error') { %}
+                    <div><span class="label label-danger">Error</span> {%=file.msg%}</div>
+                {% } %}
+            </td>
+        </tr>
+	{% } %}
+{% } %}
 
-    var cases_id = {{$cases->id}};
+var cases_id = {{$cases->id}};
 </script>
 
 
