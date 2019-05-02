@@ -148,7 +148,7 @@ function initEvent() {
 							key + 1,
 							'<a href="' + val[0] + '" class="fancybox-button" data-rel="fancybox-button">' + 
 							//'<img src="' + val[1] + '" style="width:96px"/><div>' + val[2] + '</div></a>',
-							'<img src="' + val[1] + '" style="width:96px"/></a>',
+							'<img src="' + val[1] + '" style="width:96px"/></a><br>Gender: ' + val[2],
 							val[3],
 							'<button class="btn btn-sm blue search" image-no="' + val[4] + '"><i class="fa fa-search"></i> Search</button>' +
 							(

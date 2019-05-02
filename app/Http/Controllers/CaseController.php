@@ -293,7 +293,7 @@ class CaseController extends Controller
 			return [
 				env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/images/'.$item->filename_uploaded, //asset($item->file_url),
                 env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/thumbnails/'.$item->filename_uploaded,//asset($item->thumbnail_url),
-				$item->filename,
+				$item->gender,
 				$item->lastSearched,
 				$item->id
 			];
@@ -337,11 +337,11 @@ class CaseController extends Controller
         $organizations = FacesetSharing::where([
                 ['organization_requestor', $organ_id], ['status', 'ACTIVE']
             ])
-            ->get()->pluck('organization_owner');
+        ->get()->pluck('organization_owner');
         $owner = FacesetSharing::where([
                 ['organization_owner', $organ_id], ['status', 'ACTIVE']
             ])
-            ->get()->pluck('organization_requestor');
+        ->get()->pluck('organization_requestor');
         $organizations = $organizations->merge($owner);
         $organizations = $organizations->unique();
         $collection_ids = Organization::whereIn('id', $organizations)->get()->pluck($collection_field);

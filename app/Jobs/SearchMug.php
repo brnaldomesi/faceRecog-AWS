@@ -71,7 +71,6 @@ class SearchMug implements ShouldQueue
             // - if the search result image was created after the last search date, add the image to the list.
             // - update the case_search table with the image_id and search result, and last_search date.
 
-
             //$result_new = FaceSearch::searchBySimilarityScore($file_path, $organ_id, $gender, 'CASE_SEARCH', $image->lastSearched);
             $result_new = $this->searchFaceByAWS();
 

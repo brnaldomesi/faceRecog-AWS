@@ -318,11 +318,12 @@ class AwsAutoSearch extends Command
         $organizations = FacesetSharing::where([
             ['organization_requestor', $organ_id], ['status', 'ACTIVE']
         ])
-            ->get()->pluck('organization_owner');
+        ->get()->pluck('organization_owner');
+        
         $owner = FacesetSharing::where([
             ['organization_owner', $organ_id], ['status', 'ACTIVE']
         ])
-            ->get()->pluck('organization_requestor');
+        ->get()->pluck('organization_requestor');
         $organizations = $organizations->merge($owner);
         $organizations = $organizations->unique();
         $collection_ids = Organization::whereIn('id', $organizations)->get()->pluck($collection_field);
