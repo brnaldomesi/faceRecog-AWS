@@ -223,11 +223,7 @@
                         </td>
                         <td>
                           @if ($sharing->status === 'ACTIVE')
-                            @if (auth()->user()->organizationId == $sharing->organization_owner)
-                              <span class="label label-success">Requestor</span>
-                            @else
-                              <span class="label label-success">Owner</span>
-                            @endif
+                            <span class="label label-success">Active</span>
                           @endif
                         </td>
                       </tr>
