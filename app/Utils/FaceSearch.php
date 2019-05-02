@@ -278,14 +278,14 @@ class FaceSearch
     
     // Get a list of organization's that share data with this user's organization
     $organization = FacesetSharing::where([
-        ['organization_owner', $organ_id], ['status', 'ACTIVE']
-      ])
-      ->get()->pluck('organization_requestor')->push($organ_id);
-
-    $owner = FacesetSharing::where([
         ['organization_requestor', $organ_id], ['status', 'ACTIVE']
       ])
-      ->get()->pluck('organization_owner');
+      ->get()->pluck('organization_owner')->push($organ_id);
+
+    $owner = FacesetSharing::where([
+        ['organization_owner', $organ_id], ['status', 'ACTIVE']
+      ])
+      ->get()->pluck('organization_requestor');
 
     $organization = $organization->merge($owner);
     $organization = $organization->unique();
@@ -408,14 +408,14 @@ class FaceSearch
     
     // Get a list of organization's that share data with this user's organization
     $organization = FacesetSharing::where([
-        ['organization_owner', $organ_id], ['status', 'ACTIVE']
-      ])
-      ->get()->pluck('organization_requestor')->push($organ_id);
-
-    $owner = FacesetSharing::where([
         ['organization_requestor', $organ_id], ['status', 'ACTIVE']
       ])
-      ->get()->pluck('organization_owner');
+      ->get()->pluck('organization_owner')->push($organ_id);
+
+    $owner = FacesetSharing::where([
+        ['organization_owner', $organ_id], ['status', 'ACTIVE']
+      ])
+      ->get()->pluck('organization_requestor');
 
     $organization = $organization->merge($owner);
     $organization = $organization->unique();

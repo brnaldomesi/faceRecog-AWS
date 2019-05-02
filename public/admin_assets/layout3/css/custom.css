@@ -45,3 +45,8 @@ Rounded Portlets
 	cursor: pointer;
 	background-color: rgb(204, 6, 6);
 }
+
+.label-success.hover:hover {
+	cursor: pointer;
+	background-color: rgb(60, 140, 100);
+}

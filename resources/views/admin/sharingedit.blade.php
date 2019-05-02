@@ -116,7 +116,7 @@
   @endif
             <hr>
             <div class="form-group">
-              <div class="col-md-offset-4 col-md-4">
+              <div class="col-md-offset-3 col-md-6" style="text-align: center;">
                 {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
                 <a href="{{ route('admin') }}" class="btn btn-default">
                   Cancel
