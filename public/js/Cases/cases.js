@@ -33,7 +33,6 @@ function showFaceDetail(aws_face_id) {
 }
 
 function initEvent() {
-
 	$(".fileupload-buttonbar button.clean").click(function () {
 		$("#enrollForm table tbody").empty();
 	});

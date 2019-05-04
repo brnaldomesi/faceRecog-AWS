@@ -97,11 +97,13 @@
                 data.context = that._renderUpload(data.files)
                     .data('data', data)
                     .addClass('processing');
+
                 options.filesContainer[
                     options.prependFiles ? 'prepend' : 'append'
                 ](data.context);
                 that._forceReflow(data.context);
                 that._transition(data.context);
+
                 data.process(function () {
                     return $this.fileupload('process', data);
                 }).always(function () {
@@ -118,6 +120,18 @@
                             data.autoUpload !== false) {
                         data.submit();
                     }
+                    //added by naldokan
+                    data.context.each(function (index) {
+                        var error = data.files[index].error;
+                        if (!error) {
+                            $(this).find("#gender").show();
+                            $(this).find("#gender").select2({
+                                placeholder: "Select Gender",
+                                allowClear: true
+                            });
+                        }
+                    });
+                    //
                 }).fail(function () {
                     if (data.files.error) {
                         data.context.each(function (index) {
@@ -510,11 +524,18 @@
             e.preventDefault();
             var button = $(e.currentTarget),
                 template = button.closest('.template-upload'),
-                data = template.data('data');
-            button.prop('disabled', true);
-            if (data && data.submit) {
-                data.submit();
+                data = template.data('data'),
+            // modified by naldokan
+                gender = template.find("#gender").val();
+            if(gender) {
+                button.prop('disabled', true);
+                if (data && data.submit) {
+                    data.submit();
+                }
+            } else {
+                bootbox.alert('Please select gender before uploading the case image!');
             }
+            //
         },
 
         _cancelHandler: function (e) {
