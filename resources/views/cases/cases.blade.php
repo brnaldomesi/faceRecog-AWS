@@ -142,7 +142,7 @@
                                     <span> Cancel upload </span>
                                 </button>
                                 <button type="reset" class="btn yellow clean">
-                                    <i class="fa fa-check"></i>
+                                    <i class="fa fa-trash"></i>
                                     <span> Clean </span>
                                 </button>
                                 <!-- The global file processing state -->
@@ -193,9 +193,7 @@
 			</div>
 		</div>
 	</div>
-
-		  </div>
-
+	</div>
 
 	  <div class="col-md-6">
 		<div class="portlet light">
@@ -275,17 +273,16 @@
 <script id="template-upload" type="text/x-tmpl">
 {% for (var i=0, file; file=o.files[i]; i++) { %}
     <tr class="template-upload fade">
-        <td>
+        <td style="text-align:center;">
             <span class="preview"></span>
         </td>
-        <td style="max-width:100px;">
-        	<span class="text-warning">Select Gender:</span>
-			<select name="gender" id="gender" style="margin:5px;">
+        <td style="max-width:150px; text-align:center;">
+			<select name="gender" class="gender js-states form-control" id="gender" style="display:none; margin:5px; width:130px;">
+				<option></option>
 				<option value="MALE">Male</option>
 				<option value="FEMALE">Female</option>
 			</select>
-			<br>
-            <strong class="error text-white label label-danger"></strong>
+            <strong class="error text-white label label-danger" style="margin:5px;"></strong>
         </td>
         <td>
             <p class="size">Processing...</p>
@@ -323,10 +320,16 @@
                     {% } %}
                 </span>
             </td>
-            <td colspan=3>
+            <td colspan=2 style="text-align:center;">
                 {% if (file.status=='error') { %}
                     <div><span class="label label-danger">Error</span> {%=file.msg%}</div>
                 {% } %}
+            </td>
+            <td>
+                <button class="btn yellow cancel">
+                    <i class="fa fa-trash"></i>
+                    <span>Clean</span>
+                </button>
             </td>
         </tr>
 	{% } %}
@@ -335,8 +338,7 @@
 var cases_id = {{$cases->id}};
 </script>
 
-
-<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.js') }}"></script>
 <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
 <script type="text/javascript" src="{{ asset('admin_assets/pages/scripts/table-managed.js') }}"></script>

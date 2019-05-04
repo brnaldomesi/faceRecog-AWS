@@ -75,11 +75,11 @@
                 <div class="form-group row">
                   <label for="name" class="col-md-3 col-form-label text-right padding-top-10">{{ __('Gender') }}</label>
                   <div class="col-md-6">
-					<select class="form-control" name="gender">
-						<option value="">Select One</option>
-						<option value="MALE">Male</option>
-						<option value="FEMALE">Female</option>
-					</select>
+        					<select class="form-control" name="gender">
+        						<option value="">Select One</option>
+        						<option value="MALE">Male</option>
+        						<option value="FEMALE">Female</option>
+        					</select>
                   </div>
                 </div>
               </div>
