@@ -123,6 +123,7 @@ class AwsAutoSearch extends Command
 
 				// face search from the image on the face collections
 				$key = 'storage/case/images/'. $image->filename_uploaded;
+				
 				$collection_id = '';
 				if(isset($organ->aws_collection_male_id)){
 					$collection_id = $organ->aws_collection_male_id;
@@ -130,6 +131,7 @@ class AwsAutoSearch extends Command
 						$collection_id = $organ->aws_collection_female_id;
 					}
 				}
+				
 				if($collection_id == ''){
 					continue;
 				}
@@ -143,7 +145,7 @@ class AwsAutoSearch extends Command
 				if(isset($result_new['status']) && $result_new['status'] != 200){
 
 					// There are no similar faces for this case image. Update lastSearched
-					echo "   - No similar faces were found for this case image" . PHP_EOL;
+					echo "   - No new similar faces were found for this case image" . PHP_EOL;
 					
 					$image->lastSearched = now();
 					$image->save();
@@ -331,6 +333,11 @@ class AwsAutoSearch extends Command
         // if there is the shared collections, search collections.
         if(count($collection_ids) > 0){
             foreach ($collection_ids as $collection_id_tmp){
+				
+				if ($collection_id_tmp == '') {
+					continue;
+				}
+				
                 $search_res_tmp = $this->awsFaceSearch($key, $collection_id_tmp);
                 if($search_res_tmp['status'] !== 200){
                     continue;
@@ -378,7 +385,7 @@ class AwsAutoSearch extends Command
             //header("Content-Type: {$result['ContentType']}");
 
             $bytes = $result['Body'];
-
+			
             try {
                 $results = $this->aws_rekognition_client->SearchFacesByImage([
                     "CollectionId"=> $collection_id,
