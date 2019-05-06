@@ -127,7 +127,8 @@
                             $(this).find("#gender").show();
                             $(this).find("#gender").select2({
                                 placeholder: "Select Gender",
-                                allowClear: true
+                                allowClear: true,
+                                minimumResultsForSearch: -1
                             });
                         }
                     });
