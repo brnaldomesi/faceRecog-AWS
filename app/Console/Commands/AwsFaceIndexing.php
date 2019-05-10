@@ -148,12 +148,15 @@ class AwsFaceIndexing extends Command
                         $external_image_url = $face->savedPath;
                         $aws_bucket = $this->s3_bucket;
                         $img_key = explode($this->s3_bucket.'/', $face->savedPath)[1];
+	
+                        $logstr = "\nStarted faceindexing S3_Object saved at: " . $external_image_url;
+                        $log = fopen("public/debug_index.txt","a");
+                        fwrite($log, $logstr);
+                        fclose($log);
 
-						
-						
                         // face indexing by using aws rekoginition.
                         $indexed_face = $this->awsFaceIndexing($aws_bucket, $img_key,$external_image_url,$collection_id);
-                        //Log::emergency('$indexed_face_id] =>'.$indexed_face['face_id']);
+                        //Log::emergency('$indexed_face_id] =>' . $indexed_face['face_id']);
 
                         if(isset($indexed_face['face_id']) && $indexed_face['face_id'] != '' && $indexed_face !== 'faild'){
 
@@ -217,6 +220,12 @@ class AwsFaceIndexing extends Command
                             Face::where('id',$face->id)->update(['aws_face_id'=>$aws_face_id]);
                             Faceset::where('id', $facesetId)->increment('faces');
                         }else{
+                            //log
+                            $logstr = "--------Failed";
+                            $log = fopen("public/debug_index.txt","a");
+                            fwrite($log, $logstr);
+                            fclose($log);
+
                             // set the aws_face_id is not used.
                             Face::where('id',$face->id)->update(['aws_face_id'=>'false']);
                         }
@@ -279,7 +288,7 @@ class AwsFaceIndexing extends Command
 
                 return $res;
 
-            }catch(Rekognition $e){
+            }catch(RekognitionException $e){
                 return 'faild';
             }
 
