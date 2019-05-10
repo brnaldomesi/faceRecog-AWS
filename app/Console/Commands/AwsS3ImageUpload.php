@@ -169,7 +169,21 @@ class AwsS3ImageUpload extends Command
 					imagejpeg($im2,"temp.jpg");
 					
 					// Load our newly cropped image into image_source
-					$image_source = file_get_contents("temp.jpg");
+					$image_source = @file_get_contents("temp.jpg");
+
+					// if failed to get image
+					if($image_source === FALSE) {
+						$downloadFailed = true;
+
+						FaceTmp::find($face_tmp->id)->delete();
+						
+						// log error
+						$logstr = "Failed to get image file from: " . $face_tmp->image_url;
+						Log::emergency($logstr);
+						$log = fopen("public/debug.txt","a");
+						fwrite($log, $logstr . "\n");
+						fclose($log);
+					}
 				} 
 				else 
 				{
@@ -183,7 +197,21 @@ class AwsS3ImageUpload extends Command
 			else
 			{
 				// image source url.
-				$image_source =  file_get_contents($face_tmp->image_url);
+				$image_source =  @file_get_contents($face_tmp->image_url);
+				
+				// if failed to get image
+				if($image_source === FALSE) {
+					$downloadFailed = true;
+
+					FaceTmp::find($face_tmp->id)->delete();
+					
+					// log error
+					$logstr = "Failed to get image file from: " . $face_tmp->image_url;
+					Log::emergency($logstr);
+					$log = fopen("public/debug.txt","a");
+					fwrite($log, $logstr . "\n");
+					fclose($log);
+				}
 			}
 
 			if ($downloadFailed == false)

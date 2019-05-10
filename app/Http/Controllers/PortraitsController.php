@@ -426,7 +426,7 @@ class PortraitsController extends Controller
 						
 						$imgUrl = $csvLine[0];
                         $identifiers = $csvLine[1];
-                        fwrite($log,"Importing info : face_tmps => " . $organizationId . " @ " . $imgUrl. "@" .$identifiers . "@" . $gender);
+                        fwrite($log,"Importing info : face_tmps => " . $organizationId . " @ " . $imgUrl. "@" .$identifiers . "@" . $gender . "\n");
                         // insert new row to the face_tmps table.
 
                         $facetmp_id = FaceTmp::create([
