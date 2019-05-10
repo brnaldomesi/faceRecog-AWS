@@ -1,0 +1,4 @@
+
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/c0fd69358de2f868f79718e6014f1619.png--------Failed
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/ea73080eb7c12c8a99ec34c9dc43c18d.png--------Failed
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/c52ff7a9835942015fd6d1d4374b77b3.jpg
