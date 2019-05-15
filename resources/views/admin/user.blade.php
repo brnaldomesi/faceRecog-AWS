@@ -111,7 +111,7 @@
             <div class="form-group">
               <div class="col-md-offset-3 col-md-6" style="text-align: center;">
                 {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
-                <a href="{{ route('admin') }}" class="btn btn-default">
+                <a href="{{ route('admin.manageusers.show') }}" class="btn btn-default">
                   Cancel
                 </a>
               </div>

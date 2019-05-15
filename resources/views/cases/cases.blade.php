@@ -104,10 +104,10 @@
 					  <div class="form-group">
 						  {!! Form::label(null, 'Create Date ', ['class' => 'col-md-4 control-label']) !!}
 						  <div class="col-md-6">
-							  {!! Form::text(null, $cases->created_at, ['class' => 'form-control', 'disabled' => 'disabled']) !!}
+							  {!! Form::text(null, $cases->created_at->format('m/d/Y'), ['class' => 'form-control', 'disabled' => 'disabled']) !!}
 						  </div>
 					  </div>
-
+					  
 					  <hr>
 					  <div class="form-group">
 						  <div class="col-md-offset-3 col-md-6" style="text-align: center;">
@@ -233,7 +233,7 @@
 							</a>
 						</td>
 						<td>
-							{{ $value->searchedOn }}
+							{{ Carbon\Carbon::parse($value->searchedOn)->format("m/d/Y H:i:s") }}
 						</td>
 						<td>
 							{{count($value->results['data_list'])}}

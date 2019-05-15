@@ -98,7 +98,7 @@
 									{{ $user->loginCount }}
               					</td>
               					<td>
-                  {{ Carbon\Carbon::parse($user->lastlogin)->format("d/m/Y H:i:s") }}
+                  {{ Carbon\Carbon::parse($user->lastlogin)->format("m/d/Y H:i:s") }}
               					</td>
 								<td>
 									@if (Auth::user()->id != $user->id)
@@ -128,7 +128,7 @@
 @endsection
 
 @section('extrajs')
-	<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
   <script type="text/javascript" src="{{ asset('js/admin/index.js') }}"></script>

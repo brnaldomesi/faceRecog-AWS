@@ -215,8 +215,24 @@ class AdminController extends Controller
             $user->password = Hash::make($request->password);
         }
         $user->save();
+		
+		// Send an email to the new user to provide them with the link to log in
+		$link = url('/login');
+		
+		$text = "An AFR Engine user account has been created for you.  Your login is " . $user->email . ".  Check with your department Administrator for your default password.  You can change it from the login screen by clicking 'Forgot Your Password'<br><br>";
+		$text .= "Click the link below to log into AFR Engine.<br><br>";
+		$text .= "<a href='{$link}'>AFR Engine Login</a><br><br>";
+		$text .= "This email address is not monitored.  Please do not reply.";
+		
+		$from = "notifications@afrengine.com";
+		$subject = "AFR Engine :: Your account has been created";
+			
+		try {
+			Mail::to($user->email)
+				->queue(new Notify($from, $subject, $text));
+		} catch (\Exception $e) {}
 
-        return redirect()->route('admin');
+        return redirect()->route('admin.manageusers.show');
     }
 
     public function update(Request $request, User $user)

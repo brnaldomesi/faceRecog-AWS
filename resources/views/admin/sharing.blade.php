@@ -93,7 +93,7 @@
                           {{ $sharing->requestor->name }}
                         </td>
                         <td>
-                          {{ $sharing->updated_at->format('Y-m-d') }}
+                          {{ $sharing->updated_at->format('m/d/Y') }}
                         </td>
                         <td>                  
                           <span class="label label-success hover action-approve" organization="{{ $sharing->organization_requestor }}">Approve</span>
@@ -112,7 +112,7 @@
                           {{ $sharing->owner->name }}
                         </td>
                         <td>
-                          {{ $sharing->updated_at->format('Y-m-d') }}
+                          {{ $sharing->updated_at->format('m/d/Y') }}
                         </td>
                         <td>                  
                           <span class="label label-default">Pending Approval</span>
@@ -130,7 +130,7 @@
                           {{ $sharing->owner->name }}
                         </td>
                         <td>
-                          {{ $sharing->updated_at->format('Y-m-d') }}
+                          {{ $sharing->updated_at->format('m/d/Y') }}
                         </td>
                         <td>                  
                           <span class="label label-warning">Declined</span>
@@ -164,7 +164,7 @@
                           {{ $sharing->requestor->name }}
                         </td>
                         <td>
-                          {{ $sharing->updated_at->format('Y-m-d') }}
+                          {{ $sharing->updated_at->format('m/d/Y') }}
                         </td>
                         <td>                  
                           <span class="label label-warning">Declined by you</span>
@@ -219,7 +219,7 @@
                           @endif
                         </td>
                         <td>
-                          {{ $sharing->updated_at->format('Y-m-d') }}
+                          {{ $sharing->updated_at->format('m/d/Y') }}
                         </td>
                         <td>
                           @if ($sharing->status === 'ACTIVE')
