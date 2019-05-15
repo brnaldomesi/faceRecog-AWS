@@ -143,7 +143,7 @@
 
           						</td>
           						<td class="center">
-          						   {{ $c->created_at }}
+          						   {{ $c->created_at->format('m/d/Y') }}
           						</td>
           						</tr>
                     @endforeach

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 use App\Models\Face as FaceModel;
 use App\Models\User;
+use App\Models\UserLog;
 use App\Models\Faceset;
 use App\Models\FacesetSharing;
 use App\Models\Cases;
@@ -112,6 +113,13 @@ class CaseController extends Controller
 		$cases->caseNumber = $request->caseNumber;
 		$cases->type = $request->type;
 		$cases->save();
+		
+		// Insert this case creation into the UserLog table
+		UserLog::create([
+		  'userId' => $user->id,
+          'event' => 'Created case ' . $cases->caseNumber,
+		  'ip' => $request->ip()
+		]);
 
 		return redirect()->route('cases.id.show', $cases);
 	}
@@ -128,7 +136,7 @@ class CaseController extends Controller
 		}
 		$cases->save();
 
-		return redirect()->route('cases.id.show', $cases);
+		return redirect()->route('cases.show');
 	}
 
     // Start upload button on the cases detail page..
@@ -290,11 +298,13 @@ class CaseController extends Controller
 		}
 
 		$result = $cases->images->map(function ($item, $key) {
+			$date = date_create($item->lastSearched);
+			
 			return [
 				env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/images/'.$item->filename_uploaded, //asset($item->file_url),
                 env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/thumbnails/'.$item->filename_uploaded,//asset($item->thumbnail_url),
 				$item->gender,
-				$item->lastSearched,
+				date_format($date,'m/d/Y H:i:s'),
 				$item->id
 			];
 		});
@@ -382,6 +392,7 @@ class CaseController extends Controller
         $image->lastSearched = now();
 		$image->save();
 
+		
 
 		if(isset($search_res['status']) && $search_res['status'] != 'faild'){
             $search = CaseSearch::create([
@@ -390,6 +401,14 @@ class CaseController extends Controller
                 'searchedOn' => now(),
                 'results' => $search_res
             ]);
+			
+			// Insert this search into the UserLog table
+			UserLog::create([
+				'userId' => Auth::user()->id,
+				'event' => 'Case Search #' . $search->id,
+				'ip' => $request->ip()
+			]);
+		
             return response()->json(
                 array_merge($search_res, [
                         'time' => date('Y-m-d h:m:s'),

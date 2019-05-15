@@ -83,7 +83,7 @@
 									{{ $event->event }}
               					</td>
               					<td>
-									{{ $event->updated_at->format("d/m/Y H:i:s") }}
+									{{ $event->updated_at->format("m/d/Y H:i:s") }}
               					</td>
 							</tr>
 						@endforeach
