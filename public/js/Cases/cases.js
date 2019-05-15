@@ -10,6 +10,9 @@ function showFaceDetail(aws_face_id) {
         cenrerY: true,
     });
 
+	$("#details_link_"+aws_face_id).addClass('hidden');
+	$('#details_loading_'+aws_face_id).removeClass('hidden');
+	
     $.ajax({
         url: url_getfacedetailinfo,
         type: 'post',
@@ -23,9 +26,15 @@ function showFaceDetail(aws_face_id) {
 
             $('#id_dv_face_detail_organ_'+aws_face_id).removeClass('hidden');
             $('#id_dv_face_detail_organ_'+aws_face_id + ' .txt-organization').html(response.organ_name);
+			
+			$('#details_loading_'+aws_face_id).addClass('hidden');
 
         },
         error: function (jqXHR, status, error) {
+			
+			$("#details_link_"+aws_face_id).removeClass('hidden');
+			$('#details_loading_'+aws_face_id).addClass('hidden');			
+			
             Metronic.unblockUI();
             bootbox.alert(status + "<br>" + error);
         }
@@ -192,7 +201,7 @@ function initEvent() {
 
 			body += '<div class="clearfix">'
 			body += '	<div class="needle-side-bar col-md-2 col-sm-3 col-xs-6 col-xs-offset-3 col-sm-offset-0">';
-			body += '		<img src="' + needle_image_src + '" class="img-thumbnail fanc1ybox-button" data-rel="fancybox-button">';
+			body += '		<img src="' + needle_image_src + '" class="img-thumbnail fancybox-button" data-rel="fancybox-button">';
 			body += '	</div>';
 			
 			for (var i = 0, len = data.data_list.length; i < len; i++) {
@@ -206,7 +215,7 @@ function initEvent() {
 			});
 
 			body += '<div class="my-bootbox-body col-md-10 col-sm-9 col-xs-12">';
-			body += '<ul class="list-new ext1">';
+			body += '<ul class="list-new ext1" style="padding-inline-start:0px;">';
 
 			$.each(flat, function (index, value) {
 				var image_url = value.image;
@@ -216,7 +225,7 @@ function initEvent() {
 				
 				similarity = Math.round(value.similarity);
 				
-				body += '<li style="margin: 10px 0;">';
+				body += '<li style="margin: 10px 0;list-style:none;">';
 				body += '	<div>';
 				body += '		<a href="' + image_url + '" class="fancybox-button" data-rel="fancybox-button">';
 				body += '		<img src="' + image_url + '" class="img-thumbnail" alt="Can not load image"></a>';
@@ -225,8 +234,9 @@ function initEvent() {
 				body += '		<div class="field">';
 				body += '			<div><b>Similarity:</b></div>';
 				body += '			<div>' + value.similarity.toFixed() + '%</div>';
-				body += '			<div><a href="#" onclick="showFaceDetail(\''+value.face_id+'\')">Detail</a></div>';
-				body += '		</div>';
+				body += '			<div class="field" id="details_link_'+value.face_id+'"><a href="#" onclick="showFaceDetail(\''+value.face_id+'\')">(Click for details)</a></div>';
+				body += '			<div class="field hidden" id="details_loading_'+value.face_id+'"><img src="https://www.afrengine.com/engine/img/input-spinner.gif"></div>';
+				body += '		</div>';				
                 body += '		<div class="field hidden" id="id_dv_face_detail_'+value.face_id+'">';
                 body += '			<div><b>Identifiers:</b></div>';
                 body += '			<div class="txt-identifiers"></div>';
