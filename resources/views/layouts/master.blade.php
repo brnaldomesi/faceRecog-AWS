@@ -118,7 +118,7 @@
                               <a class="nav-link" href="{{ url('/organization') }}">{{ __('Organization') }}</a>
                           </li>
                         @else
-  						            <li class="nav-item @if(Request::segment(1) == 'cases'){{ __('active')}}@endif">
+  						  <li class="nav-item @if(Request::segment(1) == 'cases'){{ __('active')}}@endif">
                               <a class="nav-link" href="{{ url('/cases') }}">{{ __('Cases') }}</a>
                           </li>
                           <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
@@ -126,11 +126,15 @@
                           </li>
                         @endif
 
-              @if (Auth::user()->permission->isAdmin())
-                        <li class="nav-item @if(Request::segment(1) == 'admin'){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/admin') }}">{{ __('Admin') }}</a>
-                        </li>
-              @endif
+						@if (Auth::user()->permission->isAdmin())
+							<li class="nav-item @if(Request::segment(1) == 'admin'){{ __('active')}}@endif">
+								<a class="nav-link" href="{{ url('/admin') }}">{{ __('Admin') }}</a>
+							</li>
+						@endif
+						
+  						  <li class="nav-item @if(Request::segment(1) == 'support'){{ __('active')}}@endif">
+                              <a class="nav-link" href="{{ url('/support') }}">{{ __('Help & Support') }}</a>
+                          </li>
 
                       </ul>
                       <!-- Right Side Of Navbar -->
