@@ -298,13 +298,19 @@ class CaseController extends Controller
 		}
 
 		$result = $cases->images->map(function ($item, $key) {
-			$date = date_create($item->lastSearched);
+			
+			if (!is_null($item->lastSearched)) {
+				$date = date_create($item->lastSearched);
+				$date = date_format($date,"m/d/Y H:i:s");
+			} else {
+				$date = "";
+			}
 			
 			return [
 				env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/images/'.$item->filename_uploaded, //asset($item->file_url),
                 env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/thumbnails/'.$item->filename_uploaded,//asset($item->thumbnail_url),
 				$item->gender,
-				date_format($date,'m/d/Y H:i:s'),
+				$date,
 				$item->id
 			];
 		});
