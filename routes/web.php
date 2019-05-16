@@ -86,4 +86,8 @@ Route::group(['middleware' => ['authen']], function () {
 	Route::post('/awstest_faceindexing', 'TestController@awstestFaceindexing');
 	Route::post('/awstest_searchface', 'TestController@awstestSearchface');
 	Route::post('/awstest_delete_face', 'TestController@awstestDeleteFace');
+	
+	// Case
+	Route::get('/support', 'SupportController@index');
+	
 });
