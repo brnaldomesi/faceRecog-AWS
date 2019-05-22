@@ -51,6 +51,21 @@
             </a>
           </div>
           <div class="col-sm-6 col-xs-12 margin-bottom-10">
+            <a class="dashboard-stat dashboard-stat-light blue-madison" href="/engine/searches">
+            <div class="visual">
+              <i class="fa fa-database fa-icon-medium"></i>
+            </div>
+            <div class="details">
+              <div class="number">
+                 {{ $searchCount }}
+              </div>
+              <div class="desc">
+                 Search count
+              </div>
+            </div>
+            </a>
+          </div>		  
+          <div class="col-sm-6 col-xs-12 margin-bottom-10">
             <a class="dashboard-stat dashboard-stat-light blue-madison" href="javascript:;">
             <div class="visual">
               <i class="fa fa-database fa-icon-medium"></i>

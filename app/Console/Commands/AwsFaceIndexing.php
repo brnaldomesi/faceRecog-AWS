@@ -107,7 +107,8 @@ class AwsFaceIndexing extends Command
 
     public function handle_one($index){
 		
-        $face = Face::where('aws_face_id', '')->first();
+        $face = Face::where('aws_face_id', '')->latest()->first();
+		
         if(isset($face->facesetId)){
             $facesetId = $face->facesetId;
             $gender = $face->gender;
@@ -289,6 +290,10 @@ class AwsFaceIndexing extends Command
                 return $res;
 
             }catch(RekognitionException $e){
+				
+				Log::emergency($e->getMessage());
+				Log::emergency($img_key);
+				
                 return 'faild';
             }
 
