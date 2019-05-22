@@ -90,4 +90,6 @@ Route::group(['middleware' => ['authen']], function () {
 	// Case
 	Route::get('/support', 'SupportController@index');
 	
+	// Organization Searches (SuperAdmin)
+	Route::get('/searches','SearchesController@index');
 });

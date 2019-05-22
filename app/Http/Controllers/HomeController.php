@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\Organization;
 use App\Models\Stat;
 use App\Models\Cases;
+use App\Models\CaseSearch;
 use App\Models\FacesetSharing;
 use App\Models\Face as FaceModel;
 
@@ -41,6 +42,7 @@ class HomeController extends Controller
         if($isSuperAdmin) {
             $organizationCount = Organization::count();
             $faceCount = FaceModel::count();
+			$searchCount = CaseSearch::count();
         }
         else
         {
@@ -70,6 +72,6 @@ class HomeController extends Controller
         // Send the totals back to the home view so we can display the data to the user
         //return view('home', compact('caseCount', 'facesCount', 'searchCount', 'appCount', 'organizationCount', 'faceCount'));
 		
-		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount'));
+		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount','searchCount'));
     }
 }
