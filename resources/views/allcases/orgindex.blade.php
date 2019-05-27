@@ -34,7 +34,7 @@
                 <a href="{{ route('allcases.show') }}">All Cases</a><i class="fa fa-circle"></i>
               </li>
               <li class="active">
-                {{ $org->name }}
+                {{ $org->name }} Cases
               </li>
             </ul>
             <div class="row">
