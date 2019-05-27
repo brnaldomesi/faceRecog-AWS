@@ -71,9 +71,9 @@ Route::group(['middleware' => ['authen']], function () {
 	});
 
 	Route::group(['middleware' => ['can:create,App\Models\Organization']], function () {
-		Route::get('/organization', 'OrganizationController@index')->name('organization');
-		Route::get('/organization/new', 'OrganizationController@new')->name('organization.new');
-		Route::post('/organization', 'OrganizationController@create')->name('organization.create');
+		Route::get('/organizations', 'OrganizationController@index')->name('organization');
+		Route::get('/organizations/new', 'OrganizationController@new')->name('organization.new');
+		Route::post('/organizations', 'OrganizationController@create')->name('organization.create');
 	});
 
 	Route::post('/cases/search', 'CaseController@search')->name('search.case');
@@ -91,5 +91,10 @@ Route::group(['middleware' => ['authen']], function () {
 	Route::get('/support', 'SupportController@index');
 	
 	// Organization Searches (SuperAdmin)
-	Route::get('/searches','SearchesController@index');
+	Route::group(['middleware' => ['superadmin']], function() {
+		Route::get('/allcases','AllCasesController@index')->name('allcases.show');
+		Route::get('/allcases/{org}', 'AllCasesController@orgIndex')->name('allcases.org.show');
+		Route::get('/allcases/{org}/{cases}', 'AllCasesController@cases')->name('allcases.id.show');
+		Route::post('/allcases/{org}/{cases}/imagelist', 'AllCasesController@imagelist')->name('allcases.id.image.show');
+	});
 });

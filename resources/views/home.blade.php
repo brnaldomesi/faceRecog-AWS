@@ -36,9 +36,9 @@
       <div class="row">
         @if (Auth::user()->permission->isSuperAdmin())
           <div class="col-sm-6 col-xs-12 margin-bottom-10">
-            <a class="dashboard-stat dashboard-stat-light blue-madison" href="javascript:;">
+            <a class="dashboard-stat dashboard-stat-light purple-plum" href="/organizations">
             <div class="visual">
-              <i class="fa fa-database fa-icon-medium"></i>
+              <i class="fa fa-building fa-icon-medium"></i>
             </div>
             <div class="details">
               <div class="number">
@@ -51,24 +51,24 @@
             </a>
           </div>
           <div class="col-sm-6 col-xs-12 margin-bottom-10">
-            <a class="dashboard-stat dashboard-stat-light blue-madison" href="/engine/searches">
+            <a class="dashboard-stat dashboard-stat-light blue-madison" href="/allcases">
             <div class="visual">
-              <i class="fa fa-database fa-icon-medium"></i>
+              <i class="fa fa-briefcase fa-icon-medium"></i>
             </div>
             <div class="details">
               <div class="number">
-                 {{ $searchCount }}
+                 {{ $caseCount }}
               </div>
               <div class="desc">
-                 Search count
+                 Case count
               </div>
             </div>
             </a>
-          </div>		  
+          </div>
           <div class="col-sm-6 col-xs-12 margin-bottom-10">
-            <a class="dashboard-stat dashboard-stat-light blue-madison" href="javascript:;">
+            <a class="dashboard-stat dashboard-stat-light blue-hoki" href="javascript:;">
             <div class="visual">
-              <i class="fa fa-database fa-icon-medium"></i>
+              <i class="fa fa-user fa-icon-medium"></i>
             </div>
             <div class="details">
               <div class="number">
@@ -80,11 +80,26 @@
             </div>
             </a>
           </div>
+          <div class="col-sm-6 col-xs-12 margin-bottom-10">
+            <a class="dashboard-stat dashboard-stat-light green-haze" href="javascript:;">
+            <div class="visual">
+              <i class="fa fa-search fa-icon-medium"></i>
+            </div>
+            <div class="details">
+              <div class="number">
+                 {{ $searchCount }}
+              </div>
+              <div class="desc">
+                 Search count
+              </div>
+            </div>
+            </a>
+          </div>		  
         @else
   		    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 margin-bottom-10">
             <a class="dashboard-stat dashboard-stat-light blue-madison" href="javascript:;">
             <div class="visual">
-              <i class="fa fa-database fa-icon-medium"></i>
+              <i class="fa fa-briefcase fa-icon-medium"></i>
             </div>
             <div class="details">
               <div class="number">

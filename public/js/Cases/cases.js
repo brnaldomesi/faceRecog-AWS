@@ -18,7 +18,6 @@ function showFaceDetail(aws_face_id) {
         type: 'post',
         data: { 'aws_face_id' : aws_face_id },
         success: function (response) {
-            console.log(response);
             Metronic.unblockUI();
 
             $('#id_dv_face_detail_'+aws_face_id).removeClass('hidden');

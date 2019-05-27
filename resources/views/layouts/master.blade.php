@@ -114,8 +114,11 @@
                         </li>
 
                         @if (Auth::user()->permission->isSuperAdmin())
-                          <li class="nav-item @if(Request::segment(1) == 'organization'){{ __('active')}}@endif">
-                              <a class="nav-link" href="{{ url('/organization') }}">{{ __('Organization') }}</a>
+                          <li class="nav-item @if(Request::segment(1) == 'organizations'){{ __('active')}}@endif">
+                              <a class="nav-link" href="{{ url('/organizations') }}">{{ __('Organizations') }}</a>
+                          </li>
+                          <li class="nav-item @if(Request::segment(1) == 'allcases'){{ __('active')}}@endif">
+                              <a class="nav-link" href="{{ url('/allcases') }}">{{ __('Cases') }}</a>
                           </li>
                         @else
   						  <li class="nav-item @if(Request::segment(1) == 'cases'){{ __('active')}}@endif">
