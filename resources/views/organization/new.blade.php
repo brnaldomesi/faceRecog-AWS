@@ -6,7 +6,7 @@
     <div class="container">
       <!-- BEGIN PAGE TITLE -->
       <div class="page-title">
-        <h1>Organization</h1>
+        <h1>Organizations</h1>
       </div>
       <!-- END PAGE TITLE -->
     </div>
@@ -25,7 +25,7 @@
                 <a href="{{ route('root') }}">Home</a><i class="fa fa-circle"></i>
               </li>
               <li>
-                <a href="{{ route('organization') }}">Organization</a><i class="fa fa-circle"></i>
+                <a href="{{ route('organization') }}">Organizations</a><i class="fa fa-circle"></i>
               </li>
               <li class="active">
                 Create

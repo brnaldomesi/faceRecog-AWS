@@ -1,7 +1,8 @@
 @extends('layouts.master')
 
 @section('extracss')
-	<link href="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css') }}" rel="stylesheet">
+	<link href="{{ asset('global/plugins/select2/select2.css') }}" rel="stylesheet">
+  <link href="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -11,7 +12,7 @@
     <div class="container">
       <!-- BEGIN PAGE TITLE -->
       <div class="page-title">
-        <h1>Organizations</h1>
+        <h1>Organization Case</h1>
       </div>
       <!-- END PAGE TITLE -->
     </div>
@@ -29,18 +30,21 @@
               <li>
                 <a href="{{ route('root') }}">Home</a><i class="fa fa-circle"></i>
               </li>
+              <li>
+                <a href="{{ route('allcases.show') }}">All Cases</a><i class="fa fa-circle"></i>
+              </li>
               <li class="active">
-                Organizations
+                {{ $org->name }}
               </li>
             </ul>
             <div class="row">
               <div class="col-md-12">
-                <!-- BEGIN EXAMPLE TABLE PORTLET-->
+					 <!-- BEGIN EXAMPLE TABLE PORTLET-->
                 <div class="portlet light">
                   <div class="portlet-title">
                     <div class="caption">
                       <i class="fa fa-cogs font-green-sharp"></i>
-                      <span class="caption-subject font-green-sharp bold uppercase">Organization List</span>
+                      <span class="caption-subject font-green-sharp bold uppercase">Case List</span>
                     </div>
 <!--                     <div class="tools">
                       <a href="javascript:;" class="collapse">
@@ -56,14 +60,6 @@
                   <div class="portlet-body">
                     <div class="table-toolbar">
                       <div class="row">
-                        <div class="col-md-6">
-                          <div class="btn-group">
-                            <a href="{{ route('organization.new') }}" class="btn green">
-                            Add New
-                            <i class="fa fa-plus"></i>
-                            </a>
-                          </div>
-                        </div>
                         <!-- <div class="col-md-6">
                           <div class="btn-group pull-right">
                             <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="fa fa-angle-down"></i>
@@ -86,46 +82,66 @@
                         </div> -->
                       </div>
                     </div>
-                    <table class="table table-striped table-hover" id="table-organization-list">
+                    <table class="table table-striped table-hover" id="table-case-list">
                     <thead>
                     <tr>
                       <th class="table-checkbox hidden">
-                        <input type="checkbox" class="group-checkable" data-set="#table-organization-list .checkboxes"/>
+                        <input type="checkbox" class="group-checkable" data-set="#table-case-list .checkboxes"/>
                       </th>
                       <th>
-                        Org name
+                         Case #
                       </th>
                       <th>
-                        Manager name 
+                         Type
                       </th>
                       <th>
-                        Contact email
+                         Status
                       </th>
                       <th>
                          Created
                       </th>
+
                     </tr>
                     </thead>
                     <tbody>
-@foreach ($organizations as $key => $o)
-					  <tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }} gradeX tname">
-						<td class="hidden">
-						  <input type="checkbox" class="checkboxes" value="1"/>
-						</td>
-						<td>
-						  {{ $o->name }}
-						</td>
-						<td>
-						  {{ $admins[$key]->name }}
-						</td>
-            <td>
-              {{ $admins[$key]->email }}
-            </td>
-						<td class="center">
-						   {{ $o->created_at }}
-						</td>
-						</tr>
-@endforeach
+                    @foreach ($cases as $key => $c)
+          					  <tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }} gradeX tname" onClick="javascript:location.href='{{ route('allcases.id.show', ['org'=>$c->organization->id, 'id' => $c->id]) }}';">
+          						<td class="hidden">
+          						  <input type="checkbox" class="checkboxes" value="1"/>
+          						</td>
+          						<td>
+          						  {{ $c->caseNumber }}
+          						</td>
+          						<td>
+          						  {{ $c->type }}
+          						</td>
+          						<td>
+                      @switch ($c->status)
+                    	  @case ('ACTIVE')
+          						   	<span class="label label-sm label-danger">
+            							  Active
+            							</span>
+                    		@break
+
+                    	  @case ('CLOSED')
+            							<span class="label label-sm label-warning">
+            							  CLOSED
+            							</span>
+                    		@break
+
+                     	  @case ('SOLVED')
+             							<span class="label label-sm label-success">
+            							  SOLVED
+            							</span>
+                     		@break
+                      @endswitch
+
+          						</td>
+          						<td class="center">
+          						   {{ $c->created_at->format('m/d/Y') }}
+          						</td>
+          						</tr>
+                    @endforeach
                     </tbody>
                     </table>
                   </div>
@@ -146,7 +162,8 @@
 @endsection
 
 @section('extrajs')
-	<script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
-  <script type="text/javascript" src="{{ asset('js/organization/list.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('js/Cases/caselist.js') }}"></script>
 @endsection

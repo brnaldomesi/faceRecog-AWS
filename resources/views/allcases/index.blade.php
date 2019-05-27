@@ -12,7 +12,7 @@
     <div class="container">
       <!-- BEGIN PAGE TITLE -->
       <div class="page-title">
-        <h1>Organization Searches</h1>
+        <h1>All Cases</h1>
       </div>
       <!-- END PAGE TITLE -->
     </div>
@@ -31,7 +31,7 @@
                 <a href="{{ route('root') }}">Home</a><i class="fa fa-circle"></i>
               </li>
               <li class="active">
-                Organization Searches
+                All Cases
               </li>
             </ul>
             <div class="row">
@@ -41,7 +41,7 @@
                   <div class="portlet-title">
                     <div class="caption">
                       <i class="fa fa-cogs font-green-sharp"></i>
-                      <span class="caption-subject font-green-sharp bold uppercase">Search List</span>
+                      <span class="caption-subject font-green-sharp bold uppercase">Case List</span>
                     </div>
 <!--                     <div class="tools">
                       <a href="javascript:;" class="collapse">
@@ -85,12 +85,12 @@
                       <th class="table-checkbox hidden">
                         <input type="checkbox" class="group-checkable" data-set="#table-case-list .checkboxes"/>
                       </th>
-					  <th>
-						Organization
-					  </th>
                       <th>
                          Case #
                       </th>
+          					  <th>
+          						Organization
+          					  </th>
                       <th>
                          Type
                       </th>
@@ -105,38 +105,38 @@
                     </thead>
                     <tbody>
                     @foreach ($cases as $key => $c)
-          					  <tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }} gradeX tname" onClick="javascript:location.href='{{ route('cases.id.show', ['id' => $c->id]) }}';">
+          					  <tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }} gradeX tname" onClick="javascript:location.href='{{ route('allcases.id.show', ['org'=>$c->organization->id, 'id' => $c->id]) }}';">
           						<td class="hidden">
           						  <input type="checkbox" class="checkboxes" value="1"/>
           						</td>
-								<td>
-								{{ $c->organizationId }}
-								</td>
-          						<td>
-          						  {{ $c->caseNumber }}
-          						</td>
+                      <td>
+                        {{ $c->caseNumber }}
+                      </td>
+      								<td>
+      								  {{ $c->organization->name }}
+      								</td>
           						<td>
           						  {{ $c->type }}
           						</td>
           						<td>
                       @switch ($c->status)
-                      	  @case ('ACTIVE')
-                      						   	<span class="label label-sm label-danger">
-                      							  Active
-                      							</span>
-                      		@break
+                    	  @case ('ACTIVE')
+          						   	<span class="label label-sm label-danger">
+            							  Active
+            							</span>
+                    		@break
 
-                      	  @case ('CLOSED')
-                      							<span class="label label-sm label-warning">
-                      							  CLOSED
-                      							</span>
-                      		@break
+                    	  @case ('CLOSED')
+            							<span class="label label-sm label-warning">
+            							  CLOSED
+            							</span>
+                    		@break
 
-                      	  @case ('SOLVED')
-                        							<span class="label label-sm label-success">
-                      							  SOLVED
-                      							</span>
-                      		@break
+                     	  @case ('SOLVED')
+             							<span class="label label-sm label-success">
+            							  SOLVED
+            							</span>
+                     		@break
                       @endswitch
 
           						</td>
@@ -168,4 +168,5 @@
 	<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('js/Cases/caselist.js') }}"></script>
 @endsection

@@ -22,4 +22,9 @@ class Organization extends Model
   {
   	return $this->hasMany('App\Models\User', 'organizationId');
   }
+
+  public function cases()
+  {
+    return $this->hasMany('App\Models\Cases', 'organizationId');
+  }
 }
