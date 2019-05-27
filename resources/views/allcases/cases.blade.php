@@ -39,7 +39,7 @@
 				<a href="{{ route('allcases.show') }}">All Cases</a><i class="fa fa-circle"></i>
 			  </li>
 			  <li>
-				<a href="{{ route('allcases.org.show', ['id' => $cases->organization]) }}">{{ $cases->organization->name }}</a><i class="fa fa-circle"></i>
+				<a href="{{ route('allcases.org.show', ['id' => $cases->organization]) }}">{{ $cases->organization->name }} Cases</a><i class="fa fa-circle"></i>
 			  </li>
 			  <li class="active">
 				{{ $cases->caseNumber }}
