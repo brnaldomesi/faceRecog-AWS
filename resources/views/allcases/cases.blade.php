@@ -108,7 +108,7 @@
 					<div class="form-group">
 						{!! Form::label(null, 'Creator Name ', ['class' => 'col-md-4 control-label']) !!}
 						<div class="col-md-6">
-						  {!! Form::text(null, Auth::user()->name, ['class' => 'form-control', 'disabled' => 'disabled']) !!}
+						  {!! Form::text(null, $cases->user->name, ['class' => 'form-control', 'disabled' => 'disabled']) !!}
 						</div>
 					</div>
 					<div class="form-group">

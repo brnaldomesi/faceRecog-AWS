@@ -22,4 +22,9 @@ class Cases extends Model
     {
         return $this->belongsTo('App\Models\Organization', 'organizationId');
     }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'userId');
+    }
 }
