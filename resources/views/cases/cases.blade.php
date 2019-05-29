@@ -82,16 +82,15 @@
 					  <div class="form-group">
 						  {!! Form::label('status', 'Status ', ['class' => 'col-md-4 control-label']) !!}
 						  <div class="col-md-6">
-							  {!! Form::select('status', ['ACTIVE' => 'Active', 'SOLVED' => 'Solved', 'CLOSED' => 'Closed'], null,
-							  $cases->status == 'ACTIVE' ? ['class' => 'form-control bs-select', 'required' => 'required']
-							  							 : ['class' => 'form-control bs-select', 'required' => 'required', 'disabled' => 'disabled']) !!}
+							  {!! Form::select('status', ['ACTIVE' => 'Active', 'SOLVED' => 'Solved', 'CLOSED' => 'Closed'], null, 
+								['class' => 'form-control bs-select', 'required' => 'required']) !!}
 						  </div>
 					  </div>
 
-					  <div class="form-group {{ $cases->status != 'CLOSED' ? 'hidden' : '' }}">
+					  <div class="form-group">
 						  {!! Form::label('dispo', 'Disposition ', ['class' => 'col-md-4 control-label']) !!}
 						  <div class="col-md-6">
-							  {!! Form::textarea('dispo', null, ['class' => 'form-control autosize', 'required' => 'required', 'disabled' => 'disabled']) !!}
+							  {!! Form::textarea('dispo', null, ['class' => 'form-control autosize']) !!}
 						  </div>
 					  </div>
 
