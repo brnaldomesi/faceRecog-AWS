@@ -92,7 +92,8 @@ class CaseController extends Controller
 	{
 	    return view('cases.cases', [
 			'cases' => $cases,
-			'search_history' => $cases->caseSearches()->with('image')->orderBy('created_at', 'asc')->get()
+			'search_history' => $cases->caseSearches()->with('image')->orderBy('created_at', 'asc')->get(),
+			'isUpdated' => false
 		]);
 	}
 
@@ -131,12 +132,14 @@ class CaseController extends Controller
 		if (!is_null($request->status)) {
 			$cases->status = $request->status;
 		}
-		if ($request->status == 'CLOSED') {
-			$cases->dispo = $request->dispo;
-		}
+		$cases->dispo = $request->dispo;
 		$cases->save();
 
-		return redirect()->route('cases.show');
+	    return view('cases.cases', [
+			'cases' => $cases,
+			'search_history' => $cases->caseSearches()->with('image')->orderBy('created_at', 'asc')->get(),
+			'isUpdated' => true
+		]);
 	}
 
     // Start upload button on the cases detail page..

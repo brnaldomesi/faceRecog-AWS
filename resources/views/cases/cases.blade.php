@@ -356,11 +356,13 @@ var cases_id = {{$cases->id}};
 <script src="{{ asset('global/plugins/jquery-file-upload/js/jquery.fileupload-validate.js') }}" type="text/javascript"></script>
 <script src="{{ asset('global/plugins/jquery-file-upload/js/jquery.fileupload-ui.js') }}" type="text/javascript"></script>
 <script src="{{ asset('global/plugins/fancybox/source/jquery.fancybox.pack.js') }}" type="text/javascript"></script>
-
-
+<script src="{{ asset('global/plugins/bootbox/bootbox.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('admin_assets/pages/scripts/form-fileupload.js') }}" type="text/javascript"></script>
 <script>
 	var url_getfacedetailinfo = '{{ route('search.detailfaceinfo') }}';
+	@if ($isUpdated)
+		bootbox.alert('Saved successfully!');
+	@endif
 </script>
 <script type="text/javascript" src="{{ asset('js/Cases/cases.js') }}"></script>
 @endsection
