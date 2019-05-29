@@ -55,16 +55,15 @@ function initEvent() {
 		}
 	});
 
-	$("select[name=status]").change(function () {
-		if ($(this).val() == 'CLOSED') {
-			$("textarea[name=dispo]").prop('disabled', false)
-				.parents(".form-group").removeClass('hidden');
-		} else {
-			$("textarea[name=dispo]").prop('disabled', true)
-				.parents(".form-group").addClass('hidden');
-		}
-	
-	});
+	// $("select[name=status]").change(function () {
+	// 	if ($(this).val() == 'CLOSED') {
+	// 		$("textarea[name=dispo]").prop('disabled', false)
+	// 			.parents(".form-group").removeClass('hidden');
+	// 	} else {
+	// 		$("textarea[name=dispo]").prop('disabled', true)
+	// 			.parents(".form-group").addClass('hidden');
+	// 	}
+	// });
 
 	$("a.fancybox-button").fancybox();
 	var cases_status = $("#hidden-cases-status").val();
