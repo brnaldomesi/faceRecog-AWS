@@ -127,7 +127,7 @@ class AwsS3ImageUpload extends Command
 
 			$downloadFailed = false;
 			
-			if ($og_account_name == 'maricopacountyjail')
+			if ($og_account_name == 'maricopacountyjail' || $og_account_name == 'pinalcountyjail')
 			{
 				// Proxy for importing scraped images
 				$ch = curl_init($face_tmp->image_url);
