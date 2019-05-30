@@ -131,5 +131,18 @@
   <script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
-  <script type="text/javascript" src="{{ asset('js/admin/index.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('js/Admin/index.js') }}"></script>
+  <script src="{{ asset('global/plugins/bootbox/bootbox.min.js') }}" type="text/javascript"></script>
+
+  <script>
+    @if (\Session::has('isUserCreated'))
+      bootbox.alert('Created an user successfully!');
+    @endif
+    @if (\Session::has('isUserSaved'))
+      bootbox.alert('Updated user information successfully!');
+    @endif
+</script>
 @endsection
+
+
+

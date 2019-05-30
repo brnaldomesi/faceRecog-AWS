@@ -134,13 +134,12 @@ class CaseController extends Controller
 		$cases->dispo = $request->dispo;
 		$cases->save();
 
-	    return redirect()->back()->with('isUpdated', true);
+	    return redirect()->back()->with('isCaseUpdated', true);
 	}
 
     // Start upload button on the cases detail page..
 	public function addImage(Request $request, Cases $cases)
-	{
-		
+	{		
 		Log::info('Uploading new case image');
 		
         // s3 image upload get the image url. on the "cases" directory.

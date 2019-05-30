@@ -360,8 +360,8 @@ var cases_id = {{$cases->id}};
 <script src="{{ asset('admin_assets/pages/scripts/form-fileupload.js') }}" type="text/javascript"></script>
 <script>
 	var url_getfacedetailinfo = '{{ route('search.detailfaceinfo') }}';
-	@if (\Session::has('isUpdated'))
-		bootbox.alert('Saved successfully!');
+	@if (\Session::has('isCaseUpdated'))
+		bootbox.alert('Updated the case information successfully!');
 	@endif
 </script>
 <script type="text/javascript" src="{{ asset('js/Cases/cases.js') }}"></script>
