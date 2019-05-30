@@ -136,10 +136,10 @@
 
   <script>
     @if (\Session::has('isUserCreated'))
-      bootbox.alert('Created an user successfully!');
+      bootbox.alert('New user has been created');
     @endif
     @if (\Session::has('isUserSaved'))
-      bootbox.alert('Updated user information successfully!');
+      bootbox.alert('Updated user information successfully');
     @endif
   </script>
 @endsection
