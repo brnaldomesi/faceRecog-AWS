@@ -66,15 +66,11 @@
                 {!! $errors->first('name', '<p class="help-block">:message</p>') !!}
               </div>
             </div>
-
+  @if (!isset($user))
             <div class="form-group {{ $errors->has('password') ? ' has-error' : ''}}">
               {!! Form::label('password', 'Password ', ['class' => 'col-md-4 control-label']) !!}
               <div class="col-md-6">
-  @if (isset($user))
-                {!! Form::password('password', ['class' => 'form-control', 'placeholder' => 'Blank would leave it unchanged']) !!}
-  @else
-                {!! Form::password('password', ['class' => 'form-control', 'placeholder' => 'Blank would set it to "123456789"']) !!}
-  @endif
+                {!! Form::password('password', ['class' => 'form-control', 'placeholder' => 'Setup password here...']) !!}
                 {!! $errors->first('password', '<p class="help-block">:message</p>') !!}
               </div>
             </div>
@@ -85,7 +81,7 @@
                 {!! Form::password('password_confirmation', ['class' => 'form-control']) !!}
               </div>
             </div>
-
+@endif
             <div class="form-group">
               {!! Form::label('organization', 'Organization ', ['class' => 'col-md-4 control-label']) !!}
               <div class="col-md-6">
@@ -128,9 +124,7 @@
 
 @section('extrajs')
 
-
-
-  <script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
 <script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/jquery.ui.widget.js') }}" type="text/javascript"></script>
 <script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/load-image.min.js') }}" type="text/javascript"></script>
 

@@ -59,6 +59,7 @@ class AdminController extends Controller
 		// Build our list of users for this organization
 		$users = User::orderBy('name', 'asc')
 			->where('organizationId', Auth::user()->organizationId)
+			->where('id', '!=', Auth::user()->id)
 			->get();
         return view('admin.users-manage',compact('users'));
     }
@@ -200,20 +201,15 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'confirmed'
+            'password' => 'required|confirmed|min:6'
         ]);
-
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->organizationId = Auth::user()->organizationId;
         $user->userGroupId = 2;
-
-        if (empty($request->password)) {
-            $user->password = Hash::make('123456789');
-        } else {
-            $user->password = Hash::make($request->password);
-        }
+		// we don't set default password but always set password with input request
+		$user->password = Hash::make($request->password);
         $user->save();
 		
 		// Send an email to the new user to provide them with the link to log in
@@ -232,15 +228,14 @@ class AdminController extends Controller
 				->queue(new Notify($from, $subject, $text));
 		} catch (\Exception $e) {}
 
-        return redirect()->route('admin.manageusers.show');
+        return redirect()->route('admin.manageusers.show')->with('isUserCreated', true);
     }
 
     public function update(Request $request, User $user)
     {
     	$request->validate([
     		'name' => 'required',
-    		'email' => 'required|unique:users,email,' . $user->id,
-    		'password' => 'confirmed'
+    		'email' => 'required|unique:users,email,' . $user->id
     	]);
 
     	$user->name = $request->name;
@@ -250,11 +245,7 @@ class AdminController extends Controller
 			$user->organizationId = $request->organizationId;
     	}
 
-    	if ($request->password) {
-    		 $user->password = Hash::make($request->password);
-    	}
     	$user->save();
-
-    	return redirect()->route('admin.id.show', $user);
-    }
+		return redirect()->route('admin.manageusers.show')->with('isUserSaved', true);
+     }
 }
