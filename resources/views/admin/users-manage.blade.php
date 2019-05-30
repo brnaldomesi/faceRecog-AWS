@@ -141,7 +141,7 @@
     @if (\Session::has('isUserSaved'))
       bootbox.alert('Updated user information successfully!');
     @endif
-</script>
+  </script>
 @endsection
 
 

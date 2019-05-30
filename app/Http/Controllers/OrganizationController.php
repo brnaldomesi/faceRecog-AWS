@@ -61,7 +61,7 @@ class OrganizationController extends Controller
 		$request->validate([
 	        'name' => 'required|unique:organizations',
 	        'email' => 'required|email|unique:users',
-	        'password' => 'confirmed'
+	        'password' => 'required|confirmed|min:6'
 	    ]);
 
 		$newOrganization = Organization::create([
@@ -82,12 +82,7 @@ class OrganizationController extends Controller
 		$newUser->email = $request->email;
 		$newUser->organizationId = $organId;
     	$newUser->userGroupId = 1;
-
-	    if (empty($request->password)) {
-	        $newUser->password = Hash::make('123456789');
-	    } else {
-	        $newUser->password = Hash::make($request->password);
-	    }
+        $newUser->password = Hash::make($request->password);
 	    $newUser->save();
 
 	    $newStat = new Stat;
@@ -95,7 +90,7 @@ class OrganizationController extends Controller
 	    $newStat->searches = 0;
 	    $newStat->save();
 
-	    return redirect()->route('organization');
+	    return redirect()->route('organization')->with('isOrgCreated', true);
 	}
 
 }
