@@ -153,7 +153,7 @@
   
   <script>
     @if (\Session::has('isOrgCreated'))
-      bootbox.alert('Created an organization successfully!');
+      bootbox.alert('New organization has been created');
     @endif
   </script>
 @endsection
