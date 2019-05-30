@@ -149,4 +149,11 @@
 	<script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
   <script type="text/javascript" src="{{ asset('js/organization/list.js') }}"></script>
+  <script src="{{ asset('global/plugins/bootbox/bootbox.min.js') }}" type="text/javascript"></script>
+  
+  <script>
+    @if (\Session::has('isOrgCreated'))
+      bootbox.alert('Created an organization successfully!');
+    @endif
+  </script>
 @endsection
