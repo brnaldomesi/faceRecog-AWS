@@ -100,7 +100,7 @@ class Controller extends BaseController
 
                 return $res;
 
-            }catch(Rekognition $e){
+            }catch(RekognitionException $e){
                 return 'faild';
             }
 

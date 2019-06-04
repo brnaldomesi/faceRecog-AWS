@@ -38,9 +38,17 @@
                 <!-- BEGIN EXAMPLE TABLE PORTLET-->
                 <div class="portlet light">
                   <div class="portlet-title">
-                    <div class="caption">
-                      <i class="fa fa-cogs font-green-sharp"></i>
+                    <div class="caption col-sm-6">
+                      <i class="fa fa-building font-green-sharp"></i>
                       <span class="caption-subject font-green-sharp bold uppercase">Organization List</span>
+                    </div>
+                    <div class="col-sm-6" style="text-align: right; padding-right: 0px;">
+                      <div class="btn-group">
+                        <a href="{{ route('organization.new') }}" class="btn green">
+                        Add New
+                        <i class="fa fa-plus"></i>
+                        </a>
+                      </div>
                     </div>
 <!--                     <div class="tools">
                       <a href="javascript:;" class="collapse">
@@ -56,14 +64,6 @@
                   <div class="portlet-body">
                     <div class="table-toolbar">
                       <div class="row">
-                        <div class="col-md-6">
-                          <div class="btn-group">
-                            <a href="{{ route('organization.new') }}" class="btn green">
-                            Add New
-                            <i class="fa fa-plus"></i>
-                            </a>
-                          </div>
-                        </div>
                         <!-- <div class="col-md-6">
                           <div class="btn-group pull-right">
                             <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="fa fa-angle-down"></i>
@@ -87,46 +87,46 @@
                       </div>
                     </div>
                     <table class="table table-striped table-hover" id="table-organization-list">
-                    <thead>
-                    <tr>
-                      <th class="table-checkbox hidden">
-                        <input type="checkbox" class="group-checkable" data-set="#table-organization-list .checkboxes"/>
-                      </th>
-                      <th>
-                        Org name
-                      </th>
-                      <th>
-                        Manager name 
-                      </th>
-                      <th>
-                        Contact email
-                      </th>
-                      <th>
-                         Created
-                      </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-@foreach ($organizations as $key => $o)
-					  <tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }} gradeX tname">
-						<td class="hidden">
-						  <input type="checkbox" class="checkboxes" value="1"/>
-						</td>
-						<td>
-						  {{ $o->name }}
-						</td>
-						<td>
-						  {{ $admins[$key]->name }}
-						</td>
-            <td>
-              {{ $admins[$key]->email }}
-            </td>
-						<td class="center">
-						   {{ $o->created_at }}
-						</td>
-						</tr>
-@endforeach
-                    </tbody>
+                      <thead>
+                        <tr>
+                          <th class="table-checkbox hidden">
+                            <input type="checkbox" class="group-checkable" data-set="#table-organization-list .checkboxes"/>
+                          </th>
+                          <th>
+                            Org name
+                          </th>
+                          <th>
+                            Manager name 
+                          </th>
+                          <th>
+                            Contact email
+                          </th>
+                          <th>
+                            Created
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      @foreach ($organizations as $key => $o)
+                        <tr class="{{ $key % 2 > 0 ? 'odd' : 'even' }} gradeX tname">
+                          <td class="hidden">
+                            <input type="checkbox" class="checkboxes" value="1"/>
+                          </td>
+                          <td>
+                            {{ $o->name }}
+                          </td>
+                          <td>
+                            {{ $admins[$key]->name }}
+                          </td>
+                          <td>
+                            {{ $admins[$key]->email }}
+                          </td>
+                          <td class="center">
+                            {{ $o->created_at }}
+                          </td>
+                        </tr>
+                      @endforeach
+                      </tbody>
                     </table>
                   </div>
                 </div>

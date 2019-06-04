@@ -37,18 +37,19 @@ function initEvent() {
 
 
 function validateEnrollForm() {
-  if($('#portraitDiv')[0].childElementCount === 0 && !$('[name=csv]').val()) { //Not choose portrait
-    bootbox.alert('Manually upload a photo or CSV file for import');
+  if($('#portraitDiv')[0].childElementCount === 0) {
+    bootbox.alert('Please import a photo to be enrolled.');
     return false;
   }
 
-  if($('[name=identifiers]').val() === '' && !$('[name=csv]').val()) {
-    bootbox.alert('Please enter some identifiers for this image')
+  if($('[name=identifiers]').val() === '') {
+    bootbox.alert('Please enter the identifier of the photo.')
     $('[name=identifiers]').focus()
     return false;
   }
-  if($('[name=gender]').val() === '' && !$('[name=csv]').val()) {
-    bootbox.alert('Select a perceived gender')
+  
+  if($('[name=gender]').val() === '') {
+    bootbox.alert('Please select the perceived gender.')
     $('[name=gender]').focus()
     return false;
   }
@@ -58,7 +59,6 @@ function validateEnrollForm() {
 
 function uploadPortrait() {
 	
-	
   if(validateEnrollForm()){
 
     Metronic.blockUI({
@@ -67,20 +67,17 @@ function uploadPortrait() {
 
     var form = $('#enrollForm')[0]; // You need to use standard javascript object here
     var formData = new FormData(form);
-	
-    //formData.append('_token', $("input:hidden[name=_token]").val())
-    formData.append('isCsv', $('[name=csv]').val())
-	
-	var pathArray = window.location.href.split( '/' );
-	
-	var pathStr = '';
-	for (var i = 0; i < pathArray.length - 1; i++)
-	{
-		pathStr = pathStr + pathArray[i];
-		if (i < pathArray.length - 2) {
-			pathStr = pathStr + '/';
-		}
-	}
+    
+    var pathArray = window.location.href.split( '/' );
+    
+    var pathStr = '';
+    for (var i = 0; i < pathArray.length - 1; i++)
+    {
+      pathStr = pathStr + pathArray[i];
+      if (i < pathArray.length - 2) {
+        pathStr = pathStr + '/';
+      }
+    }
 
     $.ajax({
       url : pathStr,

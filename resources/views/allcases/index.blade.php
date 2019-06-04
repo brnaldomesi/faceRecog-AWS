@@ -40,7 +40,7 @@
                 <div class="portlet light">
                   <div class="portlet-title">
                     <div class="caption">
-                      <i class="fa fa-cogs font-green-sharp"></i>
+                      <i class="fa fa-briefcase font-green-sharp"></i>
                       <span class="caption-subject font-green-sharp bold uppercase">Case List</span>
                     </div>
 <!--                     <div class="tools">

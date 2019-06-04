@@ -16,4 +16,9 @@ class Faceset extends Model
     protected $fillable = [
         'facesetToken', 'organizationId', 'gender'
     ];
+
+    public function organization()
+    {
+        return $this->belongsTo('App\Models\Organization', 'organizationId');
+    }
 }
