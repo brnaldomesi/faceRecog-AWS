@@ -79,11 +79,11 @@
                         </div> -->
                       </div>
                     </div>
-                    <table class="table table-striped table-hover" id="table-case-list">
+                    <table class="table table-striped table-hover" id="table-allcase-list">
                     <thead>
                     <tr>
                       <th class="table-checkbox hidden">
-                        <input type="checkbox" class="group-checkable" data-set="#table-case-list .checkboxes"/>
+                        <input type="checkbox" class="group-checkable" data-set="#table-allcase-list .checkboxes"/>
                       </th>
                       <th>
                          Case #
