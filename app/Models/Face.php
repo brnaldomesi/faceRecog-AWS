@@ -12,7 +12,12 @@ class Face extends Model
    *
    * @var array
    */
-  protected $fillable = [
-      'faceToken', 'facesetId', 'imageId', 'identifiers', 'gender', 'faceMatches', 'savedPath','aws_face_id'
-  ];
+    protected $fillable = [
+        'faceToken', 'facesetId', 'imageId', 'identifiers', 'gender', 'faceMatches', 'savedPath','aws_face_id'
+    ];
+    
+    public function faceset()
+    {
+        return $this->belongsTo('App\Models\Faceset', 'facesetId');
+    }
 }

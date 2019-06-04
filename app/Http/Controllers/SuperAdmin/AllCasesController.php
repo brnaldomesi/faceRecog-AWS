@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 
@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
-use App\Models\UserLog;
-
 use App\Models\Cases;
 use App\Models\CaseSearch;
 use App\Models\Organization;

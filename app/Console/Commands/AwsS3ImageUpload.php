@@ -51,7 +51,7 @@ class AwsS3ImageUpload extends Command
      *
      * @var string
      */
-    protected $description = 'It would be upload the image from the face_tmp table to the AWS S3 storage and add the real s3 image url to the faces table.';
+    protected $description = 'It would upload the image from the face_tmp table to the AWS S3 storage and add the real s3 image url to the faces table.';
 
     /**
      * Create a new command instance.
