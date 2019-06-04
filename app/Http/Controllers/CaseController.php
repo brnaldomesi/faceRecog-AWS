@@ -249,7 +249,7 @@ class CaseController extends Controller
 	        } else {
 	        	// face indexing does not work.
 				Log::info('No face found in image');
-                
+
                 // Remove origin image from S3 bucket
 	           	$result = $this->aws_s3_client->deleteObject([
 	                'Bucket' => $this->aws_s3_bucket,

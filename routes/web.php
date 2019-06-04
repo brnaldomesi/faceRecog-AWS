@@ -50,7 +50,7 @@ Route::group(['middleware' => ['authen']], function () {
 	});
 
 	Route::get('/home', 'HomeController@index')->name('home');
-	Route::get('/portraits/create', 'PortraitsController@create');
+	Route::get('/portraits/create', 'PortraitsController@create')->name('portrait.new');
 	Route::get('/portraits', 'PortraitsController@index');
 	Route::post('/portraits', 'PortraitsController@store');
 	Route::post('/portraits/search', 'PortraitsController@search')->name('search.file');
@@ -70,12 +70,6 @@ Route::group(['middleware' => ['authen']], function () {
 		Route::post('/cases/{cases}/imagelist', 'CaseController@imagelist')->name('cases.id.image.show');
 	});
 
-	Route::group(['middleware' => ['can:create,App\Models\Organization']], function () {
-		Route::get('/organizations', 'OrganizationController@index')->name('organization');
-		Route::get('/organizations/new', 'OrganizationController@new')->name('organization.new');
-		Route::post('/organizations', 'OrganizationController@create')->name('organization.create');
-	});
-
 	Route::post('/cases/search', 'CaseController@search')->name('search.case');
 	Route::post('/cases/search-history', 'CaseController@searchHistory')->name('search.history');
     Route::post('/cases/getDetailFaceInfo','CaseController@getDetailFaceInfo')->name('search.detailfaceinfo');
@@ -92,9 +86,21 @@ Route::group(['middleware' => ['authen']], function () {
 	
 	// Organization Searches (SuperAdmin)
 	Route::group(['middleware' => ['superadmin']], function() {
-		Route::get('/allcases','AllCasesController@index')->name('allcases.show');
-		Route::get('/allcases/{org}', 'AllCasesController@orgIndex')->name('allcases.org.show');
-		Route::get('/allcases/{org}/{cases}', 'AllCasesController@cases')->name('allcases.id.show');
-		Route::post('/allcases/{org}/{cases}/imagelist', 'AllCasesController@imagelist')->name('allcases.id.image.show');
+		Route::group(['middleware' => ['can:create,App\Models\Organization']], function () {
+			Route::get('/organizations', 'SuperAdmin\OrganizationController@index')->name('organization');
+			Route::get('/organizations/new', 'SuperAdmin\OrganizationController@new')->name('organization.new');
+			Route::post('/organizations', 'SuperAdmin\OrganizationController@create')->name('organization.create');
+		});
+
+		Route::get('/allcases','SuperAdmin\AllCasesController@index')->name('allcases.show');
+		Route::get('/allcases/{org}', 'SuperAdmin\AllCasesController@orgIndex')->name('allcases.org.show');
+		Route::get('/allcases/{org}/{cases}', 'SuperAdmin\AllCasesController@cases')->name('allcases.id.show');
+		Route::post('/allcases/{org}/{cases}/imagelist', 'SuperAdmin\AllCasesController@imagelist')->name('allcases.id.image.show');
+
+		Route::get('/faces','SuperAdmin\FaceController@index')->name('faces.index');
+		Route::post('/faces/importcsv','SuperAdmin\FaceController@importCSV')->name('faces.importcsv');
+		Route::post('/faces/enrollphoto','SuperAdmin\FaceController@enrollPhoto')->name('faces.enrollphoto');
+		Route::post('/faces/searchimage','SuperAdmin\FaceController@searchImage')->name('faces.searchimage');
+		Route::post('/faces/removeface','SuperAdmin\FaceController@removeFace')->name('faces.removeface');
 	});
 });

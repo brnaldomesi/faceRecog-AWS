@@ -26,33 +26,19 @@
                   <div class="text-center">
                     <span class="btn default btn-file">
                       <span class="fileinput-new">
-                        Upload
+                        Browse
                       </span>
                       <span class="fileinput-exists">
-                        Upload
+                        Browse
                       </span>
                       <input type="file" accept="image/*" name="portraitInput" id="portraitInput">
                     </span>
                     <a href="javascript:;" class="btn default fileinput-exists" hidden="" data-dismiss="fileinput">
-                      Remove 
+                      Discard 
                     </a>
                   </div>
                 </div>
               </div>
-
-              <div class="fileinput fileinput-new margin-top-15" data-provides="fileinput">
-                <span class="btn default btn-file">
-                <span class="fileinput-new">
-                CSV </span>
-                <span class="fileinput-exists">
-                CSV </span>
-                <input type="hidden" value="" name="..."><input type="file" name="csv" accept=".csv">
-                </span>
-                <span class="fileinput-filename"></span>
-                &nbsp; <a href="javascript:;" class="close fileinput-exists" data-dismiss="fileinput">
-                </a>
-              </div>
-
             </div> 
           </div>
           <!-- END PHOTO -->
@@ -66,14 +52,14 @@
               </div>
               <div class="portlet-body">
                 <div class="form-group row">
-                  <label for="name" class="col-md-3 col-form-label text-right padding-top-10">{{ __('Identifiers') }}</label>
+                  <label for="name" class="col-md-4 col-form-label text-right padding-top-10">{{ __('Identifiers') }}</label>
                   <div class="col-md-6">
                     <input id="identifiers" type="text" class="form-control" name="identifiers">
                   </div>
                 </div>
 
                 <div class="form-group row">
-                  <label for="name" class="col-md-3 col-form-label text-right padding-top-10">{{ __('Gender') }}</label>
+                  <label for="name" class="col-md-4 col-form-label text-right padding-top-10">{{ __('Gender') }}</label>
                   <div class="col-md-6">
         					<select class="form-control" name="gender">
         						<option value="">Select One</option>

@@ -36,7 +36,7 @@
       <div class="row">
         @if (Auth::user()->permission->isSuperAdmin())
           <div class="col-sm-6 col-xs-12 margin-bottom-10">
-            <a class="dashboard-stat dashboard-stat-light purple-plum" href="{{ url('organizations') }}">
+            <a class="dashboard-stat dashboard-stat-light purple-plum" href="{{ route('organization') }}">
             <div class="visual">
               <i class="fa fa-building fa-icon-medium"></i>
             </div>
@@ -51,7 +51,7 @@
             </a>
           </div>
           <div class="col-sm-6 col-xs-12 margin-bottom-10">
-            <a class="dashboard-stat dashboard-stat-light blue-madison" href="{{ url('allcases') }}">
+            <a class="dashboard-stat dashboard-stat-light blue-madison" href="{{ route('allcases.show') }}">
             <div class="visual">
               <i class="fa fa-briefcase fa-icon-medium"></i>
             </div>
@@ -66,7 +66,7 @@
             </a>
           </div>
           <div class="col-sm-6 col-xs-12 margin-bottom-10">
-            <a class="dashboard-stat dashboard-stat-light blue-hoki" href="javascript:;">
+            <a class="dashboard-stat dashboard-stat-light blue-hoki" href="{{ route('faces.index') }}">
             <div class="visual">
               <i class="fa fa-user fa-icon-medium"></i>
             </div>
