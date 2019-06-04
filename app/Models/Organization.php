@@ -16,7 +16,12 @@ class Organization extends Model
 	public function faces()
   {
     return $this->hasManyThrough('App\Models\Face', 'App\Models\Faceset', 'organizationId' ,'facesetId');
-  }  
+  }
+  
+  public function facesTmp()
+  {
+    return $this->hasMany('App\Models\FaceTmp', 'organizationId');
+  }
   
   public function users()
   {

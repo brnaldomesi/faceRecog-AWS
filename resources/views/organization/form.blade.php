@@ -30,7 +30,7 @@
   </div>
 </div>
 
-<div class="form-group {{ $errors->has('adminName') ? ' has-error' : ''}}">
+<div class="form-group {{ $errors->has('contactPhone') ? ' has-error' : ''}}">
     {!! Form::label('contactPhone', 'Phone ', ['class' => 'col-md-4 control-label']) !!}
     <div class="col-md-6">
         {!! Form::text('contactPhone', null, ['class' => 'form-control', 'required' => 'required']) !!}
@@ -55,7 +55,7 @@
 
 <div class="form-group">
     <div class="col-md-offset-3 col-md-6" style="text-align: center;">
-        {!! Form::submit('Create', ['class' => 'btn btn-primary']) !!}
+        {!! Form::submit('Create', ['class' => 'btn green-haze']) !!}
         <a href="{{ route('organization') }}" class="btn btn-default">
             Cancel
         </a>

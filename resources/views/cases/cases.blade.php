@@ -14,17 +14,17 @@
 <div class="page-container">
   <!-- BEGIN PAGE HEAD -->
   <div class="page-head">
-	<div class="container">
-	  <!-- BEGIN PAGE TITLE -->
-	  <div class="page-title">
-		<h1>Cases</h1>
-	  </div>
-	  <!-- END PAGE TITLE -->
-	</div>
+		<div class="container">
+			<!-- BEGIN PAGE TITLE -->
+			<div class="page-title">
+				<h1>Cases</h1>
+			</div>
+			<!-- END PAGE TITLE -->
+		</div>
   </div>
   <!-- END PAGE HEAD -->
   <div class="page-content">
-	<div class="container">
+		<div class="container">
 	  <!-- <div class="row justify-content-center">
 		<div class="col-md-12">
 		  <div class="card">
@@ -124,44 +124,44 @@
 				  	@if ($cases->status == 'ACTIVE')
 				  	<form id="enrollForm" action="{{ route('cases.id.image.add', $cases->id) }}" method="POST" class="form-horizontal" >
 						{{ csrf_field() }}
-                        <!-- The fileupload-button bar contains buttons to add/delete files and start/cancel the upload -->
-                        <div class="row fileupload-buttonbar">
-                            <div class="col-lg-12 text-center">
-                                <!-- The fileinput-button span is used to style the file input field as button -->
-                                <span class="btn green fileinput-button">
-                                    <i class="fa fa-plus"></i>
-                                    <span> Add files... </span>
-                                    <input type="file" name="files[]" multiple=""> </span>
-                                <button type="submit" id="id_btn_start_upload1" class="btn blue start">
-                                    <i class="fa fa-upload"></i>
-                                    <span> Start upload </span>
-                                </button>
-                                <button type="reset" class="btn warning cancel">
-                                    <i class="fa fa-ban-circle"></i>
-                                    <span> Cancel upload </span>
-                                </button>
-                                <button type="reset" class="btn yellow clean">
-                                    <i class="fa fa-trash"></i>
-                                    <span> Clean </span>
-                                </button>
-                                <!-- The global file processing state -->
-                                <span class="fileupload-process"> </span>
-                            </div>
-                            <!-- The global progress information -->
-                            <div class="col-lg-12 fileupload-progress fade">
-                                <!-- The global progress bar -->
-                                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-                                    <div class="progress-bar progress-bar-success" style="width:0%;"> </div>
-                                </div>
-                                <!-- The extended global progress information -->
-                                <div class="progress-extended"> &nbsp; </div>
-                            </div>
-                        </div>
-                        <!-- The table listing the files available for upload/download -->
-                        <table role="presentation" class="table table-striped clearfix">
-                            <tbody class="files"> </tbody>
-                        </table>
-                    </form>
+							<!-- The fileupload-button bar contains buttons to add/delete files and start/cancel the upload -->
+							<div class="row fileupload-buttonbar">
+									<div class="col-lg-12 text-center">
+											<!-- The fileinput-button span is used to style the file input field as button -->
+											<span class="btn green fileinput-button">
+													<i class="fa fa-plus"></i>
+													<span> Add files... </span>
+													<input type="file" name="files[]" multiple=""> </span>
+											<button type="submit" id="id_btn_start_upload1" class="btn blue start">
+													<i class="fa fa-upload"></i>
+													<span> Start upload </span>
+											</button>
+											<button type="reset" class="btn warning cancel">
+													<i class="fa fa-ban-circle"></i>
+													<span> Cancel upload </span>
+											</button>
+											<button type="reset" class="btn yellow clean">
+													<i class="fa fa-trash"></i>
+													<span> Clean </span>
+											</button>
+											<!-- The global file processing state -->
+											<span class="fileupload-process"> </span>
+									</div>
+									<!-- The global progress information -->
+									<div class="col-lg-12 fileupload-progress fade">
+											<!-- The global progress bar -->
+											<div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+													<div class="progress-bar progress-bar-success" style="width:0%;"> </div>
+											</div>
+											<!-- The extended global progress information -->
+											<div class="progress-extended"> &nbsp; </div>
+									</div>
+							</div>
+							<!-- The table listing the files available for upload/download -->
+							<table role="presentation" class="table table-striped clearfix">
+									<tbody class="files"> </tbody>
+							</table>
+						</form>
 					<hr>
 					@endif
 					<input type="hidden" id="hidden-image-list-url" value="{{ route('cases.id.image.show', $cases->id) }}">
@@ -194,56 +194,56 @@
 	</div>
 	</div>
 
-	  <div class="col-md-6">
+	<div class="col-md-6">
 		<div class="portlet light">
 		  <div class="portlet-title">
-			<div class="caption">
-			  <span class="caption-subject font-green-sharp bold uppercase">Search History</span>
-			</div>
+				<div class="caption">
+					<span class="caption-subject font-green-sharp bold uppercase">Search History</span>
+				</div>
 		  </div>
 		  <div class="portlet-body">
 	  		<table class="table table-striped table-hover" id="table-search-history">
-				<thead>
-				<tr>
-					<th>
-						 #
-					</th>
-					<th>
-						 Image
-					</th>
-					<th>
-						 Date Searched
-					</th>
-					<th>
-						 Results
-					</th>
-				</tr>
-				</thead>
-				<tbody>
-				@foreach ($search_history as $key => $value)
-					<tr history-no="{{ $value->id }}">
-						<td>
-							{{ $key + 1 }}
-						</td>
-						<td>
-							<a href="{{ asset($value->image->file_url) }}" class="fancybox-button" data-rel="fancybox-button">
-								<img src="{{ asset($value->image->thumbnail_url) }}" style="width:96px"/>
-								{{-- <div>{{ $value->image->filename }}</div> --}}
-							</a>
-						</td>
-						<td>
-							{{ Carbon\Carbon::parse($value->searchedOn)->format("m/d/Y H:i:s") }}
-						</td>
-						<td>
-							{{count($value->results['data_list'])}}
-						</td>
+					<thead>
+					<tr>
+						<th>
+							#
+						</th>
+						<th>
+							Image
+						</th>
+						<th>
+							Date Searched
+						</th>
+						<th>
+							Results
+						</th>
 					</tr>
-				@endforeach
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+					@foreach ($search_history as $key => $value)
+						<tr history-no="{{ $value->id }}">
+							<td>
+								{{ $key + 1 }}
+							</td>
+							<td>
+								<a href="{{ asset($value->image->file_url) }}" class="fancybox-button" data-rel="fancybox-button">
+									<img src="{{ asset($value->image->thumbnail_url) }}" style="width:96px"/>
+									{{-- <div>{{ $value->image->filename }}</div> --}}
+								</a>
+							</td>
+							<td>
+								{{ Carbon\Carbon::parse($value->searchedOn)->format("m/d/Y H:i:s") }}
+							</td>
+							<td>
+								{{count($value->results['data_list'])}}
+							</td>
+						</tr>
+					@endforeach
+					</tbody>
+				</table>
 		  </div>
 		</div>
-	  </div>
+	</div>
 
 	</div>
   </div>
