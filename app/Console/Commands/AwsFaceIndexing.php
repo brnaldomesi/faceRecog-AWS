@@ -222,13 +222,12 @@ class AwsFaceIndexing extends Command
                             Faceset::where('id', $facesetId)->increment('faces');
                         }else{
                             //log
-                            $logstr = "--------Failed";
+                            $logstr = "--------Failed Indexing-------";
                             $log = fopen("public/debug_index.txt","a");
                             fwrite($log, $logstr);
                             fclose($log);
-
                             // set the aws_face_id is not used.
-                            Face::where('id',$face->id)->update(['aws_face_id'=>'false']);
+                            Face::where('id',$face->id)->delete();
                         }
 
                     }
