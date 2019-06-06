@@ -87,3 +87,83 @@ Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afre
 Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a2539d0f400b64d9e1615e4dbafd7d96.jpg
 Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/8269e080addbb934caa5d40b0105ff85.png--------Failed Indexing-------
 Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/8269e080addbb934caa5d40b0105ff85.png--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/67ca56886c2bbf6ef17a5605db927bfd.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/ef5fbdb6f808d58727033be19c3aaf0a.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/67ca56886c2bbf6ef17a5605db927bfd.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/67ca56886c2bbf6ef17a5605db927bfd.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/ef5fbdb6f808d58727033be19c3aaf0a.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/a052bff414cb1baf16ceabfb21d24f9b.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/998b987a4230ade31700acb0bcb81663.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/dcc5ec54653af6ac5524064b9a010289.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4561b24b84e2b142ab2b0d45d1f45572.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/48e91f11f2fa1b6940ab194273e590e3.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/60d2c4ed2b889f9ee9ab8a8233509730.jpeg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/8b8add0526c62a1962e38d4633ca7679.jpeg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/b350a7cf90912b44872f431c19e1118f.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/3945845e1172eee8af9bb484eba3f128.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/7498ddd0b5bfab92362cbe8f290f385d.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/4e623502c6798dc4285ad0b1c347881d.jpg--------Failed Indexing-------
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/f7129e253034a0bef00cdc4cc31dc2f9.jpg--------Failed Indexing-------
