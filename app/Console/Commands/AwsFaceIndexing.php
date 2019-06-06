@@ -258,6 +258,7 @@ class AwsFaceIndexing extends Command
         }
     }
 
+    // Check quality of face to eliminate bad quality images in Indexing process
     public function checkFaceQuality($faceDetail) {
 
         if($faceDetail['Quality']['Sharpness'] < env('AWS_INDEXING_MIN_SHARPNESS') ||
