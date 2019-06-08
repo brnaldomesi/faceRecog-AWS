@@ -11,7 +11,7 @@
           <span class="btn default btn-file">
           <span class="fileinput-new">Browse</span>
           <span class="fileinput-exists">Browse</span>
-          <input type="hidden" value="" name="..."><input type="file" name="csv" accept=".csv" required>
+          <input type="hidden" value="" name="..."><input type="file" name="csv" id="csvInput" accept=".csv" required>
           </span>
           <span class="fileinput-filename"></span>
           &nbsp; <a href="javascript:;" class="close fileinput-exists" data-dismiss="fileinput">

@@ -12,7 +12,15 @@ function validateCSVForm() {
       message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you imported a CSV file.'
     });
     return false;
+  } else {
+    if(!validateCSVFile($('#csvInput').val())) {
+      bootbox.alert({
+        message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please import the file with only CSV extension.'
+      });
+      return false;
+    }
   }
+
   const organization = $("#organizationCSV").val();
   if(!organization) {
     bootbox.alert({
@@ -25,39 +33,45 @@ function validateCSVForm() {
 }
 
 function validatePhotoForm() {
-  if($('#portraitDiv')[0].childElementCount === 0) {
-    bootbox.alert({
-      message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you imported an image file to enroll.'
-    });
-    return false;
-  }
+  return new Promise((resolve, reject) => {
+    if($('#portraitDiv')[0].childElementCount === 0) {
+      bootbox.alert({
+        message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you imported an image file to enroll.'
+      });
+      reject();
   
-  if($('[name=identifiers]').val() === '') {
-    bootbox.alert({
-      message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please enter the identifier for this image.'
-    });
-    $('[name=identifiers]').focus();
-    return false;
-  }
-
-  if($('[name=gender]').val() === '') {
-    bootbox.alert({
-      message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you selected a gender.'
-    });
-    $('[name=gender]').focus();
-    return false;
-  }
-
-  const organization = $("#organizationPhoto").val();
-  if(!organization) {
-    bootbox.alert({
-      message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you selected an organization.'
-    });
-    $('[name=organizationPhoto]').focus();
-    return false;
-  }
+    } else {
+      validateImageFile($('#portraitInput').prop('files')[0]).then((resultCode) => { 
+        const organization = $("#organizationPhoto").val();
+        if($('[name=identifiers]').val() === '') {
+          bootbox.alert({
+            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please enter the identifier for this image.'
+          });
+          $('[name=identifiers]').focus();
+          reject();
+        } else if($('[name=gender]').val() === '') {
+          bootbox.alert({
+            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you selected a gender.'
+          });
+          $('[name=gender]').focus();
+          reject();
+        } else if(!organization) {
+          bootbox.alert({
+            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you selected an organization.'
+          });
+          $('[name=organizationPhoto]').focus();
+          reject();
+        } else {
+          resolve();
+        }
   
-  return true;
+      }).catch((resultCode) => {
+        notifyInvalidImage(resultCode);
+        reject();
+  
+      });
+    }
+  });
 }
 
 function validateManualReviewForm() {
@@ -105,7 +119,7 @@ function importCSV() {
 }
 
 function enrollPhoto() {
-  if(validatePhotoForm()){
+  validatePhotoForm().then(() => {
     Metronic.blockUI({
         animate: true,
     });
@@ -135,7 +149,10 @@ function enrollPhoto() {
         });
       }
     });
-  }
+
+  }).catch(() => {
+
+  });
 }
 
 function setStateActive() {

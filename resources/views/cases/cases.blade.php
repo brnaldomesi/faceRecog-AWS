@@ -126,36 +126,36 @@
 						{{ csrf_field() }}
 							<!-- The fileupload-button bar contains buttons to add/delete files and start/cancel the upload -->
 							<div class="row fileupload-buttonbar">
-									<div class="col-lg-12 text-center">
-											<!-- The fileinput-button span is used to style the file input field as button -->
-											<span class="btn green fileinput-button">
-													<i class="fa fa-plus"></i>
-													<span> Add files... </span>
-													<input type="file" name="files[]" multiple=""> </span>
-											<button type="submit" id="id_btn_start_upload1" class="btn blue start">
-													<i class="fa fa-upload"></i>
-													<span> Start upload </span>
-											</button>
-											<button type="reset" class="btn warning cancel">
-													<i class="fa fa-ban-circle"></i>
-													<span> Cancel upload </span>
-											</button>
-											<button type="reset" class="btn yellow clean">
-													<i class="fa fa-trash"></i>
-													<span> Clean </span>
-											</button>
-											<!-- The global file processing state -->
-											<span class="fileupload-process"> </span>
+								<div class="col-lg-12 text-center">
+									<!-- The fileinput-button span is used to style the file input field as button -->
+									<span class="btn green fileinput-button">
+										<i class="fa fa-plus"></i>
+										<span> Add files... </span>
+										<input type="file" name="files[]" accept="image/jpeg, image/png" multiple=""> </span>
+									<button type="submit" id="id_btn_start_upload1" class="btn blue start">
+										<i class="fa fa-upload"></i>
+										<span> Start upload </span>
+									</button>
+									<button type="reset" class="btn warning cancel">
+										<i class="fa fa-ban-circle"></i>
+										<span> Cancel upload </span>
+									</button>
+									<button type="reset" class="btn yellow clean">
+										<i class="fa fa-trash"></i>
+										<span> Clean </span>
+									</button>
+									<!-- The global file processing state -->
+									<span class="fileupload-process"> </span>
+								</div>
+								<!-- The global progress information -->
+								<div class="col-lg-12 fileupload-progress fade">
+									<!-- The global progress bar -->
+									<div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+											<div class="progress-bar progress-bar-success" style="width:0%;"> </div>
 									</div>
-									<!-- The global progress information -->
-									<div class="col-lg-12 fileupload-progress fade">
-											<!-- The global progress bar -->
-											<div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-													<div class="progress-bar progress-bar-success" style="width:0%;"> </div>
-											</div>
-											<!-- The extended global progress information -->
-											<div class="progress-extended"> &nbsp; </div>
-									</div>
+									<!-- The extended global progress information -->
+									<div class="progress-extended"> &nbsp; </div>
+								</div>
 							</div>
 							<!-- The table listing the files available for upload/download -->
 							<table role="presentation" class="table table-striped clearfix">
@@ -341,6 +341,7 @@ var cases_id = {{$cases->id}};
 <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
 <script type="text/javascript" src="{{ asset('admin_assets/pages/scripts/table-managed.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/fileValidation.js') }}"></script>
 
 <script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/jquery.ui.widget.js') }}" type="text/javascript"></script>
 <script src="{{ asset('global/plugins/jquery-file-upload/js/vendor/tmpl.min.js') }}" type="text/javascript"></script>

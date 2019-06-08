@@ -61,5 +61,6 @@
     <script type="text/javascript" src="{{ asset('global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js') }}"></script>
     <script type="text/javascript" src="{{ asset('admin_assets/pages/scripts/components-pickers.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/portraits.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/fileValidation.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/portraits/create.js') }}"></script>
 @endsection
