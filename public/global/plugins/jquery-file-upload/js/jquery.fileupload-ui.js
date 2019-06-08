@@ -528,15 +528,21 @@
                 data = template.data('data'),
             // modified by naldokan
                 gender = template.find("#gender").val();
-            if(gender) {
-                button.prop('disabled', true);
-                if (data && data.submit) {
-                    data.submit();
+            
+            validateImageFile(data.files[0]).then((resultCode) => { 
+                if(gender) {
+                    button.prop('disabled', true);
+                    if (data && data.submit) {
+                        data.submit();
+                    }
+                } else {
+                    bootbox.alert({
+                        message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please select gender before uploading the case image.'
+                    });
                 }
-            } else {
-                bootbox.alert('Please select gender before uploading the case image!');
-            }
-            //
+            }).catch((resultCode) => {
+                notifyInvalidImage(resultCode);
+            });
         },
 
         _cancelHandler: function (e) {

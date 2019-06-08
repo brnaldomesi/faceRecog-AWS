@@ -10,8 +10,10 @@ var FormFileUpload = function () {
                 disableImageResize: false,
                 autoUpload: false,
                 disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator.userAgent),
+                // modified by naldokan
                 maxFileSize: 5000000,
-                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                acceptFileTypes: /(\.|\/)(jpe?g|png)$/i,
+                //acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
                 // Uncomment the following to send cross-domain cookies:
                 //xhrFields: {withCredentials: true},                
             });

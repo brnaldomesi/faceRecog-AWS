@@ -11,7 +11,6 @@ $(document).ready(function () {
 
 function initEvent() {
 	
-	
   $("[name=portraitInput]").on('change', function (e) {
     var file = $(this)[0].files[0];
     var thisObj = this;
@@ -35,32 +34,46 @@ function initEvent() {
   ComponentsPickers.init();
 }
 
-
 function validateEnrollForm() {
-  if($('#portraitDiv')[0].childElementCount === 0) {
-    bootbox.alert('Please import a photo to be enrolled.');
-    return false;
-  }
-
-  if($('[name=identifiers]').val() === '') {
-    bootbox.alert('Please enter the identifier of the photo.')
-    $('[name=identifiers]').focus()
-    return false;
-  }
+  return new Promise((resolve, reject) => {
+    if($('#portraitDiv')[0].childElementCount === 0) {
+      bootbox.alert({
+        message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please import a photo to be enrolled.'
+      });
+      reject();
   
-  if($('[name=gender]').val() === '') {
-    bootbox.alert('Please select the perceived gender.')
-    $('[name=gender]').focus()
-    return false;
-  }
-  return true;
+    } else {
+      validateImageFile($('#portraitInput').prop('files')[0]).then((resultCode) => { 
+        if($('[name=identifiers]').val() === '') {
+          bootbox.alert({
+            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please enter the identifier of the photo.'
+          });
+          $('[name=identifiers]').focus();
+          reject();
+        }
+        else if($('[name=gender]').val() === '') {
+          bootbox.alert({
+            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please select the perceived gender.'
+          });
+          $('[name=gender]').focus();
+          reject();
+        }
+        else {
+          resolve();
+        }
+
+      }).catch((resultCode) => {
+        notifyInvalidImage(resultCode);
+        reject();
+  
+      });
+    }
+  });
 }
 
 
 function uploadPortrait() {
-	
-  if(validateEnrollForm()){
-
+  validateEnrollForm().then(() => {
     Metronic.blockUI({
         animate: true,
     });
@@ -83,18 +96,23 @@ function uploadPortrait() {
       url : pathStr,
       type : 'post',
       dataType : 'json',
-      //data: {portraitType : 'image_base64', portraitData : portraitData, name: $('[name=name]').val(), dob : $('[name=dob]').val()},
       data: formData,
       contentType: false,
       processData: false,
       success: function(data) {
         Metronic.unblockUI();
-        bootbox.alert(data.msg);
+        bootbox.alert({
+            message: '<h4 style="color: DodgerBlue;">Success<br></h4>' + data.msg
+        });
       },
       error: function (jqXHR, status, error) {
         Metronic.unblockUI();
-        bootbox.alert(status + "<br>" + error);
+        bootbox.alert({
+          message: '<h4 style="color: #f00;">Error<br></h4>' + error
+        });
       }
     });
-  }
+  }).catch(() => {
+
+  });
 }

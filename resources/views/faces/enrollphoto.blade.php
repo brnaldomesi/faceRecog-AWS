@@ -10,7 +10,7 @@
         <span class="btn default btn-file">
           <span class="fileinput-new">Browse</span>
           <span class="fileinput-exists">Browse</span>
-          <input type="file" accept="image/*" name="portraitInput" id="portraitInput">
+          <input type="file" accept="image/jpeg, image/png" name="portraitInput" id="portraitInput">
         </span>
         <a href="javascript:;" class="btn default fileinput-exists" hidden="" data-dismiss="fileinput">
           Discard
