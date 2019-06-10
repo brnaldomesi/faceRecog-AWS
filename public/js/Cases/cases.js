@@ -34,8 +34,10 @@ function showFaceDetail(aws_face_id) {
 			$("#details_link_"+aws_face_id).removeClass('hidden');
 			$('#details_loading_'+aws_face_id).addClass('hidden');			
 			
-            Metronic.unblockUI();
-            bootbox.alert(status + "<br>" + error);
+			Metronic.unblockUI();
+			bootbox.alert({
+				message: '<h4 style="color: #f00;">Error<br></h4>' + error
+			});
         }
     });
 }
@@ -199,7 +201,8 @@ function initEvent() {
 
 			body += '<div class="clearfix">'
 			body += '	<div class="needle-side-bar col-md-2 col-sm-3 col-xs-6 col-xs-offset-3 col-sm-offset-0">';
-			body += '		<img src="' + needle_image_src + '" class="img-thumbnail fancybox-button" data-rel="fancybox-button">';
+			body += '		<a href="' + needle_image_src + '" class="fancybox-button" data-rel="fancybox-button">';
+			body += '		<img src="' + needle_image_src + '" class="img-thumbnail" alt="" onerror="this.src=\'https://afrengine-images.s3.us-west-2.amazonaws.com/removed.jpg\'";/></a>';
 			body += '	</div>';
 			
 			for (var i = 0, len = data.data_list.length; i < len; i++) {
@@ -226,14 +229,14 @@ function initEvent() {
 				body += '<li style="margin: 10px 0;list-style:none;">';
 				body += '	<div>';
 				body += '		<a href="' + image_url + '" class="fancybox-button" data-rel="fancybox-button">';
-				body += '		<img src="' + image_url + '" class="img-thumbnail" alt="Can not load image"></a>';
+				body += '		<img src="' + image_url + '" class="img-thumbnail" alt="" onerror="this.src=\'https://afrengine-images.s3.us-west-2.amazonaws.com/removed.jpg\'";/></a>';
 				body += '	</div>';
 				body += '	<div style="margin-top:20px; line-height:20px">'
 				body += '		<div class="field">';
 				body += '			<div><b>Similarity:</b></div>';
 				body += '			<div>' + value.similarity.toFixed() + '%</div>';
 				body += '			<div class="field" id="details_link_'+value.face_id+'"><a href="#" onclick="showFaceDetail(\''+value.face_id+'\')">(Click for details)</a></div>';
-				body += '			<div class="field hidden" id="details_loading_'+value.face_id+'"><img src="https://www.afrengine.com/engine/img/input-spinner.gif"></div>';
+				body += '			<div class="field hidden" id="details_loading_'+value.face_id+'"><img src="../img/input-spinner.gif"></div>';
 				body += '		</div>';				
                 body += '		<div class="field hidden" id="id_dv_face_detail_'+value.face_id+'">';
                 body += '			<div><b>Identifiers:</b></div>';
