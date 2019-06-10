@@ -201,7 +201,8 @@ function initEvent() {
 
 			body += '<div class="clearfix">'
 			body += '	<div class="needle-side-bar col-md-2 col-sm-3 col-xs-6 col-xs-offset-3 col-sm-offset-0">';
-			body += '		<img src="' + needle_image_src + '" class="img-thumbnail fancybox-button" data-rel="fancybox-button">';
+			body += '		<a href="' + needle_image_src + '" class="fancybox-button" data-rel="fancybox-button">';
+			body += '		<img src="' + needle_image_src + '" class="img-thumbnail" alt="" onerror="this.src=\'https://afrengine-images.s3.us-west-2.amazonaws.com/removed.jpg\'";/></a>';
 			body += '	</div>';
 			
 			for (var i = 0, len = data.data_list.length; i < len; i++) {
