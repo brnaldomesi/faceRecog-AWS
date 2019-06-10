@@ -32,6 +32,8 @@
     <link href="{{ asset('admin_assets/layout3/css/custom.css') }}" rel="stylesheet">
     <!-- END THEME STYLES -->
     <link href="{{ asset('css/appcustom.css') }}" rel="stylesheet">
+	
+	<link rel="shortcut icon" href="{{ asset('favicon.ico') }}"> 
 </head>
 <!-- END HEAD -->
 <!-- BEGIN BODY -->
