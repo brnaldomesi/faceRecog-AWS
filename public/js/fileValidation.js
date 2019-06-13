@@ -1,23 +1,23 @@
-function notifyInvalidImage(invalidCode) {
+function notifyInvalidImage(invalidCode, invalidTarget="") {
     switch(invalidCode) {
         case 0:
             bootbox.alert({
-                message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Invalid image resolution.<br>Please make sure your image has resolution of larger than 80 * 80.'
+                message: '<h4 style="color: #f00;">Failure<br></h4>' + invalidTarget + ' Invalid image resolution.<br>Please make sure your image has resolution of larger than 80 * 80.'
             });
             break;
         case -1:
             bootbox.alert({
-                message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Invalid image file.'
+                message: '<h4 style="color: #f00;">Failure<br></h4>' + invalidTarget + ' Invalid image file.'
             });
             break;
         case -2:
             bootbox.alert({
-                message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Invalid file size.<br>Please make sure the image file you use is not larger than 5MB.'
+                message: '<h4 style="color: #f00;">Failure<br></h4>' + invalidTarget + ' Invalid file size.<br>Please make sure the image file you use is not larger than 5MB.'
             });
             break;
         case -3:
             bootbox.alert({
-                message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Invalid file type.<br>Please import image files with only PNG or JPG extension.'
+                message: '<h4 style="color: #f00;">Failure<br></h4>' + invalidTarget + ' Invalid file type.<br>Please import image files with only PNG or JPG extension.'
             });
             break;
         default:

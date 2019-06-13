@@ -74,14 +74,20 @@ Route::group(['middleware' => ['authen']], function () {
 	Route::post('/cases/search-history', 'CaseController@searchHistory')->name('search.history');
     Route::post('/cases/getDetailFaceInfo','CaseController@getDetailFaceInfo')->name('search.detailfaceinfo');
 
-	// aws test
+	// Compare
+	Route::get('/compare', 'CompareController@index')->name('compare.index');
+	Route::post('/compare/create', 'CompareController@compare')->name('compare.create');
+	Route::post('/compare/history', 'CompareController@history')->name('compare.history');
+	Route::post('/compare/save', 'CompareController@save')->name('compare.save');
+
+	// AWS test
 	Route::get('/awstest', 'TestController@index')->name('aws.test');
 	Route::post('/awstest_createCollection', 'TestController@createCollection');
 	Route::post('/awstest_faceindexing', 'TestController@awstestFaceindexing');
 	Route::post('/awstest_searchface', 'TestController@awstestSearchface');
 	Route::post('/awstest_delete_face', 'TestController@awstestDeleteFace');
 	
-	// Case
+	// Support
 	Route::get('/support', 'SupportController@index');
 	
 	// Organization Searches (SuperAdmin)
