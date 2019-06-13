@@ -173,4 +173,30 @@ class Controller extends BaseController
             echo $e->getMessage() . PHP_EOL;
         }
     }
+
+    public function awsFaceCompare($image1, $image2){
+        try{
+            $results = $this->aws_rekognition_client->compareFaces([
+                "SimilarityThreshold" => (float)$this->aws_search_min_similarity,
+                "SourceImage" => [
+                    'Bytes' => $image1,
+                ],
+                "TargetImage" => [
+                    'Bytes' => $image2,
+                ],
+            ]);
+
+            $similarity = 0;
+            if(isset($results['FaceMatches']) && count($results['FaceMatches']) > 0){
+                $similarity = $results['FaceMatches'][0]['Similarity'];
+            }
+            
+            return $similarity;
+
+        } catch(InvalidParameterException $e) {
+            return -1;
+        } catch(RekognitionException $e) {
+            return -2;
+        }
+    }
 }

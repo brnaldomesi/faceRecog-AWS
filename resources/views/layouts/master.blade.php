@@ -133,13 +133,17 @@
                             <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Enroll') }}</a>
                         </li>
                       @endif
+                        
+                        <li class="nav-item @if(Request::segment(1) == 'compare'){{ __('active')}}@endif">
+                            <a class="nav-link" href="{{ url('/compare') }}">{{ __('Face Compare') }}</a>
+                        </li>
 
                       @if (Auth::user()->permission->isAdmin())
                         <li class="nav-item @if(Request::segment(1) == 'admin'){{ __('active')}}@endif">
                           <a class="nav-link" href="{{ url('/admin') }}">{{ __('Admin') }}</a>
                         </li>
                       @endif
-                    
+                      
                         <li class="nav-item @if(Request::segment(1) == 'support'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/support') }}">{{ __('Help & Support') }}</a>
                         </li>

@@ -236,7 +236,7 @@ function initEvent() {
 				body += '			<div><b>Similarity:</b></div>';
 				body += '			<div>' + value.similarity.toFixed() + '%</div>';
 				body += '			<div class="field" id="details_link_'+value.face_id+'"><a href="#" onclick="showFaceDetail(\''+value.face_id+'\')">(Click for details)</a></div>';
-				body += '			<div class="field hidden" id="details_loading_'+value.face_id+'"><img src="../img/input-spinner.gif"></div>';
+				body += '			<div class="field hidden" id="details_loading_'+value.face_id+'"><img src="https://www.afrengine.com/engine/img/input-spinner.gif"></div>';
 				body += '		</div>';				
                 body += '		<div class="field hidden" id="id_dv_face_detail_'+value.face_id+'">';
                 body += '			<div><b>Identifiers:</b></div>';
