@@ -77,7 +77,7 @@
   <script type="text/javascript" src="{{ asset('global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
-  <script src="{{ asset('global/plugins/fancybox/source/jquery.fancybox.pack.js') }}" type="text/javascript"></script>
+  <script type="text/javascript" src="{{ asset('global/plugins/fancybox/source/jquery.fancybox.pack.js') }}"></script>
   <script type="text/javascript" src="{{ asset('js/fileValidation.js') }}"></script>
   <script type="text/javascript" src="{{ asset('js/compare/compare.js') }}"></script>
 @endsection
