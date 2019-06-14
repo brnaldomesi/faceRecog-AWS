@@ -42,4 +42,9 @@ class User extends Authenticatable
     {
         return $this->userGroup->permission;
     }
+
+    public function compare()
+    {
+        return $this->hasMany('App\Models\Compare', 'user_id');
+    }
 }

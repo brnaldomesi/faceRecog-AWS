@@ -56,12 +56,25 @@ class CompareController extends Controller
         echo json_encode( $res );
     }
     
-    public function history() 
+    public function history(Request $request) 
 	{
-		$res = new \stdClass;
-		$res->status = 200;
-        $res->msg = '93%';
-        echo json_encode( $res );
+        $compares = Auth::user()->compare()->orderBy('created_at', 'desc')->get();
+		$result = $compares->map( function ($item, $key) {
+			if (!is_null($item->created_at)) {
+				$date = date_create($item->created_at);
+				$date = date_format($date,"m/d/Y H:i:s");
+			} else {
+				$date = "";
+			}
+			
+			return [
+				$item->imageUrl1,
+				$item->imageUrl2,
+				$date,
+				$item->similarity
+			];
+		});
+        return response()->json(['data' => $result]);
     }
     
     public function save(Request $request) 
@@ -111,6 +124,7 @@ class CompareController extends Controller
             $s3_image_url2 = $b . explode($a, $s3_image_url_tmp2)[1];
             
             Compare::create([
+                'user_id' => Auth::user()->id,
                 'imageUrl1' => $s3_image_url1,
                 'imageUrl2' => $s3_image_url2,
                 'similarity' => $request->similarity

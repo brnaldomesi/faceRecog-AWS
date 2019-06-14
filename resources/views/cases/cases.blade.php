@@ -203,44 +203,44 @@
 		  </div>
 		  <div class="portlet-body">
 	  		<table class="table table-striped table-hover" id="table-search-history">
-					<thead>
-					<tr>
-						<th>
-							#
-						</th>
-						<th>
-							Image
-						</th>
-						<th>
-							Date Searched
-						</th>
-						<th>
-							Results
-						</th>
+				<thead>
+				<tr>
+					<th>
+						#
+					</th>
+					<th>
+						Image
+					</th>
+					<th>
+						Date Searched
+					</th>
+					<th>
+						Results
+					</th>
+				</tr>
+				</thead>
+				<tbody>
+				@foreach ($search_history as $key => $value)
+					<tr history-no="{{ $value->id }}">
+						<td>
+							{{ $key + 1 }}
+						</td>
+						<td>
+							<a href="{{ asset($value->image->file_url) }}" class="fancybox-button" data-rel="fancybox-button">
+								<img src="{{ asset($value->image->thumbnail_url) }}" style="width:96px"/>
+								{{-- <div>{{ $value->image->filename }}</div> --}}
+							</a>
+						</td>
+						<td>
+							{{ Carbon\Carbon::parse($value->searchedOn)->format("m/d/Y H:i:s") }}
+						</td>
+						<td>
+							{{count($value->results['data_list'])}}
+						</td>
 					</tr>
-					</thead>
-					<tbody>
-					@foreach ($search_history as $key => $value)
-						<tr history-no="{{ $value->id }}">
-							<td>
-								{{ $key + 1 }}
-							</td>
-							<td>
-								<a href="{{ asset($value->image->file_url) }}" class="fancybox-button" data-rel="fancybox-button">
-									<img src="{{ asset($value->image->thumbnail_url) }}" style="width:96px"/>
-									{{-- <div>{{ $value->image->filename }}</div> --}}
-								</a>
-							</td>
-							<td>
-								{{ Carbon\Carbon::parse($value->searchedOn)->format("m/d/Y H:i:s") }}
-							</td>
-							<td>
-								{{count($value->results['data_list'])}}
-							</td>
-						</tr>
-					@endforeach
-					</tbody>
-				</table>
+				@endforeach
+				</tbody>
+			</table>
 		  </div>
 		</div>
 	</div>

@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Compare extends Model
 {
     //
-    protected $fillable = ['imageUrl1', 'imageUrl2', 'similarity'];
+    protected $fillable = ['user_id', 'imageUrl1', 'imageUrl2', 'similarity'];
 }
