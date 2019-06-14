@@ -1,8 +1,10 @@
 @extends('layouts.master')
 
 @section('extracss')
-    <link href="{{ asset('global/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet">
-    <link href="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css') }}" rel="stylesheet">
+  <link href="{{ asset('global/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet">
+  <link href="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css') }}" rel="stylesheet">
+  <link href="{{ asset('global/plugins/fancybox/source/jquery.fancybox.css') }}" rel="stylesheet" type="text/css"/>
+  <link href="{{ asset('css/compare.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -72,10 +74,10 @@
 </div>
 @endsection
 @section('extrajs')
-    <script type="text/javascript" src="{{ asset('global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
-    
-    <script type="text/javascript" src="{{ asset('js/fileValidation.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/compare/compare.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
+  <script src="{{ asset('global/plugins/fancybox/source/jquery.fancybox.pack.js') }}" type="text/javascript"></script>
+  <script type="text/javascript" src="{{ asset('js/fileValidation.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('js/compare/compare.js') }}"></script>
 @endsection
