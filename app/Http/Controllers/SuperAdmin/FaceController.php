@@ -62,10 +62,9 @@ class FaceController extends Controller
             else 
             {
                 $lineCount++;
-                
-                if (count($csvLine) > 1) 
+                if (count($csvLine) > 1 && !empty($csvLine[0]) && !empty($csvLine[1])) 
                 {	
-                    // Checks to make sure there is at least one row of data before we process.
+                    // Checks to make sure there is at least 2 fields of data before we process.
                     if ($csvLine[2] == '') {
                         $gender = 'MALE';
                     } else {
