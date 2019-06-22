@@ -131,7 +131,7 @@ class AwsS3ImageUpload extends Command
 			{
 				// Proxy for importing scraped images
 				$ch = curl_init($face_tmp->image_url);
-				curl_setopt($ch, CURLOPT_PROXY, "107.172.225.18:80");
+				curl_setopt($ch, CURLOPT_PROXY, "107.158.219.155:80");
 				curl_setopt($ch, CURLOPT_PROXYUSERPWD, "afrengine:afrengineproxy");
 				curl_setopt($ch, CURLOPT_BINARYTRANSFER,TRUE);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
