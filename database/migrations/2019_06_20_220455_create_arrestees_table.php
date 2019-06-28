@@ -17,8 +17,8 @@ class CreateArresteesTable extends Migration
             $table->increments('id');
             $table->integer('organizationId');
 			$table->string('personId');
-            $table->string('name');
-            $table->string('dob');
+            $table->string('name', 256);
+            $table->string('dob', 256);
             $table->enum('gender', ['MALE', 'FEMALE'])->default('MALE');
             $table->timestamps();
         });

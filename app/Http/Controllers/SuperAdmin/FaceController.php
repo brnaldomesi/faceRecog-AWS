@@ -95,7 +95,7 @@ class FaceController extends Controller
 						// Image is a Frontal photo. Check Faces table to see if the Filename already exists.
 						// This will help avoid duplicates.
 						
-						$face = Face::where('filename','=',$filename)->where('organizationId','=',$organizationId)->first();
+						$face = FaceModel::where('filename','=',$filename)->where('organizationId','=',$organizationId)->first();
 						
 						// Found a duplicate.  Skip it
 						if($face) {
