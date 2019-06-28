@@ -42,6 +42,9 @@ class AllCasesController extends Controller
 	public function index()
 	{
 		$cases = Cases::orderBy('created_at','desc')->get();		
+		$solved = Cases::where('status','=','SOLVED')->get();
+		$cases->solvedCases = $solved->count();
+		
 		return view('allcases.index')->with('cases', $cases);
 	}
 

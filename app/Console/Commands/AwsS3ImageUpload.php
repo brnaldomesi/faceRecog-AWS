@@ -17,6 +17,8 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Crypt;
 
 use App\Models\User;
+use App\Models\Arrestee;
+use App\Models\Photo;
 use App\Models\Cases;
 use App\Models\Image;
 use App\Models\Face;
@@ -99,7 +101,7 @@ class AwsS3ImageUpload extends Command
          *
          * */
 
-        for($i = 0; $i < 20; $i ++){
+        for($i = 0; $i < 50; $i ++){
             $this->handle_one($i);
         }
 		
@@ -108,7 +110,7 @@ class AwsS3ImageUpload extends Command
     public function handle_one($index){
 		
         // getting the face_tmp one row
-        $face_tmp = FaceTmp::first();
+        $face_tmp = FaceTmp::orderBy('id','desc')->first();
 
         if(isset($face_tmp->organizationId) && $face_tmp->organizationId != ''){
             $og_id = $face_tmp->organizationId;
@@ -223,10 +225,19 @@ class AwsS3ImageUpload extends Command
 				$file_type_tmp = explode(".",$face_tmp->image_url);
 				$file_type = $file_type_tmp[count($file_type_tmp) -1];
 
+				// Determine what type of Pose this image is and set the storage folder appropriately
+				if ($face_tmp->pose == 'F') {
+					$folder = 'storage/face/';
+				} else {
+					$folder = 'storage/other/';
+				}
+
 				//upload image to s3 from the original image.
-				$keyname = 'storage/face/'. $og_account_name .'/' . $new_face_token .'.'. $file_type;
+				$keyname = $folder . $og_account_name .'/' . $new_face_token .'.'. $file_type;
+				
 				//Log::emergency($keyname); return;
-				try {
+				try 
+				{
 					// Upload data.
 					$result = $this->s3client ->putObject([
 						'Bucket' => $this->s3_bucket,
@@ -243,8 +254,10 @@ class AwsS3ImageUpload extends Command
 
 					// get the default facesetid from the organization and gender "MALE"
 					$gender = "MALE";
+					
 					$faceset = FaceSet::where('organizationId','=', $og_id)->where('gender','=',$gender)->first();
 					$facesetId = '';
+					
 					if(isset($faceset->organizationId) && $faceset->organizationId == $og_id){
 						$facesetId = $faceset->id;
 					}else{
@@ -257,24 +270,66 @@ class AwsS3ImageUpload extends Command
 						])->id;
 					}
 
-					// add the new row on the faces table.
-					$imageId = '';
-					$identifiers =  Crypt::encryptString($face_tmp->identifiers);
-					$face_matches = 0;
-					$aws_face_id = '';
-
-					Face::create([
-						'faceToken' => $new_face_token,
-						'savedPath' => $s3_image_url,
-						'facesetId' => $facesetId,
-						'imageId' => $imageId,
-						'identifiers' => $identifiers,
-						'gender' => $gender,
-						'faceMatches' => $face_matches,
-						'aws_face_id' => $aws_face_id
-					]);
-
-
+					// Check if personId exists in Arrestees table
+					$arrestee = Arrestee::where('personId','=',$face_tmp->personId)->where('organizationId','=',$og_id)->first();
+					
+					// This Organization's Person does not already exist in the Arrestees table.  Let's create it.
+					if (!$arrestee)
+					{
+						$arrestee = Arrestee::create([
+							'organizationId' => $og_id,
+							'personId' => $face_tmp->personId,
+							'name' => Crypt::encryptString($face_tmp->fullname),
+							'dob' => Crypt::encryptString($face_tmp->dob),
+							'gender' => $gender
+						])->id;
+						
+						$id = $arrestee;
+						
+						$log = fopen("public/debug.txt","a");
+						fwrite($log, "-- Creating new Arrestee record [" . $id . "]\n");
+						fclose($log);
+					}
+					else
+					{
+						$id = $arrestee->id;
+					}
+					
+					// If image is Frontal pose, add it to the Faces table
+					if ($face_tmp->pose == 'F')
+					{
+						// add the new row on the faces table.
+						$imageId = '';
+						$identifiers =  Crypt::encryptString($face_tmp->identifiers);
+						$face_matches = 0;
+						$aws_face_id = '';
+						
+						Face::create([
+							'faceToken' => $new_face_token,
+							'savedPath' => $s3_image_url,
+							'facesetId' => $facesetId,
+							'imageId' => $imageId,
+							'filename' => $face_tmp->filename,
+							'personId' => $id,
+							'organizationId' => $og_id,
+							'identifiers' => $identifiers,
+							'gender' => $gender,
+							'faceMatches' => $face_matches,
+							'aws_face_id' => $aws_face_id
+						]);
+					}
+					else
+					{
+						// Image is a profile/tattoo photo.  Add to Photos table and associate with existing Arrestee
+						Photo::create([
+							'arresteeId' => $id,
+							'filename' => $face_tmp->filename,
+							'poseType' => $face_tmp->pose,
+							'savedPath' => $s3_image_url,
+							'photoDate' => $face_tmp->imagedate
+						]);
+					}
+					
 					// remove the current row from the face_tmps
 					$face_tmp_id = $face_tmp->id;
 					FaceTmp::where('id', '=', $face_tmp_id)->delete();

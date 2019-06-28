@@ -44,6 +44,7 @@ class HomeController extends Controller
             $faceCount = FaceModel::count();
 			$searchCount = CaseSearch::count();
             $caseCount = Cases::count();
+			$solvedCaseCount = Cases::where('status','=','SOLVED')->get()->count();
         }
         else
         {
@@ -73,6 +74,6 @@ class HomeController extends Controller
         // Send the totals back to the home view so we can display the data to the user
         //return view('home', compact('caseCount', 'facesCount', 'searchCount', 'appCount', 'organizationCount', 'faceCount'));
 		
-		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount', 'searchCount'));
+		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount', 'searchCount','solvedCaseCount'));
     }
 }
