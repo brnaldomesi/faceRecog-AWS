@@ -14,7 +14,7 @@ class AddImagedateToFaceTmpsTable extends Migration
     public function up()
     {
         Schema::table('face_tmps', function (Blueprint $table) {
-            $table->dateTime('imagedate')->after('pose');
+            $table->date('imagedate')->after('pose');
         });
     }
 
