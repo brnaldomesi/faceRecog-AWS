@@ -361,6 +361,8 @@ var cases_id = {{$cases->id}};
 <script src="{{ asset('admin_assets/pages/scripts/form-fileupload.js') }}" type="text/javascript"></script>
 <script>
 	var url_getfacedetailinfo = '{{ route('search.detailfaceinfo') }}';
+	var url_getpersongallery = '{{ route('search.persongallery') }}';
+	
 	@if (\Session::has('isCaseUpdated'))
 		bootbox.alert('Updated the case information successfully!');
 	@endif

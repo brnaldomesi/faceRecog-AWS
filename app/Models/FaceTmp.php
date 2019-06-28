@@ -13,6 +13,6 @@ class FaceTmp extends Model
      * @var array
      */
     protected $fillable = [
-        'image_url', 'identifiers', 'gender','organizationId'
+        'organizationId','image_url', 'identifiers', 'gender','filename','personId','name','dob','pose','imagedate'
     ];
 }

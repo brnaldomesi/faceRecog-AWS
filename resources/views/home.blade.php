@@ -57,10 +57,10 @@
             </div>
             <div class="details">
               <div class="number">
-                 {{ $caseCount }}
+                 {{ $caseCount }} / {{ $solvedCaseCount }}
               </div>
               <div class="desc">
-                 Case count
+                 Total Cases / Solved Cases
               </div>
             </div>
             </a>

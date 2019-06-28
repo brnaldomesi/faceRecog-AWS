@@ -3,11 +3,71 @@ $(document).ready(function () {
 
 });
 
+function showGallery(aws_face_id) {
+	
+	Metronic.blockUI({
+        animate: true,
+        overlayColor: 'none',
+        centerY: true,
+    });
+	
+	var flat = [];
+	var match_count = 0;
+	
+	$.ajax({
+		url: url_getpersongallery,
+		type: 'post',
+		data: { 'aws_face_id' : aws_face_id },
+		success: function (response) {
+			Metronic.unblockUI();
+			
+			body = '<div class="clearfix">'
+			
+			for (var i = 0, len = response.length; i < len; i++) {
+				flat.push(response[i]);
+				match_count += 1;
+			}
+
+			$.each(flat, function (index, value) {
+				var image_url = value.savedPath;
+                if(image_url.substr(0, 7) == 'storage'){
+                	image_url = s3_base_image_url + image_url;
+				}
+				
+				body += '<a href="' + image_url + '" class="fancybox-button" title="Photo Date: '+value.photoDate+'" data-rel="fancybox-button">';
+				body += '<img src="' + image_url + '" class="img-thumbnail" alt="'+value.photoDate+'" onerror="this.src=\'https://afrengine-images.s3.us-west-2.amazonaws.com/removed.jpg\'";/></a>';
+			});
+			
+			body += '</div>';
+			
+			bootbox.dialog({
+				title: 'Photo Gallery',
+				message: body,
+				onEscape: true,
+				buttons: {
+					close: {
+						label: "Close Gallery",
+						className: 'red',
+					}
+				},
+				className: match_count > 0 ? "wide" : ''
+			});
+			
+		},
+		error: function (jqXHR,status,error) {
+			Metronic.unblockUI();
+			bootbox.alert({
+				message: '<h4 style="color: #f00;">Error<br></h4>' + error
+			});
+		}
+	});
+}
+
 function showFaceDetail(aws_face_id) {
     Metronic.blockUI({
         animate: true,
         overlayColor: 'none',
-        cenrerY: true,
+        centerY: true,
     });
 
 	$("#details_link_"+aws_face_id).addClass('hidden');
@@ -27,6 +87,11 @@ function showFaceDetail(aws_face_id) {
             $('#id_dv_face_detail_organ_'+aws_face_id + ' .txt-organization').html(response.organ_name);
 			
 			$('#details_loading_'+aws_face_id).addClass('hidden');
+			
+			if (response.galleryCount > 0) {
+				$('#id_dv_gallery_'+aws_face_id).removeClass('hidden');
+				$('#id_dv_gallery_'+aws_face_id+' .txt-gallery').html('<a href="#" onclick="showGallery(\''+aws_face_id+'\')">View ' + response.galleryCount + ' Photo(s)</a>');
+			}
 
         },
         error: function (jqXHR, status, error) {
@@ -245,6 +310,10 @@ function initEvent() {
                 body += '		<div class="field hidden" id="id_dv_face_detail_organ_'+value.face_id+'">';
                 body += '			<div><b>Organization:</b></div>';
                 body += '			<div class="txt-organization"></div>';
+                body += '		</div>';
+                body += '		<div class="field hidden" id="id_dv_gallery_'+value.face_id+'">';
+                body += '			<div><b>Photo Gallery:</b></div>';
+                body += '			<div class="txt-gallery"></div>';
                 body += '		</div>';
 				body += '	</div>';
 				body += '</li>';

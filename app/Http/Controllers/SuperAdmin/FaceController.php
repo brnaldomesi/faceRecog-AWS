@@ -13,6 +13,8 @@ use Illuminate\Support\Arr;
 
 use App\Models\Face as FaceModel;
 use App\Models\User;
+use App\Models\Photo;
+use App\Models\Arrestee;
 use App\Models\Faceset;
 use App\Models\Organization;
 use App\Models\FaceTmp;
@@ -29,7 +31,7 @@ class FaceController extends Controller
     //
     public function index()
 	{
-        $organizations = Organization::orderBy('created_at','asc')->get();
+        $organizations = Organization::orderBy('name','asc')->get();
 		return view('faces.index', compact('organizations'));
     }
 
@@ -50,6 +52,10 @@ class FaceController extends Controller
         $handle = fopen($request->csv->getPathName(), "r");
 
         ini_set('auto_detect_line_endings', true);
+		
+		// FILE STRUCTURE: UPDATED 6/25/19
+		//------------------------------------------
+		// ImageURL | Identifiers | Gender | FullName | DOB | PersonID | OrganizationID | FileName | Pose | ImageDate
         
         // Parse through the CSV file
         while ($csvLine = fgetcsv($handle, 1024)) 
@@ -62,6 +68,8 @@ class FaceController extends Controller
             else 
             {
                 $lineCount++;
+				$skip = false;
+				
                 if (count($csvLine) > 1 && !empty($csvLine[0]) && !empty($csvLine[1])) 
                 {	
                     // Checks to make sure there is at least 2 fields of data before we process.
@@ -75,16 +83,60 @@ class FaceController extends Controller
                     
                     $imgUrl = $csvLine[0];
                     $identifiers = $csvLine[1];
-                    fwrite($log,"Importing info : face_tmps => " . $organizationId . " @ " . $imgUrl. "@" .$identifiers . "@" . $gender . "\n");
-                    // insert new row to the face_tmps table.
+					$fullname = $csvLine[3];
+					$dob = $csvLine[4];
+					$personId = $csvLine[5];
+					$filename = $csvLine[7];
+					$pose = $csvLine[8];
+					$imagedate = date('Y-m-d',strtotime($csvLine[9]));
+					
+					if ($pose == 'F')
+					{
+						// Image is a Frontal photo. Check Faces table to see if the Filename already exists.
+						// This will help avoid duplicates.
+						
+						$face = Face::where('filename','=',$filename)->where('organizationId','=',$organizationId)->first();
+						
+						// Found a duplicate.  Skip it
+						if($face) {
+							$skip = true;	
+							fwrite($log,"-- Skipping.  Duplicate Frontal photo detected.\n");
+						}
+					}
+					else
+					{
+						// Image is a Profile/Tattoo photo. Check Photos table to see if the Filename already exists.
+						fwrite($log,"Analyzing 'other' photo\n");
+						
+						$photo = Photo::where('filename','=',$filename)->first();
+							
+						if ($photo) 
+						{
+							fwrite($log,"-- This photo already exists in the Photos table: " . $photo->id . "\n");
+							
+							// This photo already exists.  Skip it to avoid duplicates
+							$skip = true;
+						}
+					}
+					
+					if (!$skip)
+					{
+						fwrite($log,"Importing info : face_tmps => " . $organizationId . " @ " . $imgUrl. "@" .$identifiers . "@" . $gender . "\n");
+						// insert new row to the face_tmps table.
 
-                    $facetmp_id = FaceTmp::create([
-                        'organizationId'=> $organizationId,
-                        'image_url' => $imgUrl,
-                        'identifiers' => $identifiers,
-                        'gender' => $gender
-                    ])->id;
-
+						$facetmp_id = FaceTmp::create([
+							'organizationId'=> $organizationId,
+							'image_url' => $imgUrl,
+							'identifiers' => $identifiers,
+							'gender' => $gender,
+							'filename' => $filename,
+							'personId' => $personId,
+							'name' => $fullname,
+							'dob' => $dob,
+							'pose' => $pose,
+							'imagedate' => $imagedate
+						])->id;
+					}
                 }
                 else
                 {

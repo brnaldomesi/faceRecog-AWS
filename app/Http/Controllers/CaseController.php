@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\Face as FaceModel;
+use App\Models\Arrestee;
+use App\Models\Photo;
 use App\Models\User;
 use App\Models\UserLog;
 use App\Models\Faceset;
@@ -467,13 +469,44 @@ class CaseController extends Controller
 	    if(isset($organ->name)){
 	        $organ_name = $organ->name;
         }
+		
+		// This Face is not currently associated with a Person. Probably a legacy photo prior to the update
+		if($face->personId != '') {
+			// Grab all 'other' photos for this person
+			$photos = Photo::where('arresteeId','=',$face->personId)->orderBy('photoDate','desc')->orderBy('poseType','desc')->get();
+			if ($photos) {
+				$face->galleryCount = $photos->count();
+			}
+		}		
 
         $face->organ_name = $organ_name;
-
 
         return response()->json($face);
 
     }
 
-
+	// Loads a gallery of photos for a specific person
+	public function getPersonGallery(Request $request) {
+		if (is_null($request->aws_face_id)){
+			return response('Incorrect parameter',400);
+		}
+		
+		$face = FaceModel::where('aws_face_id','=',$request->aws_face_id)->first();
+		if(is_null($face)){
+			return response('Incorrect parameter',400);
+		}
+		
+		// This Face is not currently associated with a Person. Probably a legacy photo prior to the update
+		if($face->personId == '') 
+		{
+			return response()->json('');
+		} else 
+		{
+			// Grab all 'other' photos for this person
+			$photos = Photo::where('arresteeId','=',$face->personId)->orderBy('poseType','desc')->orderBy('photoDate','desc')->get();
+			return response()->json($photos);
+		}
+		
+		return response('Success',200);
+	}
 }
