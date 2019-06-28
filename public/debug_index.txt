@@ -189,3 +189,4 @@ Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afre
 Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/ba50da206d7c69bd4a458b249be8b7c0.jpg
 Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/8e9a7dcdad39b42e68fcdbe9d9fad5ce.jpg
 Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/da6b63c90e8772b6dc8d2b866e16f33d.jpg
+Started faceindexing S3_Object saved at: https://s3-us-west-2.amazonaws.com/afrengine-testing/storage/face/org1/69db94cc78e8b3fac8d21b1287e9e963.jpg
