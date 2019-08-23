@@ -98,7 +98,7 @@
 						</div>
 					</div>
 
-					<div class="form-group {{ $cases->status != 'CLOSED' ? 'hidden' : '' }}">
+					<div class="form-group">
 						{!! Form::label('dispo', 'Disposition ', ['class' => 'col-md-4 control-label']) !!}
 						<div class="col-md-6">
 						  {!! Form::textarea('dispo', null, ['class' => 'form-control autosize', 'disabled' => 'disabled']) !!}

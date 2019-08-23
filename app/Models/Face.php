@@ -13,7 +13,7 @@ class Face extends Model
    * @var array
    */
     protected $fillable = [
-        'faceToken','savedPath','facesetId', 'imageId','filename','personId','organizationId','identifiers', 'gender', 'faceMatches', 'aws_face_id'
+        'faceToken','savedPath','facesetId', 'imageId','filename','personId','organizationId','identifiers', 'gender', 'faceMatches', 'aws_face_id',"imagedate"
     ];
     
     public function faceset()

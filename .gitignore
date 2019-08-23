@@ -16,3 +16,4 @@ composer.lock
 public/debug.txt
 credentials
 public/debug_index.txt
+app/Console/Commands/mcso.txt

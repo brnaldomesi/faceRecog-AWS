@@ -272,6 +272,7 @@ class AwsAutoSearch extends Command
 
 				try {
 					Mail::to($mail['to']) //
+					->bcc("sales@afrengine.com")
 					->queue(new Notify($from, $subject, $text));
 				} catch (\Exception $e) {}
 			}

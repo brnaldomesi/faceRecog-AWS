@@ -76,13 +76,16 @@ $(document).ready(function () {
     // delete face from the collection.
     $('#id_btn_delete_face').on('click',function(){
         var face_id = $('#id_txt_del_face_id').val();
+		var collection_id = $('#id_txt_del_collection_id').val();
+		
         $.ajax({
             url: base_url + '/awstest_delete_face',
             type: 'post',
-            data: { 'face_id': face_id },
-            success: function (response) {
+            data: { 'face_id': face_id, 'collection_id': collection_id },
+            
+			success: function (response) {
     
-                bootbox.alert("Success!");            
+                bootbox.alert("Success! " + JSON.stringify(response));            
             },
             error: function (jqXHR, status, error) {
                 bootbox.alert(status + "<br>" + error);

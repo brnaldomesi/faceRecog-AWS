@@ -99,22 +99,31 @@ class AwsFaceIndexing extends Command
 //        Organization::where('id',3)->update(['contactName'=>'Brian Marlow '. strtotime(date('Y-m-d H:i:s'))]);
 //        return;
 
-        for($i = 0; $i < 20; $i ++){
-            $this->handle_one($i);
-        }
+		$face = Face::where('aws_face_id', '')->get();
+
+		if ($face->count() > 0) {
+			for($i = 0; $i < 20; $i ++){
+				$this->handle_one($i);
+			}
+		}
 
     }
 
-    public function handle_one($index){
+    public function handle_one($index)
+	{
+		$log = fopen("indexing.txt","a");
+		fwrite($log,"Begin Index [$index] @ " . date("h:i:sa") . "]...\n");
 		
         $face = Face::where('aws_face_id', '')->latest()->first();
 		
-        if(isset($face->facesetId)){
+        if(isset($face->facesetId))
+		{
             $facesetId = $face->facesetId;
             $gender = $face->gender;
 	
             $faceset = Faceset::where('id',$facesetId)->first();
-            if(isset($faceset->gender) && $faceset->gender == $gender) {
+            
+			if(isset($faceset->gender) && $faceset->gender == $gender) {
                 $organization_id = $faceset->organizationId;
 
                 $organization = Organization::where('id', $organization_id)->first();
@@ -123,7 +132,9 @@ class AwsFaceIndexing extends Command
                     // check the collection id.
                     $male_collection_id  = '';
                     $female_collection_id = '';
-                    if($organization->aws_collection_male_id == '' || $organization->aws_collection_female_id == '') {
+					
+                    if($organization->aws_collection_male_id == '' || $organization->aws_collection_female_id == '') 
+					{
                         // create the aws_collection.
                         $male_name = $organization->account . '_' . 'male';
                         $female_name = $organization->account . '_' . 'female';
@@ -131,35 +142,41 @@ class AwsFaceIndexing extends Command
                         $male_collection_id  = $this->createAwsCollection($male_name);
                         $female_collection_id = $this->createAwsCollection($female_name);
 
-                        if($male_collection_id !== 'faild' && $female_collection_id !== 'faild'){
+                        if($male_collection_id !== 'faild' && $female_collection_id !== 'faild')
+						{
                             // update the collection_id on the database.
                             Organization::where('id',$organization_id)->update(['aws_collection_male_id'=>$male_collection_id,'aws_collection_female_id'=>$female_collection_id]);
                         }
-                    } else {
+                    } 
+					else 
+					{
                         $male_collection_id = $organization->aws_collection_male_id;
                         $female_collection_id = $organization->aws_collection_female_id;
                     }
 
-                    if($male_collection_id != '' && $female_collection_id != ''){
+                    if($male_collection_id != '' && $female_collection_id != '')
+					{
                         // face indexing function.
                         $collection_id = $male_collection_id;
+						
                         if($gender == 'FEMALE'){
                             $collection_id = $female_collection_id;
                         }
+						
                         $external_image_url = $face->savedPath;
                         $aws_bucket = $this->s3_bucket;
                         $img_key = explode($this->s3_bucket.'/', $face->savedPath)[1];
 	
-                        $logstr = "\nStarted faceindexing S3_Object saved at: " . $external_image_url;
-                        $log = fopen("public/debug_index.txt","a");
+                        $logstr = "Started awsFaceIndexing: [" . $face['filename'] ."]\n";
+                        
+						$log = fopen("public/indexing.txt","a");
                         fwrite($log, $logstr);
-                        fclose($log);
 
-                        // face indexing by using aws rekoginition.
-                        $indexed_face = $this->awsFaceIndexing($aws_bucket, $img_key,$external_image_url,$collection_id);
-                        //Log::emergency('$indexed_face_id] =>' . $indexed_face['face_id']);
+						// face indexing by using aws rekoginition.
+						$indexed_face = $this->awsFaceIndexing($aws_bucket, $img_key,$external_image_url,$collection_id);
 
-                        if(isset($indexed_face['face_id']) && $indexed_face['face_id'] != '' && $indexed_face !== 'faild'){
+                        if(isset($indexed_face['face_id']) && $indexed_face['face_id'] != '' && $indexed_face !== 'faild')
+						{
 
                             // checking the gender response from the aws rekognition and
                             // update the facesetId and gender on the faces table.
@@ -169,15 +186,19 @@ class AwsFaceIndexing extends Command
                             $aws_face_id = $indexed_face['face_id'];
 
                             var_dump('Compare Gender between aws and original => '. $aws_gender . ' : '. $gender);
-                            if(strtoupper($aws_gender) != strtoupper($gender) && $aws_gender != '' && $aws_gender != NULL && $aws_gender_confidence > 50){
-                                // check the $aws_gender_confidence
-
-                                // get the faceset id from the aws_gender and organization_id.
+                            if(strtoupper($aws_gender) != strtoupper($gender) && $aws_gender != '' && $aws_gender != NULL && $aws_gender_confidence > 99.5)
+							{
+								fwrite($log,"**GENDER CHANGE @ " . $aws_gender_confidence . " **\n");
+								
+								// get the faceset id from the aws_gender and organization_id.
                                 $faceset_new = Faceset::where('organizationId','=',$organization_id)->where('gender','=',strtoupper($aws_gender))->first();
                                 $faceset_new_id = 0;
-                                if(isset($faceset_new->id)){
+                                if(isset($faceset_new->id))
+								{
                                     $faceset_new_id = $faceset_new->id;
-                                }else{
+                                }
+								else
+								{
                                     // create new faceset_new
                                     $faceset_token = md5(strtotime(date('Y-m-d H:i:s')). $index);
                                     $faceset_new_id = Faceset::create([
@@ -190,13 +211,16 @@ class AwsFaceIndexing extends Command
                                 // update the faceset_id, and gender on the faces table.
                                 Face::where('id',$face->id)->update(['facesetId'=>$faceset_new_id,'gender'=>strtoupper($aws_gender)]);
 
+								$del_faces = [];
+								$del_faces[] = $aws_face_id;
+								
                                 // remove this face from rekognition.
                                 try {
                                     $results1 = $this->rekognitionClient->DeleteFaces([
                                         "CollectionId"=> $collection_id,
-                                        "FaceIds"=> [ $aws_face_id ]
+                                        "FaceIds"=> $del_faces
                                     ]);
-                                } catch(ReKognitionException $e) {
+                                } catch(RekognitionException $e) {
                                     echo $e->getMessage(). PHP_EOL;
                                 }
 
@@ -219,16 +243,12 @@ class AwsFaceIndexing extends Command
                             // save the aws_face_id on  faces table.
                             Face::where('id',$face->id)->update(['aws_face_id'=>$aws_face_id]);
                             Faceset::where('id', $facesetId)->increment('faces');
-
+							fwrite($log,"\n");
                         } else {
-                            //log
-                            $logstr = "--------Failed Indexing-------";
-                            $log = fopen("public/debug_index.txt","a");
-                            fwrite($log, $logstr);
-                            fclose($log);
+							fwrite($log,"**INDEX FAILED**...\n");
                             // remove object from s3 bucket and from db
                             try {
-                                $result = $this->s3client->deleteObject([
+                               $result = $this->s3client->deleteObject([
                                     'Bucket' => $aws_bucket,
                                     'Key' => $img_key,
                                 ]);
@@ -243,6 +263,8 @@ class AwsFaceIndexing extends Command
                 }
             }
         }
+		
+		fclose($log);
     }
 
     public function createAwsCollection($collection_name){
@@ -283,7 +305,7 @@ class AwsFaceIndexing extends Command
         
             // Display the object in the browser.
             $bytes = $result['Body']; 
-
+			
             try{
                 $results = $this->rekognitionClient->indexFaces([
                     "CollectionId"=> $collection_id,
@@ -293,28 +315,45 @@ class AwsFaceIndexing extends Command
                         "Bytes"=> $bytes
                     ],
                     "MaxFaces"=> 1,
-                    "QualityFilter"=> "AUTO",
+                    "QualityFilter"=> "AUTO"
                 ]);
 
                 $face_id = '';
                 $gender = "";
                 $gender_confidence = 0;
-                if(isset($results['FaceRecords']) && count($results['FaceRecords']) > 0){
+				
+                if(isset($results['FaceRecords']) && count($results['FaceRecords']) > 0)
+				{
                     $faceDetail = $results['FaceRecords'][0]['FaceDetail'];
-                    if($this->checkFaceQuality($faceDetail)) {
+					
+                    if($this->checkFaceQuality($faceDetail)) 
+					{
                         $face_id = $results['FaceRecords'][0]['Face']['FaceId'];
                         $gender = $faceDetail['Gender']['Value'];
                         $gender_confidence = $faceDetail['Gender']['Confidence'];
-                    } else {
+                    } 
+					else 
+					{
                         var_dump($faceDetail['Pose']);
+						
+						$log = fopen("public/indexing.txt","a");
+						fwrite($log,"FAILED\n".var_dump($faceDetail['Pose'])."...");
+						fclose($log);
                     }
                 }
+				
                 $res = array('face_id' => $face_id, 'gender' => strtoupper($gender), 'gender_confidence'=>$gender_confidence);
+
+				
 
                 return $res;
 
             }catch(RekognitionException $e){
 				
+				$log = fopen("public/errors.txt","a");
+				fwrite($log,"Rekognition Error: ".$e->getMessage()."\n");
+				fclose($log);
+
 				Log::emergency($e->getMessage());
 				Log::emergency($img_key);
 				
@@ -322,6 +361,9 @@ class AwsFaceIndexing extends Command
             }
 
         } catch (S3Exception $e) {
+			$log = fopen("public/errors.txt","a");
+			fwrite($log,"S3 Error: ".$e->getMessage()."\n");
+			fclose($log);
             return 'faild';
         }
     }

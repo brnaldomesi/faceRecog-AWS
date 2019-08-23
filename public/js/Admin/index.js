@@ -36,7 +36,7 @@ $(document).ready(function () {
             [5, 15, 20, "All"] // change per page values here
         ],
 
-        "pageLength": 5,
+        "pageLength": 20,
 
         "order" : [[0, 'asc']]
 	});

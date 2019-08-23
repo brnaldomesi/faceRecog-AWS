@@ -1,4 +1,4 @@
-function notifyInvalidImage(invalidCode, invalidTarget="") {
+function notifyInvalidImage(invalidCode, invalidTarget) {
     switch(invalidCode) {
         case 0:
             bootbox.alert({
@@ -26,7 +26,8 @@ function notifyInvalidImage(invalidCode, invalidTarget="") {
 }
 
 function validateImageFile(file) {
-    return new Promise((resolve, reject) => {
+
+	var promise = new Promise(function(resolve, reject) {
         // validation of file format
         const fileName = file.name;
         let idxDot = fileName.lastIndexOf(".") + 1;
@@ -63,7 +64,9 @@ function validateImageFile(file) {
             reject(-1); 
         }
         img.src = window.URL.createObjectURL(file);
-    });    
+    });   
+		
+	return promise;
 }
 
 function validateCSVFile(fileName) {

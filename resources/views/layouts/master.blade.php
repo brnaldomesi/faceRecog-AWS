@@ -34,6 +34,17 @@
     <link href="{{ asset('css/appcustom.css') }}" rel="stylesheet">
 	
 	<link rel="shortcut icon" href="{{ asset('favicon.ico') }}"> 
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-145655933-1"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'UA-145655933-1');
+	</script>
+	
 </head>
 <!-- END HEAD -->
 <!-- BEGIN BODY -->
@@ -125,12 +136,12 @@
                         <li class="nav-item @if(Request::segment(1) == 'faces'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/faces') }}">{{ __('Face Management') }}</a>
                         </li>
+                        <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
+                            <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Enroll') }}</a>
+                        </li>						
                       @else
                         <li class="nav-item @if(Request::segment(1) == 'cases'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/cases') }}">{{ __('Cases') }}</a>
-                        </li>
-                        <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Enroll') }}</a>
                         </li>
                       @endif
                         
