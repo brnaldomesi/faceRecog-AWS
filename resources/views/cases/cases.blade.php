@@ -367,5 +367,6 @@ var cases_id = {{$cases->id}};
 		bootbox.alert('Updated the case information successfully!');
 	@endif
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
 <script type="text/javascript" src="{{ asset('js/Cases/cases.js') }}"></script>
 @endsection

@@ -28,6 +28,24 @@ use Auth;
 
 class FaceController extends Controller
 {
+	
+	public $rekognitionClient;
+	
+	function __construct()
+	{
+		parent::__construct();
+		$this->middleware('auth');
+		$this->rekognitionClient = new RekognitionClient([
+            'region'    => env('AWS_REGION_NAME'),
+            'version'   => 'latest'
+        ]);
+	}
+	
+	function __destruct()
+	{
+		unset($this->rekognitionClient);
+	}
+	
     //
     public function index()
 	{
@@ -284,14 +302,16 @@ class FaceController extends Controller
         }
         
         if(isset($face->aws_face_id)) {
+			
+			$del_faces = [];
+			$del_faces[] = $face->aws_face_id;
+			
             $org = $face->faceset->organization;
             $aws_collection_id = ($face->gender == "MALE") ? $org->aws_collection_male_id : $org->aws_collection_female_id;
             try {
-                $aws_result = $this->aws_rekognition_client->deleteFaces([
+                $aws_result = $this->rekognitionClient->deleteFaces([
                     'CollectionId' => $aws_collection_id,
-                    'FaceIds' => [
-                        $face->aws_face_id
-                    ]
+                    'FaceIds' => $del_faces
                 ]);
             } catch(RekognitionException $e) {
                 $res->status = 300;

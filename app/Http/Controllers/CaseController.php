@@ -36,7 +36,6 @@ use Aws\Rekognition\Exception\RekognitionException;
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 
-
 use Auth;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use Storage;
@@ -44,6 +43,11 @@ use Storage;
 class CaseController extends Controller
 {
 	public $facepp;
+	
+	protected $aws_rekognition_client;
+    protected $aws_s3_client;
+    protected $aws_s3_bucket;
+	
 	/**
 	 * Create a new controller instance.
 	 *
@@ -53,14 +57,22 @@ class CaseController extends Controller
 	{
         parent::__construct();
 		$this->middleware('auth');
-		$this->facepp = new Facepp();
-		$this->facepp->api_key = config('face.providers.face_plus_plus.api_key');
-		$this->facepp->api_secret = config('face.providers.face_plus_plus.api_secret');
+		
+		$this->aws_rekognition_client = new RekognitionClient([
+            'region'    => env('AWS_REGION_NAME'),
+            'version'   => 'latest'
+        ]);
+
+        $this->aws_s3_client = new S3Client([
+            'version' => 'latest',
+            'region'  => env('AWS_REGION_NAME')
+        ]);
+
+        $this->aws_s3_bucket = env('AWS_S3_BUCKET_NAME');
 	}
 
 	function __destruct()
 	{
-		unset($this->facepp);
 	}
 
 	/**
@@ -130,12 +142,13 @@ class CaseController extends Controller
 	{
 		$cases->caseNumber = $request->caseNumber;
 		$cases->type = $request->type;
+		
 		if (!is_null($request->status)) {
 			$cases->status = $request->status;
 		}
 		$cases->dispo = $request->dispo;
 		$cases->save();
-
+		
 	    return redirect()->back()->with('isCaseUpdated', true);
 	}
 
@@ -179,7 +192,13 @@ class CaseController extends Controller
         $aws_collection_id = $organization->aws_collection_cases_id;
 
 		$name_client = $file->getClientOriginalName();
-		$name_upload = str_random(15) . "." . $file->guessClientExtension();
+		
+		$ext = $file->extension();
+		if ($ext == 'jpeg') {
+			$ext = "jpg";
+		}
+		
+		$name_upload = str_random(15) . "." . $ext;
 
 		// save image to the s3 directory : storage/case/images/ : and get the s3 image url. *****
         $keyname_origin = 'storage/case/images/' . $name_upload;
@@ -191,6 +210,97 @@ class CaseController extends Controller
                 'Body' => file_get_contents($file),
                 'ACL' => 'public-read'
             ]);
+			
+			// Successfully added image. Let's perform a case search to see
+			// if this suspect matches suspect photos in other cases
+			
+			$collection_id = $organization->aws_collection_cases_id;
+			if(isset($collection_id))
+			{ 
+				$threshold = env('AWS_CASESEARCH_MIN_SIMILARITY');
+				
+				// Search all cases for the User's Organization first
+				$search_res = $this->awsFaceSearch($keyname_origin,$collection_id,(int)$threshold);
+				
+				Log::info("Users CaseID = " . $cases->id);
+				
+				// Parse through the results and remove any matches for images in this same case
+				if(isset($search_res['data_list']) && count($search_res['data_list']) > 0 && $search_res['data_list'] != null)
+				{
+					foreach($search_res['data_list'] as $key => &$match)
+					{
+						Log::info("Checking Face " . $match['face_id']);
+						
+						// Grab the Image data for this match
+						$img = Image::where('aws_face_id','=',$match['face_id'])->first();
+						
+						if(isset($img))
+						{
+							Log::info("Face belongs to case " . $img->caseId);
+						
+							// If the Image->CaseID matches the current CaseID, remove it
+							if ($img->caseId == $cases->id) 
+							{
+								Log::info("Removing " . $match['face_id'] . " due to same case");
+								unset($search_res['data_list'][$key]);
+							}
+						}
+					}
+				}
+				
+				// Build our list of organization's this User has sharing permissions with
+				$organizations = FacesetSharing::where([
+						['organization_requestor', $organization_id], ['status', 'ACTIVE']
+					])
+				->get()->pluck('organization_owner');
+				
+				$owner = FacesetSharing::where([
+					['organization_owner', $organization_id], ['status', 'ACTIVE']
+					])
+				->get()->pluck('organization_requestor');
+        
+				$organizations = $organizations->merge($owner);
+				$organizations = $organizations->unique();
+				$collection_ids = Organization::whereIn('id', $organizations)->get()->pluck('aws_collection_cases_id');
+				
+				// if there is the shared collections, search collections.
+				if(count($collection_ids) > 0){
+					foreach ($collection_ids as $collection_id_tmp){
+					
+						if ($collection_id_tmp == '') {
+							continue;
+						}
+				
+						// Perform a search on each collection
+						$search_res_tmp = $this->awsFaceSearch($keyname_origin, $collection_id_tmp,(int)$threshold);
+                
+						if($search_res_tmp['status'] !== 200){
+							continue;
+						}
+						
+						$search_res['data_list'] = array_merge($search_res['data_list'],$search_res_tmp['data_list']);
+                
+						if($search_res['status'] != 200){
+							$search_res['status'] = 200;
+						}
+					}
+					
+					if(isset($search_res['data_list']) && count($search_res['data_list']) > 0 && $search_res['data_list'] != null)
+					{
+						usort($search_res['data_list'],function($first,$second){
+							return $first['similarity'] < $second['similarity'];
+						});
+					}
+
+					if(isset($search_res['data_list']) && count($search_res['data_list']) > $this->aws_search_max_cnt)
+					{
+						$search_res['data_list'] = array_slice($search_res['data_list'], 0, $this->aws_search_max_cnt);
+					}
+				}
+				
+				Log::info($search_res);
+			}
+
 
             // Print the URL to the object.
             $s3_image_url_tmp = $result['ObjectURL'];
@@ -242,6 +352,7 @@ class CaseController extends Controller
 	                    'imgSrc'  => $s3_thumb_url_tmp,
 	                    'msg' 	  => 'No face found in the image!'
 	                );
+					
 
 	            } catch (S3Exception $e) {
 	                echo $e->getMessage() . PHP_EOL;
@@ -281,7 +392,8 @@ class CaseController extends Controller
 
 	public function imagelist(Request $request, Cases $cases)
 	{
-		if (!is_null($request->delete)) {
+		if (!is_null($request->delete)) 
+		{
 			$image = Image::find($request->delete);
 			$this->authorize('delete', $image);
 
@@ -293,7 +405,31 @@ class CaseController extends Controller
 					Storage::delete($image->thumbnail_path);
 				}
 			}
+
+			// Delete the Face from the Case Collection
+			if(isset($image->aws_face_id)) {
+				
+				$organization = Organization::where('id','=',$cases->organizationId)->first();
+				
+				$aws_collection_id = $organization->aws_collection_cases_id;
+				
+				$del_faces = [];
+				$del_faces[] = $image->aws_face_id;
+				
+				try {
+					$aws_result = $this->aws_rekognition_client->deleteFaces([
+						'CollectionId' => $aws_collection_id,
+						'FaceIds' => $del_faces
+					]);
+					
+					Log::info('Deleted ' . $image->aws_face_id);
+				} catch(RekognitionException $e) {
+					Log::info('Failed to delete face :: ' . $e->getMessage());
+				}
+			}
+			
 			$image->delete();
+			
 		}
 
 		$result = $cases->images->map(function ($item, $key) {
@@ -332,13 +468,29 @@ class CaseController extends Controller
         $organ_id = Auth::user()->organizationId;
         $organization = Organization::find($organ_id);
 
-        if(!isset($organization->aws_collection_male_id)){
-            return response('Incorrect parameter', 400);
+		// Make sure our collections have been created before performing a search. It was a bug before.
+        if($organization->aws_collection_male_id == '' || $organization->aws_collection_female_id == '')
+		{
+			$male_name = $organization->account . '_' . 'male';
+			$female_name = $organization->account . '_' . 'female';
+			
+			if ($organization->aws_collection_male_id == '') {
+				$male_collection_id = $this->createAwsCollection($male_name);
+				Organization::where('id',$organ_id)->update(['aws_collection_male_id'=>$male_collection_id]);
+			}
+			
+			if ($organization->aws_collection_female_id == '') {
+				$female_collection_id = $this->createAwsCollection($female_name);
+				Organization::where('id',$organ_id)->update(['aws_collection_female_id'=>$female_collection_id]);
+			}
+			
+			$organization = Organization::find($organ_id);
         }
-
+		
         $collection_id = $organization->aws_collection_male_id;
         $collection_field =  'aws_collection_male_id';
-        if($gender != 'MALE'){
+        
+		if($gender != 'MALE'){
             $collection_id = $organization->aws_collection_female_id;
             $collection_field =  'aws_collection_female_id';
         }

@@ -529,7 +529,7 @@
             // modified by naldokan
                 gender = template.find("#gender").val();
             
-            validateImageFile(data.files[0]).then((resultCode) => { 
+            validateImageFile(data.files[0]).then(function(resultCode) { 
                 if(gender) {
                     button.prop('disabled', true);
                     if (data && data.submit) {
@@ -540,7 +540,7 @@
                         message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please select gender before uploading the case image.'
                     });
                 }
-            }).catch((resultCode) => {
+            }).catch(function(resultCode) {
                 notifyInvalidImage(resultCode);
             });
         },

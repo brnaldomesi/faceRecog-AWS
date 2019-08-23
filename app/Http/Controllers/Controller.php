@@ -143,8 +143,11 @@ class Controller extends BaseController
                 
                 $faces_matched = $results['FaceMatches'];
                 $matched_images = [];
-                foreach($faces_matched as $face){
+                
+				foreach($faces_matched as $face)
+				{
                     $tmp = str_replace(":","/",$face['Face']['ExternalImageId']);
+					
                     $tmp = str_replace("https/","https:",$tmp);
                     if(substr($tmp,0,7) == 'storage'){
                         $tmp = env('AWS_S3_REAL_OBJECT_URL_DOMAIN'). $tmp;

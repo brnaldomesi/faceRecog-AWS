@@ -101,9 +101,18 @@ class AwsS3ImageUpload extends Command
          *
          * */
 
-        for($i = 0; $i < 50; $i ++){
-            $this->handle_one($i);
-        }
+		$face_tmp = FaceTmp::orderBy('id','desc')->first();
+		
+		if (isset($face_tmp)) {
+			
+			if ($face_tmp->count() > 0) {
+
+				for($i = 0; $i < 20; $i ++){
+					$this->handle_one($i);
+				}
+			}
+		}
+		
 		
     }
 
@@ -129,11 +138,11 @@ class AwsS3ImageUpload extends Command
 
 			$downloadFailed = false;
 			
-			if ($og_account_name == 'maricopacountyjail' || $og_account_name == 'pinalcountyjail')
+			if ($og_account_name == 'maricopacountyjail__' || $og_account_name == 'pinalcountyjail')
 			{
 				// Proxy for importing scraped images
 				$ch = curl_init($face_tmp->image_url);
-				curl_setopt($ch, CURLOPT_PROXY, "107.158.219.155:80");
+				curl_setopt($ch, CURLOPT_PROXY, "23.83.87.120:80");
 				curl_setopt($ch, CURLOPT_PROXYUSERPWD, "afrengine:afrengineproxy");
 				curl_setopt($ch, CURLOPT_BINARYTRANSFER,TRUE);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -304,6 +313,8 @@ class AwsS3ImageUpload extends Command
 						$face_matches = 0;
 						$aws_face_id = '';
 						
+						$imagedate = date('Y-m-d',strtotime($face_tmp->imagedate));
+						
 						Face::create([
 							'faceToken' => $new_face_token,
 							'savedPath' => $s3_image_url,
@@ -315,7 +326,8 @@ class AwsS3ImageUpload extends Command
 							'identifiers' => $identifiers,
 							'gender' => $gender,
 							'faceMatches' => $face_matches,
-							'aws_face_id' => $aws_face_id
+							'aws_face_id' => $aws_face_id,
+							'imagedate' => $imagedate
 						]);
 					}
 					else

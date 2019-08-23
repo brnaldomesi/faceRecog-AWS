@@ -269,16 +269,37 @@ class TestController extends Controller
         delete face from collection.
      */ 
     public function awstestDeleteFace(Request $request){
+		
+		$log = fopen("awsdelete.txt","a");
+		
         $face_id = $request->input('face_id');
-        try{    
-            $results = $this->rekognitionClient->DeleteFaces([
-                "CollectionId"=> $this->test_collection_id,
-                "FaceIds"=> [ $face_id ]
-            ]);
-            return response()->json($results);
-        }catch(ReKognitionException $e){
-            echo $e->getMessage(). PHP_EOL;
-        }
+		$collection_id = $request->input('collection_id');
+		
+		$face_ids = [];
+		$face_ids[] = $face_id;
+		
+		fwrite($log,"face_id: [".$face_id."] :: collection_id: [".$collection_id."]\n");
+		
+		if ($collection_id != '')
+		{
+			try{    
+				$results = $this->rekognitionClient->DeleteFaces([
+					"CollectionId" => $collection_id,
+					"FaceIds" => $face_ids
+				]);
+				
+				fwrite($log,"Results: [`$results`]\n");
+				fclose($log);
+				
+				return response()->json($results);
+			}catch(RekognitionException $e){
+				fwrite($log,"Error: [".$e->getMessage()."]\n");
+				echo $e->getMessage(). PHP_EOL;
+				fclose($log);
+			}
+			
+			$face_ids = [];
+		}
     }
 
 

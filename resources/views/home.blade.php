@@ -94,7 +94,37 @@
               </div>
             </div>
             </a>
-          </div>		  
+          </div>
+		  <div class="col-sm-6 col-xs-12 margin-bottom-10">
+            <a class="dashboard-stat dashboard-stat-light blue-hoki" href="javascript:;">
+            <div class="visual">
+              <i class="fa fa-user fa-icon-medium"></i>
+            </div>
+            <div class="details">
+              <div class="number">
+                 {{ $faceQue }}
+              </div>
+              <div class="desc">
+                 Face Que
+              </div>
+            </div>
+            </a>
+          </div>
+		  <div class="col-sm-6 col-xs-12 margin-bottom-10">
+            <a class="dashboard-stat dashboard-stat-light green-haze" href="javascript:;">
+            <div class="visual">
+              <i class="fa fa-search fa-icon-medium"></i>
+            </div>
+            <div class="details">
+              <div class="number">
+                 {{ $todaysUsers }}
+              </div>
+              <div class="desc">
+                 Active Users Today
+              </div>
+            </div>
+            </a>
+          </div>
         @else
   		    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 margin-bottom-10">
             <a class="dashboard-stat dashboard-stat-light blue-madison" href="javascript:;">

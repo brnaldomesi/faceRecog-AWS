@@ -116,7 +116,7 @@
                     <div class="col-md-12">
                         <label>
                             Delete Face From this Collection:
-                            <input type="text" id="id_txt_del_collection_id"  class="form-control input-inline" value="maricopacountyjail_male_1547784083" size="100" readonly>
+                            <input type="text" id="id_txt_del_collection_id"  class="form-control input-inline" value="sbcountysheriff_male_1563990783" size="100">
                         </label>
                     </div>
                 </div>
@@ -129,7 +129,7 @@
                     </div>
                 </div>
 
-                <input type="button" disabled id="id_btn_delete_face" class="btn btn-success" value="Delete Face from Collection">
+                <input type="button" id="id_btn_delete_face" class="btn btn-success" value="Delete Face from Collection">
             </form>
 
 

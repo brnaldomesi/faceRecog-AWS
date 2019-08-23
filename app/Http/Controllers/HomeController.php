@@ -8,6 +8,7 @@ Home Screen once the user is logged in
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 use App\Models\Organization;
 use App\Models\Stat;
@@ -15,6 +16,8 @@ use App\Models\Cases;
 use App\Models\CaseSearch;
 use App\Models\FacesetSharing;
 use App\Models\Face as FaceModel;
+use App\Models\FaceTmp;
+use App\Models\User;
 
 use Auth;
 
@@ -42,9 +45,11 @@ class HomeController extends Controller
         if($isSuperAdmin) {
             $organizationCount = Organization::count();
             $faceCount = FaceModel::count();
+			$faceQue = FaceTmp::count();
 			$searchCount = CaseSearch::count();
             $caseCount = Cases::count();
 			$solvedCaseCount = Cases::where('status','=','SOLVED')->get()->count();
+			$todaysUsers = User::whereDate('lastlogin','=',Carbon::today())->get()->count();
         }
         else
         {
@@ -74,6 +79,6 @@ class HomeController extends Controller
         // Send the totals back to the home view so we can display the data to the user
         //return view('home', compact('caseCount', 'facesCount', 'searchCount', 'appCount', 'organizationCount', 'faceCount'));
 		
-		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount', 'searchCount','solvedCaseCount'));
+		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount','faceQue','todaysUsers','searchCount','solvedCaseCount'));
     }
 }
