@@ -261,8 +261,11 @@ class AwsS3ImageUpload extends Command
 					$b = env('AWS_S3_REAL_OBJECT_URL_DOMAIN');
 					$s3_image_url = $b . explode($a, $s3_image_url_tmp)[1];
 
-					// get the default facesetid from the organization and gender "MALE"
-					$gender = "MALE";
+					if ($face_tmp->gender == '') {
+						$gender = "MALE";
+					} else {
+						$gender = $face_tmp->gender;
+					}
 					
 					$faceset = FaceSet::where('organizationId','=', $og_id)->where('gender','=',$gender)->first();
 					$facesetId = '';
