@@ -54,7 +54,11 @@ class HomeController extends Controller
         else
         {
             $organizationId = Auth::user()->organizationId;
-            
+			
+			$orgTotalCases = Cases::where('organizationId',$organizationId)->get()->count();
+			$orgCasesSolved = Cases::where('organizationId',$organizationId)
+									->where('status','=','SOLVED')->get()->count();
+			
             // Get the User ID for the logged in user
             $userId = Auth::user()->id;
             
@@ -79,6 +83,6 @@ class HomeController extends Controller
         // Send the totals back to the home view so we can display the data to the user
         //return view('home', compact('caseCount', 'facesCount', 'searchCount', 'appCount', 'organizationCount', 'faceCount'));
 		
-		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount','faceQue','todaysUsers','searchCount','solvedCaseCount'));
+		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount','faceQue','todaysUsers','searchCount','solvedCaseCount','orgTotalCases','orgCasesSolved'));
     }
 }

@@ -186,7 +186,7 @@ class AwsFaceIndexing extends Command
                             $aws_face_id = $indexed_face['face_id'];
 
                             var_dump('Compare Gender between aws and original => '. $aws_gender . ' : '. $gender);
-                            if(strtoupper($aws_gender) != strtoupper($gender) && $aws_gender != '' && $aws_gender != NULL && $aws_gender_confidence > 99.5)
+                            if(strtoupper($aws_gender) != strtoupper($gender) && $aws_gender != '' && $aws_gender != NULL && $aws_gender_confidence > 99.9)
 							{
 								fwrite($log,"**GENDER CHANGE @ " . $aws_gender_confidence . " **\n");
 								
