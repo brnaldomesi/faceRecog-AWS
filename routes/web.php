@@ -70,6 +70,10 @@ Route::group(['middleware' => ['authen']], function () {
 		Route::post('/cases/{cases}/imagelist', 'CaseController@imagelist')->name('cases.id.image.show');
 	});
 
+	Route::group(['middleware' => ['can:delete,cases']], function () {
+		Route::delete('/cases/{cases}', 'CaseController@delete')->name('cases.id.delete');
+	});
+
 	Route::post('/cases/search', 'CaseController@search')->name('search.case');
 	Route::post('/cases/search-history', 'CaseController@searchHistory')->name('search.history');
     Route::post('/cases/getDetailFaceInfo','CaseController@getDetailFaceInfo')->name('search.detailfaceinfo');

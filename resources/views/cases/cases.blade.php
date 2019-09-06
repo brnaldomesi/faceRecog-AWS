@@ -61,6 +61,8 @@
 				<div class="portlet-body">
 				<div class="tab-content">
 				  <div class="tab-pane active" id="portlet_primary">
+				  	{!! Form::open(['method' => 'DELETE', 'class' => 'form-delete form-horizontal']) !!}
+              		{!! Form::close() !!}
 					{!! Form::model($cases, ['route' => ['cases.id.update', $cases->id], 'method' => 'PUT', 'class' => 'form-horizontal']) !!}
 						
 					 <div class="form-group {{ $errors->has('caseNumber') ? ' has-error' : ''}}">
@@ -114,6 +116,7 @@
 							  <a href="{{ route('cases.show') }}" class="btn btn-default">
 								  Cancel
 							  </a>
+							  <button class="btn btn-danger case-delete" url="{{ route('cases.id.delete', $cases) }}">Delete</button>
 						  </div>
 					  </div>
 					{!! Form::close() !!}

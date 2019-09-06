@@ -152,6 +152,35 @@ class CaseController extends Controller
 	    return redirect()->back()->with('isCaseUpdated', true);
 	}
 
+	public function delete(Cases $cases)
+	{
+		// delete face from aws rekognition collection
+		$organization = Organization::where('id','=',$cases->organizationId)->first();
+		$aws_collection_id = $organization->aws_collection_cases_id;
+
+		$images = Image::where('caseId', '=', $cases->id)->get();
+		
+		foreach($images as $image) {
+			$del_faces = [];
+			$del_faces[] = $image->aws_face_id;
+			if(count($del_faces) > 0) {
+				try {
+					$aws_result = $this->aws_rekognition_client->deleteFaces([
+						'CollectionId' => $aws_collection_id,
+						'FaceIds' => $del_faces
+					]);
+					Log::info('Deleted case image from collection :: ' . $image->aws_face_id);
+				} catch(RekognitionException $e) {
+					Log::info('Failed to delete face :: ' . $e->getMessage());
+				}
+			}
+		}			
+
+		// delete cases record from database
+		$cases->delete();
+		return redirect()->route('cases.show')->with('isCaseDeleted', true);
+	}
+
     // Start upload button on the cases detail page..
 	public function addImage(Request $request, Cases $cases)
 	{		

@@ -26,6 +26,11 @@ class CasesPolicy
         return null;
     }
 
+    public function create(User $user)
+    {
+        return $user->permission->can_create_case;
+    }
+
     public function update(User $user, Cases $case)
     {
         if (!$user->permission->can_edit_case) {
@@ -34,9 +39,12 @@ class CasesPolicy
         return $user->id === $case->userId;
     }
 
-    public function create(User $user)
+    public function delete(User $user, Cases $case)
     {
-        return $user->permission->can_create_case;
+        if (!$user->permission->can_edit_case) {
+            return false;
+        }
+        return ($user->id === $case->userId); // || ($user->userGroupId == 2 && $user->organizationId == $case->organizationId);
     }
 
     public function view(User $user, Cases $case)

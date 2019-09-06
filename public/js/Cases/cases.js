@@ -406,6 +406,27 @@ function initEvent() {
 		});
 	});
 
+	$('.tab-content #portlet_primary .case-delete').click(function () {
+		// delete case
+		bootbox.confirm({
+			title: "Delete a case?",
+			message: "Are you sure that you'll delete this case?",
+			buttons: {
+				cancel: {
+					label: '<i class="fa fa-times"></i> Cancel'
+				},
+				confirm: {
+					label: '<i class="fa fa-check"></i> Confirm',
+					className: 'btn-danger'
+				}
+			},
+			callback: function (result) {
+				if(result)
+					$('.form-delete').attr('action', $(this).attr('url')).submit();	
+			}
+		});
+        return false;
+    });
 }
 
 
