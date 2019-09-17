@@ -60,7 +60,7 @@ button.ui-btn {
     top: calc(100% - 70px);
     width: 60px;
     height: 60px;
-    background-image: url('/img/enroll/ic_photo_camera_white_32px.svg');
+    background-image: url('../img/enroll/ic_photo_camera_white_32px.svg');
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.5);
 }
@@ -73,13 +73,13 @@ button.ui-btn {
     display: none;
     width: 40px;
     height: 40px;
-    background-image: url('/img/enroll/ic_camera_rear_white_24px.svg');
+    background-image: url('../img/enroll/ic_camera_rear_white_24px.svg');
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.5);
 }
 
 #switchCameraButton[aria-pressed="true"] {
-    background-image: url('/img/enroll/ic_camera_front_white_24px.svg');
+    background-image: url('../img/enroll/ic_camera_front_white_24px.svg');
 }
 
 #retakePhotoButton {
@@ -88,7 +88,7 @@ button.ui-btn {
     top: calc(100% - 70px);
     width: 60px;
     height: 60px;
-    background-image: url('/img/enroll/ic_retake_photo_40px.svg');
+    background-image: url('../img/enroll/ic_retake_photo_40px.svg');
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.5);
 }
