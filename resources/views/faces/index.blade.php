@@ -14,7 +14,7 @@
     <div class="container">
       <!-- BEGIN PAGE TITLE -->
       <div class="page-title">
-        <h1>Add</h1>
+        <h1>Face Management</h1>
       </div>
       <!-- END PAGE TITLE -->
     </div>
@@ -40,19 +40,11 @@
               <!-- Enroll Panel -->
               <div class="col-md-6">
                 <div class="portlet light">
-                  <div class="portlet-title tabbable-line">
+                  <div class="portlet-title">
                     <div class="caption">
                       <i class="fa fa-user-plus font-green-sharp"></i>
                       <span class="caption-subject font-green-sharp bold uppercase">Enroll</span>
                     </div>
-                    <ul class="nav nav-tabs">
-                      <li class="active">
-                        <a href="#portlet_importcsv" data-toggle="tab"> Import CSV </a>
-                      </li>
-                      <li>
-                        <a href="#portlet_enrollphoto" data-toggle="tab"> Enroll Photo </a>
-                      </li>
-                    </ul>
                   </div>
 
                   <div class="portlet-body">
@@ -61,11 +53,6 @@
 				              <div class="tab-pane active" id="portlet_importcsv">
                         {!! Form::open(['id' => 'csvForm', 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) !!}
                           @include ('faces.importcsv')
-                        {!! Form::close() !!}
-                      </div>
-                      <div class="tab-pane" id="portlet_enrollphoto">
-                        {!! Form::open(['id' => 'photoForm', 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) !!}
-                          @include ('faces.enrollphoto')
                         {!! Form::close() !!}
                       </div>
                     </div>
@@ -131,11 +118,6 @@
   <script>
     $(document).ready(function () {
       $(this).find("#organizationCSV").select2({
-        placeholder: "Select Organization",
-        allowClear: true,
-        minimumResultsForSearch: -1
-      });
-      $(this).find("#organizationPhoto").select2({
         placeholder: "Select Organization",
         allowClear: true,
         minimumResultsForSearch: -1

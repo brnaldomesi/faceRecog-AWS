@@ -50,11 +50,13 @@ Route::group(['middleware' => ['authen']], function () {
 	});
 
 	Route::get('/home', 'HomeController@index')->name('home');
-	Route::get('/portraits/create', 'PortraitsController@create')->name('portrait.new');
-	Route::get('/portraits', 'PortraitsController@index');
-	Route::post('/portraits', 'PortraitsController@store');
-	Route::post('/portraits/search', 'PortraitsController@search')->name('search.file');
 
+	// Enroll
+	Route::group(['middleware' => ['can:create,App\Models\Cases']], function () {
+		Route::get('/enroll','EnrollController@index')->name('enroll.index');
+		Route::post('/enroll','EnrollController@enroll')->name('enroll.enroll');
+	});
+	
 	// Case
 	Route::get('/cases', 'CaseController@index')->name('cases.show');
 

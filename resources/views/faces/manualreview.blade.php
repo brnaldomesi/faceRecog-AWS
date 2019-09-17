@@ -12,7 +12,7 @@
 <div class="form-group">
   <div class="col-xs-12">
     <div class="thumbnail" id="imageThumbnail" style="width: 250px; height: 250px; margin:0 auto;">
-      <img src="" alt="" id="faceImage" style="height:240px;"/>
+      <img src="" alt="" id="faceImage" style="max-width: 240px; max-height: 240px;"/>
     </div>
   </div>
 </div>

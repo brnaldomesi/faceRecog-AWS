@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -135,11 +135,11 @@
                         </li>
                         <li class="nav-item @if(Request::segment(1) == 'faces'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/faces') }}">{{ __('Face Management') }}</a>
-                        </li>
-                        <li class="nav-item @if(Request::segment(1) == 'portraits' && Request::segment(2) == 'create'){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/portraits/create') }}">{{ __('Enroll') }}</a>
                         </li>						
                       @else
+                        <li class="nav-item @if(Request::segment(1) == 'enroll'){{ __('active')}}@endif">
+                            <a class="nav-link" href="{{ url('/enroll') }}">{{ __('Enroll') }}</a>
+                        </li>
                         <li class="nav-item @if(Request::segment(1) == 'cases'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/cases') }}">{{ __('Cases') }}</a>
                         </li>

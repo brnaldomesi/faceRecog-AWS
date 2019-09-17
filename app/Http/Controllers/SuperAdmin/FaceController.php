@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Arr;
 
-use App\Models\Face as FaceModel;
+use App\Models\Face;
 use App\Models\User;
 use App\Models\Photo;
 use App\Models\Arrestee;
@@ -113,7 +113,7 @@ class FaceController extends Controller
 						// Image is a Frontal photo. Check Faces table to see if the Filename already exists.
 						// This will help avoid duplicates.
 						
-						$face = FaceModel::where('filename','=',$filename)->where('organizationId','=',$organizationId)->first();
+						$face = Face::where('filename','=',$filename)->where('organizationId','=',$organizationId)->first();
 						
 						// Found a duplicate.  Skip it
 						if($face) {
@@ -177,93 +177,9 @@ class FaceController extends Controller
         echo json_encode( $res );
     }
 
-    public function enrollPhoto(Request $request)
-    {
-        $organizationId = $request->organizationPhoto;
-		$organizationAccount = Organization::find($organizationId)->account;	// account name used for data storage, etc.
-				
-        //****** Image is a single image uploaded by the user *******//
-        // image upload to the s3 storage and faceindexing the image to the aws rekognition.
-        //ini_set('max_execution_time', 300);
-        
-        $res = new \stdClass;
-
-        $gender = $request->gender;
-        $identifiers = $request->identifiers;
-
-        // Get image filename
-        $filename = $request->portraitInput->getClientOriginalName();
-        // get the file type.
-        $file_type_tmp = explode(".",$filename);
-        $file_type = $file_type_tmp[count($file_type_tmp) -1];
-
-        // Get image filecontent
-        $file = $request->portraitInput->getPathName();
-        $image_file = file_get_contents($file);
-
-        // Manual upload of image.
-        $new_face_token = md5(strtotime(date('Y-m-d H:i:s')). 'manual_upload');
-        
-        $faceset = FaceSet::where('organizationId','=', $organizationId)->where('gender','=',$gender)->first();
-        
-        // getting the facesetId.
-        $facesetId = 0;
-        if(isset($faceset->organizationId) && $faceset->organizationId == $organizationId){
-            $facesetId = $faceset->id;
-        }else{
-            // create new faceset;
-            $faceset_token = md5(strtotime(date('Y-m-d H:i:s')).'manual_upload'. rand(0,9));
-            $facesetId = Faceset::create([
-                'facesetToken' => $faceset_token,
-                'organizationId' => $organizationId,
-                'gender' => $gender
-            ])->id;
-        }
-
-        // s3 image upload.
-        $keyname = 'storage/face/'. $organizationAccount .'/' . $new_face_token .'.'. $file_type;
-        try {
-            // Upload data.
-            $result = $this->aws_s3_client->putObject([
-                'Bucket' => $this->aws_s3_bucket,
-                'Key' => $keyname,
-                'Body' => $image_file,
-                'ACL' => 'public-read'
-            ]);
-
-            // Print the URL to the object.
-            $s3_image_url_tmp = $result['ObjectURL'];
-            $a = env('AWS_S3_UPLOAD_URL_DOMAIN');
-            $b = env('AWS_S3_REAL_OBJECT_URL_DOMAIN');
-            $s3_image_url = $b . explode($a, $s3_image_url_tmp)[1];
-
-            FaceModel::create([
-                'faceToken' => $new_face_token,
-                'facesetId' => $facesetId,
-                'imageId' => '',
-                'identifiers' => Crypt::encryptString($identifiers),
-                'gender' => $gender,
-                'savedPath' => $s3_image_url,
-                'aws_face_id' => ''
-            ]);
-
-            // Increment our faces
-            Faceset::where('id', $facesetId)->increment('faces');
-        }catch (S3Exception $e) {
-            $res->status = 300;
-            $res->msg = $e->getMessage();
-            echo json_encode( $res );
-            return;
-        }
-
-        $res->status = 200;
-        $res->msg = 'Photo has been enrolled successfully.';
-        echo json_encode( $res );
-    }
-
     public function searchImage(Request $request)
     {
-        $face = FaceModel::where('faceToken', '=', $request->faceToken)->first();
+        $face = Face::where('faceToken', '=', $request->faceToken)->first();
         $res = new \stdClass;
         if(isset($face)) {
             $res->status = 200;
@@ -277,7 +193,7 @@ class FaceController extends Controller
 
     public function removeFace(Request $request)
     {        
-        $face = FaceModel::where('faceToken', '=', $request->faceToken)->first();
+        $face = Face::where('faceToken', '=', $request->faceToken)->first();
         $res = new \stdClass;
 
         if(!isset($face)) {

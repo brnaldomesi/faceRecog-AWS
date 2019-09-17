@@ -32,48 +32,6 @@ function validateCSVForm() {
   return true;
 }
 
-function validatePhotoForm() {
-  return new Promise((resolve, reject) => {
-    if($('#portraitDiv')[0].childElementCount === 0) {
-      bootbox.alert({
-        message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you imported an image file to enroll.'
-      });
-      reject();
-  
-    } else {
-      validateImageFile($('#portraitInput').prop('files')[0]).then((resultCode) => { 
-        const organization = $("#organizationPhoto").val();
-        if($('[name=identifiers]').val() === '') {
-          bootbox.alert({
-            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please enter the identifier for this image.'
-          });
-          $('[name=identifiers]').focus();
-          reject();
-        } else if($('[name=gender]').val() === '') {
-          bootbox.alert({
-            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you selected a gender.'
-          });
-          $('[name=gender]').focus();
-          reject();
-        } else if(!organization) {
-          bootbox.alert({
-            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you selected an organization.'
-          });
-          $('[name=organizationPhoto]').focus();
-          reject();
-        } else {
-          resolve();
-        }
-  
-      }).catch((resultCode) => {
-        notifyInvalidImage(resultCode);
-        reject();
-  
-      });
-    }
-  });
-}
-
 function validateManualReviewForm() {
   if($('[name=faceToken]').val() === '') {
     bootbox.alert({
@@ -104,9 +62,15 @@ function importCSV() {
       processData: false,
       success: function(data) {
         Metronic.unblockUI();
-        bootbox.alert({
+        if(data.status == 200) {
+          bootbox.alert({
             message: '<h4 style="color: DodgerBlue;">Success<br></h4>' + data.msg
-        });
+          });
+        } else {
+          bootbox.alert({
+            message: '<h4 style="color: #f00;">Error<br></h4>' + data.msg
+          });
+        }   
       },
       error: function (jqXHR, status, error) {
         Metronic.unblockUI();
@@ -116,43 +80,6 @@ function importCSV() {
       }
     });
   }
-}
-
-function enrollPhoto() {
-  validatePhotoForm().then(() => {
-    Metronic.blockUI({
-        animate: true,
-    });
-
-    var form = $('#photoForm')[0];
-    var formData = new FormData(form);
-    var apiUrl = $('#route-face-enrollphoto').val();
-    //var returnUrl = $('#route-face-index').val();
-    
-    $.ajax({
-      url : apiUrl,
-      type : 'post',
-      dataType : 'json',
-      data: formData,
-      contentType: false,
-      processData: false,
-      success: function(data) {
-        Metronic.unblockUI();
-        bootbox.alert({
-            message: '<h4 style="color: DodgerBlue;">Success<br></h4>' + data.msg
-        });
-      },
-      error: function (jqXHR, status, error) {
-        Metronic.unblockUI();
-        bootbox.alert({
-          message: '<h4 style="color: #f00;">Error<br></h4>' + error
-        });
-      }
-    });
-
-  }).catch(() => {
-
-  });
 }
 
 function setStateActive() {
