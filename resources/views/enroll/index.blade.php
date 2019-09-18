@@ -41,19 +41,11 @@
               <!-- Enroll Panel -->
               <div class="col-md-12">
                 <div class="portlet light">
-                  <div class="portlet-title tabbable-line">
+                  <div class="portlet-title">
                     <div class="caption">
                       <i class="fa fa-user-plus font-green-sharp"></i>
                       <span class="caption-subject font-green-sharp bold uppercase">Enroll</span>
                     </div>
-                    <ul class="nav nav-tabs">
-                      <li>
-                        <a href="#portlet_fromstorage" data-toggle="tab"> From Storage </a>
-                      </li>
-                      <li>
-                        <a href="#portlet_fromcamera" data-toggle="tab"> From Camera </a>
-                      </li>
-                    </ul>
                   </div>
 
                   <div class="portlet-body">
@@ -66,7 +58,7 @@
                           <div class="col-sm-6 text-center" style="margin-bottom:40px;">
                             <div class="row" style="margin:15px;">
                               <div class="col-sm-12 caption text-center">
-                                <span class="caption-subject font-green-sharp bold uppercase">Import an image file</span>
+                                <span class="caption-subject font-green-sharp bold uppercase">Import / Take a photo</span>
                               </div>
                             </div>
                             <div class="fileinput fileinput-new" data-provides="fileinput">
@@ -77,8 +69,8 @@
                               </div>
                               <div class="text-center">
                                 <span class="btn default btn-file">
-                                  <span class="fileinput-new">Browse</span>
-                                  <span class="fileinput-exists">Browse</span>
+                                  <span class="fileinput-new">Pickup</span>
+                                  <span class="fileinput-exists">Pickup</span>
                                   <input type="file" accept="image/jpeg, image/png" name="portraitInput" id="portraitInput">
                                 </span>
                                 <a href="javascript:;" class="btn default fileinput-exists" hidden="" data-dismiss="fileinput">
@@ -135,7 +127,8 @@
                       </div>
                       
                       <!-- From Camera Panel -->
-                      <div class="tab-pane" id="portlet_fromcamera">
+                      <!-- Not being used now-->
+                      <!-- <div class="tab-pane" id="portlet_fromcamera">
                         {!! Form::open(['id' => 'fromCameraForm', 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) !!}
                         <div class="row">
                           <input type="hidden" id="portraitCamera" name="portraitCamera">
@@ -205,7 +198,7 @@
                           </div>
                         </div>
                         {!! Form::close() !!}
-                      </div>
+                      </div> -->
                     </div>
                   </div>
                 </div>
