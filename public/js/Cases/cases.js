@@ -410,13 +410,13 @@ function initEvent() {
 		// delete case
 		bootbox.confirm({
 			title: "Delete a case?",
-			message: "Are you sure that you'll delete this case?",
+			message: "Are you sure you want to delete this case and related images?",
 			buttons: {
 				cancel: {
 					label: '<i class="fa fa-times"></i> Cancel'
 				},
 				confirm: {
-					label: '<i class="fa fa-check"></i> Confirm',
+					label: '<i class="fa fa-check"></i> Yes',
 					className: 'btn-danger'
 				}
 			},

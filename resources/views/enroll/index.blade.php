@@ -6,9 +6,11 @@
   <link href="{{ asset('global/plugins/select2/select2.css') }}" rel="stylesheet">
   <link href="{{ asset('global/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet">
   <link href="{{ asset('css/enroll.css') }}" rel="stylesheet" type="text/css" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0"/>  
 @endsection
 
 @section('content')
+
 <div class="page-container">
   <!-- BEGIN PAGE HEAD -->
   <div class="page-head">
@@ -44,7 +46,7 @@
                   <div class="portlet-title">
                     <div class="caption">
                       <i class="fa fa-user-plus font-green-sharp"></i>
-                      <span class="caption-subject font-green-sharp bold uppercase">Enroll</span>
+                      <span class="caption-subject font-green-sharp bold uppercase">Enroll a Face</span>
                     </div>
                   </div>
 
@@ -69,8 +71,8 @@
                               </div>
                               <div class="text-center">
                                 <span class="btn default btn-file">
-                                  <span class="fileinput-new">Pickup</span>
-                                  <span class="fileinput-exists">Pickup</span>
+                                  <span class="fileinput-new">Select Image</span>
+                                  <span class="fileinput-exists">Select Image</span>
                                   <input type="file" accept="image/jpeg, image/png" name="portraitInput" id="portraitInput">
                                 </span>
                                 <a href="javascript:;" class="btn default fileinput-exists" hidden="" data-dismiss="fileinput" id="btn_discard">
@@ -98,10 +100,6 @@
                               <label for="name" class="col-sm-3 col-form-label text-right" style="padding-top:5px;">{{ __('DOB') }}</label>
                               <div class="input-group date col-sm-9" data-date-format="mm/dd/yyyy" style="padding:0px 15px 0px 15px !important;">
                                 <input type="text" class="form-control text" placeholder="mm/dd/yyyy" id="fromstorage_dob" name="fromstorage_dob">
-                                <span class="input-group-addon">
-                                  <span class="fa fa-calendar">
-                                  </span>
-                                </span>
                               </div>
                             </div>
 

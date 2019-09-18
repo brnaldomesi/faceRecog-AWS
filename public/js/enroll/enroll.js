@@ -1,6 +1,7 @@
 $(document).ready(function () {
 
-  $('.input-group.date').datepicker({format: "mm/dd/yyyy", autoclose: true}); 
+  //$('.input-group.date').datepicker({format: "mm/dd/yyyy", autoclose: true}); 
+  
   $(this).find("#fromstorage_gender").select2({
     placeholder: "Select Gender",
     allowClear: true,
@@ -17,27 +18,34 @@ function validateStorageEnrollForm() {
   return new Promise((resolve, reject) => {
     if($('#portraitDiv')[0].childElementCount === 0) {
       bootbox.alert({
-        message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you imported an image file to enroll.'
+        message: '<h4 style="color: #f00;">Error<br></h4>' + 'Take a photo or select an image to enroll.'
       });
       reject();
   
     } else {
       validateImageFile($('#portraitInput').prop('files')[0]).then((resultCode) => { 
-        if($('[name=fromstorage_name]').val() === '') {
+        
+		if($('[name=fromstorage_name]').val() === '') {
           bootbox.alert({
-            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you entered the name.'
+            message: '<h4 style="color: #f00;">Error<br></h4>' + 'Enter the persons full name'
           });
           $('[name=fromstorage_name]').focus();
           reject();
         } else if($('[name=fromstorage_dob]').val() === '') {
           bootbox.alert({
-            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you entered the date of birth.'
+            message: '<h4 style="color: #f00;">Error<br></h4>' + 'Enter the persons birthdate like mm/dd/yyyy'
           });
           $('[name=fromstorage_dob]').focus();
           reject();
+		} else if(validateDate($('[name=fromstorage_dob]').val()) === false) {
+				bootbox.alert({
+					message: '<h4 style="color: #f00;">Error<br></h4>' + 'Enter the persons birthdate like 		mm/dd/yyyy'
+				});
+				$('[name=fromstorage_dob]').focus();
+				reject();
         } else if($('[name=fromstorage_gender]').val() === '') {
           bootbox.alert({
-            message: '<h4 style="color: #f00;">Failure<br></h4>' + 'Please make sure you selected a gender.'
+            message: '<h4 style="color: #f00;">Error<br></h4>' + 'Select a gender'
           });
           $('[name=fromstorage_gender]').focus();
           reject();
@@ -369,4 +377,41 @@ function retakeSnapshotUI() {
           setTimeout(setFalseAgain, timeOut);
       }   
   }
+}
+
+function validateDate(dateValue)
+{
+    var selectedDate = dateValue;
+    if(selectedDate == '')
+        return false;
+
+    var regExp = /^(\d{1,2})(\/|-)(\d{1,2})(\/|-)(\d{4})$/; //Declare Regex
+    var dateArray = selectedDate.match(regExp); // is format OK?
+
+    if (dateArray == null){
+        return false;
+    }
+
+    month = dateArray[1];
+    day= dateArray[3];
+    year = dateArray[5];        
+
+    if (month < 1 || month > 12){
+        return false;
+    }else if (day < 1 || day> 31){ 
+        return false;
+    }else if ((month==4 || month==6 || month==9 || month==11) && day ==31){
+        return false;
+    }else if (month == 2){
+        var isLeapYear = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+        if (day> 29 || (day ==29 && !isLeapYear)){
+            return false
+        }
+    }
+	
+	if (dateValue.includes("-")) {
+		return false;
+	}
+	
+    return true;
 }

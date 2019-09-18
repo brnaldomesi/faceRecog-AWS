@@ -143,7 +143,7 @@
 
           						</td>
           						<td class="center">
-          						   {{ $c->created_at->format('m/d/Y') }}
+          						   {{ $c->created_at->format('m/d/Y H:i') }}
           						</td>
           						</tr>
                     @endforeach
@@ -168,11 +168,7 @@
 
 @section('extrajs')
   <script src="{{ asset('global/plugins/bootbox/bootbox.min.js') }}" type="text/javascript"></script>
-  <script>
-    @if (\Session::has('isCaseDeleted'))
-      bootbox.alert('Deleted the case successfully!');
-    @endif
-  </script>
+
 	<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
