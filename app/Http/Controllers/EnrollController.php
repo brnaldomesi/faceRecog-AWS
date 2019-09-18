@@ -74,7 +74,7 @@ class EnrollController extends Controller
         // Get info from the request
         if($request->portraitInput) {
             // Enroll from storage          
-            $name = $request->fromstorage_name;
+            $name = ucwords(strtolower($request->fromstorage_name));
             $dob = $request->fromstorage_dob;
             $gender = $request->fromstorage_gender;
 
@@ -91,7 +91,7 @@ class EnrollController extends Controller
         } else {
             // Enroll from camera
             // Not being used
-            $name = $request->fromcamera_name;
+            $name = ucwords(strtolower($request->fromcamera_name));
             $dob = $request->fromcamera_dob;
             $gender = $request->fromcamera_gender;
 

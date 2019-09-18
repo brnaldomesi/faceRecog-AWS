@@ -73,7 +73,7 @@
                                   <span class="fileinput-exists">Pickup</span>
                                   <input type="file" accept="image/jpeg, image/png" name="portraitInput" id="portraitInput">
                                 </span>
-                                <a href="javascript:;" class="btn default fileinput-exists" hidden="" data-dismiss="fileinput">
+                                <a href="javascript:;" class="btn default fileinput-exists" hidden="" data-dismiss="fileinput" id="btn_discard">
                                   Discard
                                 </a>
                               </div>
