@@ -90,7 +90,7 @@ class EnrollController extends Controller
             $file = $request->portraitInput->getPathName();
             
             // resize the image to a width of 300 and constrain aspect ratio (auto height)
-            $img = Image::make(file_get_contents($file))->orientate()->resize(480, null, function ($constraint) {
+            $img = Image::make($file)->orientate()->resize(480, null, function ($constraint) {
                 $constraint->aspectRatio();
             });
             $img->save($file);
