@@ -137,11 +137,11 @@
                             <a class="nav-link" href="{{ url('/faces') }}">{{ __('Face Management') }}</a>
                         </li>						
                       @else
-                        <li class="nav-item @if(Request::segment(1) == 'enroll'){{ __('active')}}@endif">
-                            <a class="nav-link" href="{{ url('/enroll') }}">{{ __('Enroll') }}</a>
-                        </li>
                         <li class="nav-item @if(Request::segment(1) == 'cases'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/cases') }}">{{ __('Cases') }}</a>
+                        </li>
+                        <li class="nav-item @if(Request::segment(1) == 'enroll'){{ __('active')}}@endif">
+                            <a class="nav-link" href="{{ url('/enroll') }}">{{ __('Enroll') }}</a>
                         </li>
                       @endif
                         
