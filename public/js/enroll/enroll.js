@@ -75,7 +75,13 @@ function enrollFromStorage() {
         Metronic.unblockUI();
         if(data.status == 200) {
           bootbox.alert({
-            message: '<h4 style="color: DodgerBlue;">Success<br></h4>' + data.msg
+            message: '<h4 style="color: DodgerBlue;">Success<br></h4>' + data.msg,
+            callback: function () {
+              $('#btn_discard').click();
+              $('#fromstorage_name').val('');
+              $('#fromstorage_dob').val('');
+              $("#fromstorage_gender").select2("val", "");
+            }
           });
         } else {
           bootbox.alert({
