@@ -6,20 +6,11 @@ $(document).ready(function () {
     allowClear: true,
     minimumResultsForSearch: -1
   });
-  $(this).find("#fromcamera_gender").select2({
-    placeholder: "Select Gender",
-    allowClear: true,
-    minimumResultsForSearch: -1
-  });
-
-  // Set active tab based on the device
-  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    $('.nav-tabs a[href="#portlet_fromcamera"]').tab('show');    
-  } else {
-    $('.nav-tabs a[href="#portlet_fromstorage"]').tab('show');
-  }  
-
+  // $(this).find("#fromcamera_gender").select2({
+  //   placeholder: "Select Gender",
+  //   allowClear: true,
+  //   minimumResultsForSearch: -1
+  // });
 });
 
 function validateStorageEnrollForm() {
@@ -63,6 +54,52 @@ function validateStorageEnrollForm() {
   });
 }
 
+function enrollFromStorage() {
+  validateStorageEnrollForm().then(() => {
+    Metronic.blockUI({
+        animate: true,
+    });
+
+    var form = $('#fromStorageForm')[0];
+    var formData = new FormData(form);
+    var apiUrl = $('#route-enroll').val();
+    
+    $.ajax({
+      url : apiUrl,
+      type : 'post',
+      dataType : 'json',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(data) {
+        Metronic.unblockUI();
+        if(data.status == 200) {
+          bootbox.alert({
+            message: '<h4 style="color: DodgerBlue;">Success<br></h4>' + data.msg
+          });
+        } else {
+          bootbox.alert({
+            message: '<h4 style="color: #f00;">Error<br></h4>' + data.msg
+          });
+        }   
+      },
+      error: function (jqXHR, status, error) {
+        Metronic.unblockUI();
+        bootbox.alert({
+          message: '<h4 style="color: #f00;">Error<br></h4>' + error
+        });
+      }
+    });
+
+  }).catch(() => {
+
+  });
+}
+
+/* ************************ */
+/* Not being used from here */
+/* ************************ */
+
 function validateCameraEnrollForm() {
   return new Promise((resolve, reject) => {
     if($('#portraitCamera').val() == '') {
@@ -96,14 +133,47 @@ function validateCameraEnrollForm() {
   });
 }
 
-function enrollFromStorage() {
-  
-}
-
 function enrollFromCamera() {
-  
-}
+  validateCameraEnrollForm().then(() => {
+    Metronic.blockUI({
+        animate: true,
+    });
 
+    var form = $('#fromCameraForm')[0];
+    var formData = new FormData(form);
+    var apiUrl = $('#route-enroll').val();
+    
+    $.ajax({
+      url : apiUrl,
+      type : 'post',
+      dataType : 'json',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(data) {
+        Metronic.unblockUI();
+        if(data.status == 200) {
+          bootbox.alert({
+            message: '<h4 style="color: DodgerBlue;">Success<br></h4>' + data.msg
+          });
+        } else {
+          bootbox.alert({
+            message: '<h4 style="color: #f00;">Error<br></h4>' + data.msg
+          });
+        }        
+      },
+      error: function (jqXHR, status, error) {
+        Metronic.unblockUI();
+        bootbox.alert({
+          message: '<h4 style="color: #f00;">Error<br></h4>' + error
+        });
+      }
+    });
+
+  }).catch(() => {
+
+  });
+}
 
 var takeSnapshotUI = createClickFeedbackUI();
 
