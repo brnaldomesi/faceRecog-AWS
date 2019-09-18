@@ -19,6 +19,7 @@ use Aws\Rekognition\RekognitionClient;
 use Aws\Rekognition\Exception\RekognitionException;
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class EnrollController extends Controller
 {
@@ -87,7 +88,15 @@ class EnrollController extends Controller
 
             // Get image filecontent
             $file = $request->portraitInput->getPathName();
+            
+            // resize the image to a width of 300 and constrain aspect ratio (auto height)
+            $img = Image::make(file_get_contents($file))->orientate()->resize(480, null, function ($constraint) {
+                $constraint->aspectRatio();
+            });
+            $img->save($file);
+
             $image_file = file_get_contents($file);
+            
         } else {
             // Enroll from camera
             // Not being used
