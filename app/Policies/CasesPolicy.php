@@ -7,6 +7,8 @@ use App\Models\Cases;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
 
+use Log;
+
 class CasesPolicy
 {
     use HandlesAuthorization;
@@ -36,7 +38,13 @@ class CasesPolicy
         if (!$user->permission->can_edit_case) {
             return false;
         }
-        return $user->id === $case->userId;
+		
+		if ($user->permission->isAdmin()) {
+			// Lets Admin view all cases
+			return true;
+		} else {
+			return $user->id === $case->userId;
+		}
     }
 
     public function delete(User $user, Cases $case)

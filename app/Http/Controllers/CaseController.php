@@ -29,6 +29,7 @@ use App\Utils\ImageResize;
 use App\Utils\FaceSearch;
 use App\Utils\Facepp;
 
+use Intervention\Image\ImageManagerStatic as EditImage;
 
 // aws package.
 use Aws\Rekognition\RekognitionClient;
@@ -84,9 +85,20 @@ class CaseController extends Controller
 	 */
 	public function index()
 	{
-		$cases = Auth::user()->cases()
-			->orderBy('created_at', 'asc')
-			->get();
+		if (Auth::user()->permission->isAdmin()) 
+		{
+			$cases = Cases::where('cases.organizationId','=',Auth::user()->organizationId)
+						->leftJoin('users','cases.userId','=','users.id')
+						->select('cases.*','users.name')
+						->orderBy('cases.created_at', 'asc')
+						->get();
+		}
+		else
+		{
+			$cases = Auth::user()->cases()
+				->orderBy('created_at', 'asc')
+				->get();
+		}
 		
 		return view('cases.index')->with('cases', $cases);
 	}
@@ -222,6 +234,20 @@ class CaseController extends Controller
 
 		$name_client = $file->getClientOriginalName();
 		
+		// Get image filecontent
+        $newfile = $file->getPathName();
+
+		// resize the image to a width of 480 and constrain aspect ratio (auto height)
+        $img = EditImage::make($newfile)->orientate();
+		
+		if ($img->width() > 800) {
+			$img->resize(800, null, function ($constraint) {
+				$constraint->aspectRatio();
+			});
+		}
+        
+		$img->save($newfile);
+			
 		$ext = $file->extension();
 		if ($ext == 'jpeg') {
 			$ext = "jpg";
@@ -236,10 +262,11 @@ class CaseController extends Controller
             $result = $this->aws_s3_client->putObject([
                 'Bucket' => $this->aws_s3_bucket,
                 'Key' => $keyname_origin,
-                'Body' => file_get_contents($file),
+                'Body' => file_get_contents($newfile),
                 'ACL' => 'public-read'
             ]);
 			
+/*			
 			// Successfully added image. Let's perform a case search to see
 			// if this suspect matches suspect photos in other cases
 			
@@ -329,7 +356,7 @@ class CaseController extends Controller
 				
 				Log::info($search_res);
 			}
-
+*/
 
             // Print the URL to the object.
             $s3_image_url_tmp = $result['ObjectURL'];
@@ -485,6 +512,8 @@ class CaseController extends Controller
 
 	public function search(Request $request)
 	{
+		$log = fopen("searches.txt","a");
+		
 		if (is_null($request->image)) {
 			return response('Incorrect parameter', 400);
 		}
@@ -542,9 +571,12 @@ class CaseController extends Controller
         $organizations = $organizations->unique();
         $collection_ids = Organization::whereIn('id', $organizations)->get()->pluck($collection_field);
 
-        // if there is the shared collections, search collections.
+		// if there is the shared collections, search collections.
         if(count($collection_ids) > 0){
+			
             foreach ($collection_ids as $collection_id_tmp){
+				
+				fwrite($log, "Searching " . $collection_id_tmp . "\n");
 				
 				if ($collection_id_tmp == '') {
 					continue;
@@ -578,7 +610,7 @@ class CaseController extends Controller
         $image->lastSearched = now();
 		$image->save();
 
-		
+		fclose($log);
 
 		if(isset($search_res['status']) && $search_res['status'] != 'faild'){
             $search = CaseSearch::create([

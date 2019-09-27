@@ -102,6 +102,11 @@
                       <th>
                          Status
                       </th>
+					  @if (Auth::user()->permission->isAdmin())
+					  <th>
+				         Creator
+					  </th>
+					  @endif 
                       <th>
                          Created
                       </th>
@@ -142,6 +147,11 @@
                       @endswitch
 
           						</td>
+						@if (Auth::user()->permission->isAdmin())
+							<td class="center">
+							{{ $c->name }}
+							</td>
+						@endif
           						<td class="center">
           						   {{ $c->created_at->format('m/d/Y H:i') }}
           						</td>

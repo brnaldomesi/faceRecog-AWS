@@ -93,13 +93,13 @@
                             <input type="checkbox" class="group-checkable" data-set="#table-organization-list .checkboxes"/>
                           </th>
                           <th>
-                            Org name
+                            Organization
                           </th>
                           <th>
-                            Manager name 
+                            Contact Name
                           </th>
                           <th>
-                            Contact email
+                            Contact Email
                           </th>
                           <th>
                             Created
@@ -122,7 +122,8 @@
                             {{ $admins[$key]->email }}
                           </td>
                           <td class="center">
-                            {{ $o->created_at }}
+                            {{ $o->created_at->format('m/d/Y') }}
+							
                           </td>
                         </tr>
                       @endforeach
