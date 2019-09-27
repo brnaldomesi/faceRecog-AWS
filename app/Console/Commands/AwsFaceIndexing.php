@@ -112,10 +112,9 @@ class AwsFaceIndexing extends Command
     public function handle_one($index)
 	{
 		$log = fopen("indexing.txt","a");
-		fwrite($log,"Begin Index [$index] @ " . date("h:i:sa") . "]...\n");
 		
-        $face = Face::where('aws_face_id', '')->latest()->first();
-		
+        $face = Face::where('aws_face_id', '')->inRandomOrder()->first();
+	
         if(isset($face->facesetId))
 		{
             $facesetId = $face->facesetId;
@@ -123,18 +122,21 @@ class AwsFaceIndexing extends Command
 	
             $faceset = Faceset::where('id',$facesetId)->first();
             
-			if(isset($faceset->gender) && $faceset->gender == $gender) {
+			if(isset($faceset->gender) && $faceset->gender == $gender) 
+			{
                 $organization_id = $faceset->organizationId;
-
                 $organization = Organization::where('id', $organization_id)->first();
-                if(isset($organization->aws_collection_male_id) && isset($organization->aws_collection_female_id)) {
-
+				
+                if(isset($organization->aws_collection_male_id) && isset($organization->aws_collection_female_id)) 
+				{
                     // check the collection id.
                     $male_collection_id  = '';
                     $female_collection_id = '';
 					
                     if($organization->aws_collection_male_id == '' || $organization->aws_collection_female_id == '') 
 					{
+						fwrite($log, "Creating new collections\n");
+						
                         // create the aws_collection.
                         $male_name = $organization->account . '_' . 'male';
                         $female_name = $organization->account . '_' . 'female';
@@ -167,9 +169,8 @@ class AwsFaceIndexing extends Command
                         $aws_bucket = $this->s3_bucket;
                         $img_key = explode($this->s3_bucket.'/', $face->savedPath)[1];
 	
-                        $logstr = "Started awsFaceIndexing: [" . $face['filename'] ."]\n";
+                        $logstr = "Indexing: [" . $face['filename'] ."] as " . $gender . "...";
                         
-						$log = fopen("public/indexing.txt","a");
                         fwrite($log, $logstr);
 
 						// face indexing by using aws rekoginition.
@@ -177,13 +178,16 @@ class AwsFaceIndexing extends Command
 
                         if(isset($indexed_face['face_id']) && $indexed_face['face_id'] != '' && $indexed_face !== 'faild')
 						{
-
-                            // checking the gender response from the aws rekognition and
+							
+                            
+							// checking the gender response from the aws rekognition and
                             // update the facesetId and gender on the faces table.
                             $aws_gender = strtoupper($indexed_face['gender']);
                             $aws_gender_confidence = $indexed_face['gender_confidence'];
                             //Log::emergency('aws rekognition face indexing: Gender Confidence => '. $aws_gender_confidence);
                             $aws_face_id = $indexed_face['face_id'];
+							
+							/* GENDER VERIFICATION CODE.  CAUSING PROBLEMS AT THE MOMENT 
 
                             var_dump('Compare Gender between aws and original => '. $aws_gender . ' : '. $gender);
                             if(strtoupper($aws_gender) != strtoupper($gender) && $aws_gender != '' && $aws_gender != NULL && $aws_gender_confidence > 99.9)
@@ -239,13 +243,18 @@ class AwsFaceIndexing extends Command
                                     var_dump($aws_face_id);
                                 }
                             }
-
+							*/
+							
                             // save the aws_face_id on  faces table.
                             Face::where('id',$face->id)->update(['aws_face_id'=>$aws_face_id]);
                             Faceset::where('id', $facesetId)->increment('faces');
-							fwrite($log,"\n");
-                        } else {
-							fwrite($log,"**INDEX FAILED**...\n");
+							fwrite($log,"Done\n");
+							
+                        } 
+						else 
+						{
+							fwrite($log,"FAILED\n");
+							
                             // remove object from s3 bucket and from db
                             try {
                                $result = $this->s3client->deleteObject([

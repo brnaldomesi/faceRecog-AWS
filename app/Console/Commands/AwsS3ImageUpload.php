@@ -30,6 +30,8 @@ use App\Models\FaceTmp;
 use App\Utils\FaceSearch;
 use App\Mail\Notify;
 
+use Intervention\Image\ImageManagerStatic as EditImage;
+
 // aws package.
 use Aws\Rekognition\RekognitionClient;
 use Aws\Rekognition\Exception\RekognitionException;
@@ -138,71 +140,41 @@ class AwsS3ImageUpload extends Command
 
 			$downloadFailed = false;
 			
-			if ($og_account_name == 'maricopacountyjail__' || $og_account_name == 'pinalcountyjail')
+			if ($og_account_name == 'pinalcountyjail')
 			{
-				// Proxy for importing scraped images
-				$ch = curl_init($face_tmp->image_url);
-				curl_setopt($ch, CURLOPT_PROXY, "23.83.87.120:80");
-				curl_setopt($ch, CURLOPT_PROXYUSERPWD, "afrengine:afrengineproxy");
-				curl_setopt($ch, CURLOPT_BINARYTRANSFER,TRUE);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
-				curl_setopt($ch, CURLOPT_HEADER, 0);
-				$im = curl_exec($ch);
+				if (file_exists("temp.jpg")) {
+					unlink("temp.jpg");
+				}
 				
-				// Check if the Image URl was a redirect from the original URL
-				// If it was, there was an error.  Delete the temp record
-				$lastUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+				try {
+					$img = EditImage::make($face_tmp->image_url);
 				
-				if ($lastUrl == $face_tmp->image_url)
-				{
+					$h = $img->height();
+					$w = $img->width();
 				
-					if (file_exists("temp.jpg")) {
-						unlink("temp.jpg");
-					}
-					
-					$fp = fopen("temp.jpg","x");
-					fwrite($fp,$im);
-					fclose($fp);
-					curl_close($ch);
-					
-					// Load our image resource
-					$im = imagecreatefromjpeg("temp.jpg");
-					
-					// Get our width/height
-					$width = imagesx($im);
-					$height = imagesy($im);
-					
-					// Crop the watermark
-					$im2 = imagecrop($im,['x'=>0,'y'=>0,'width'=>$width,'height'=>$height-61]);
-					
-					// Save the cropped image
-					imagejpeg($im2,"temp.jpg");
-					
-					// Load our newly cropped image into image_source
-					$image_source = @file_get_contents("temp.jpg");
-
-					// if failed to get image
-					if($image_source === FALSE) {
-						$downloadFailed = true;
-
-						FaceTmp::find($face_tmp->id)->delete();
-						
-						// log error
-						$logstr = "Failed to get image file from: " . $face_tmp->image_url;
-						Log::emergency($logstr);
-						$log = fopen("public/debug.txt","a");
-						fwrite($log, $logstr . "\n");
-						fclose($log);
-					}
-				} 
-				else 
-				{
+					$img->resizeCanvas(0,-61,'top',true);
+					$img->save("temp.jpg");
+				
+				} catch (Exception $e) {
 					$downloadFailed = true;
-					
-					// Unable to download the image.  Delete it
-					$face_tmp_id = $face_tmp->id;
-					FaceTmp::where('id', '=', $face_tmp_id)->delete();
+				}
+				
+				
+				// Load our newly cropped image into image_source
+				$image_source = @file_get_contents("temp.jpg");
+
+				// if failed to get image
+				if($image_source === FALSE) {
+					$downloadFailed = true;
+
+					FaceTmp::find($face_tmp->id)->delete();
+						
+					// log error
+					$logstr = "Failed to get image file from: " . $face_tmp->image_url;
+					Log::emergency($logstr);
+					$log = fopen("public/debug.txt","a");
+					fwrite($log, $logstr . "\n");
+					fclose($log);
 				}
 			}
 			else
@@ -234,6 +206,18 @@ class AwsS3ImageUpload extends Command
 				$file_type_tmp = explode(".",$face_tmp->image_url);
 				$file_type = $file_type_tmp[count($file_type_tmp) -1];
 
+				// resize the image to a width of 480 and constrain aspect ratio (auto height)
+				$img = EditImage::make($image_source)->orientate();
+					
+				if ($img->width() > 480) {
+					$img->resize(480, null, function ($constraint) {
+						$constraint->aspectRatio();
+					});
+				}
+
+				// Encode the image to a JPG string and prep for upload to S3
+				$data = (string) $img->encode('jpg',90);
+        
 				// Determine what type of Pose this image is and set the storage folder appropriately
 				if ($face_tmp->pose == 'F') {
 					$folder = 'storage/face/';
@@ -251,7 +235,7 @@ class AwsS3ImageUpload extends Command
 					$result = $this->s3client ->putObject([
 						'Bucket' => $this->s3_bucket,
 						'Key'    => $keyname,
-						'Body'   => $image_source,
+						'Body'   => $data,
 						'ACL'    => 'public-read'
 					]);
 
