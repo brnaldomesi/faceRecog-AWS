@@ -364,6 +364,8 @@ function initEvent() {
 			Metronic.unblockUI();
 			showSearchResultDialog(response, needle_image_src);
 		});
+		
+		gtag('event', 'page_view');
 	});
 
 	$('#table-image-list').on('click', '.search', function () {
@@ -404,6 +406,8 @@ function initEvent() {
 				bootbox.alert(status + "<br>" + error);
 			}
 		});
+		
+		gtag('event', 'page_view');
 	});
 
 	$('.tab-content #portlet_primary .case-delete').click(function () {

@@ -119,9 +119,8 @@
                       @endswitch
 
           						</td>
-          						<td class="center">
-								   <span style="display:none;">{{ $c->created_at->format('Ymd H:i') }}</span>
-          						   {{ $c->created_at->format('m/d/Y H:i') }}
+          						<td class="center" data-sort="{{ $c->created_at->format('Ymd H:i') }}">
+          						   {{ $c->created_at->format('m/d/Y') }}
           						</td>
           						</tr>
                     @endforeach
