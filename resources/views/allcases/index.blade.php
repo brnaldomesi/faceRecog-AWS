@@ -43,40 +43,19 @@
                       <i class="fa fa-briefcase font-green-sharp"></i>
                       <span class="caption-subject font-green-sharp bold uppercase">Case List</span>
                     </div>
-<!--                     <div class="tools">
-                      <a href="javascript:;" class="collapse">
-                      </a>
-                      <a href="#portlet-config" data-toggle="modal" class="config">
-                      </a>
-                      <a href="javascript:;" class="reload">
-                      </a>
-                      <a href="javascript:;" class="remove">
-                      </a>
-                    </div> -->
                   </div>
                   <div class="portlet-body">
                     <div class="table-toolbar">
                       <div class="row">
-                        <!-- <div class="col-md-6">
-                          <div class="btn-group pull-right">
-                            <button class="btn dropdown-toggle" data-toggle="dropdown">Tools <i class="fa fa-angle-down"></i>
-                            </button>
-                            <ul class="dropdown-menu pull-right">
-                              <li>
-                                <a href="javascript:;">
-                                Print </a>
-                              </li>
-                              <li>
-                                <a href="javascript:;">
-                                Save as PDF </a>
-                              </li>
-                              <li>
-                                <a href="javascript:;">
-                                Export to Excel </a>
-                              </li>
-                            </ul>
+						<div class="col-md-6">
+                        </div>
+
+                         <div class="col-md-6">
+                          <div class="btn-group pull-right" id="all-report-bar">
+                            
                           </div>
-                        </div> -->
+                        </div>
+						
                       </div>
                     </div>
                     <table class="table table-striped table-hover" id="table-allcase-list">
@@ -168,5 +147,10 @@
 	<script type="text/javascript" src="{{ asset('global/plugins/select2/select2.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/media/js/jquery.dataTables.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js') }}"></script>
+  
+ <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jqc-1.12.4/jszip-2.5.0/dt-1.10.20/b-1.6.0/b-html5-1.6.0/b-print-1.6.0/datatables.min.js"></script>
+  
   <script type="text/javascript" src="{{ asset('js/Cases/caselist.js') }}"></script>
 @endsection
