@@ -96,8 +96,6 @@ class AwsFaceIndexing extends Command
 
         // **** - update the real gender and update facesetID from the response.
 
-//        Organization::where('id',3)->update(['contactName'=>'Brian Marlow '. strtotime(date('Y-m-d H:i:s'))]);
-//        return;
 
 		$face = Face::where('aws_face_id', '')->get();
 

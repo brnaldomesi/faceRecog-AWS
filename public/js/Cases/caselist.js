@@ -1,7 +1,10 @@
 
 $(document).ready(function () {
-	$('#table-case-list').dataTable({
-
+	
+	var table = $('#table-case-list').DataTable({
+		buttons: [
+			'excel','pdf'
+		],
 		 "language": {
             "aria": {
                 "sortAscending": ": activate to sort column ascending",
@@ -28,8 +31,13 @@ $(document).ready(function () {
         "order" : [[4, 'desc']]
 	});
 	
-	$('#table-allcase-list').dataTable({
-
+	table.buttons().container()
+		.appendTo( document.getElementById("report-bar"));
+	
+	var alltable = $('#table-allcase-list').DataTable({
+		buttons: [
+			'excel','pdf'
+		],
 		 "language": {
             "aria": {
                 "sortAscending": ": activate to sort column ascending",
@@ -55,4 +63,7 @@ $(document).ready(function () {
 
         "order" : [[5, 'desc'],[2,'asc']]
 	});
+	
+	alltable.buttons().container()
+		.appendTo( document.getElementById("all-report-bar"));
 });
