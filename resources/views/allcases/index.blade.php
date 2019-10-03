@@ -120,7 +120,8 @@
 
           						</td>
           						<td class="center">
-          						   {{ $c->created_at->format('m/d/Y') }}
+								   <span style="display:none;">{{ $c->created_at->format('Ymd H:i') }}</span>
+          						   {{ $c->created_at->format('m/d/Y H:i') }}
           						</td>
           						</tr>
                     @endforeach

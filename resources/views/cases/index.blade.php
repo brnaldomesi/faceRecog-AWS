@@ -130,6 +130,7 @@
 							</td>
 						@endif
           						<td class="center">
+									<span style="display:none;">{{ $c->created_at->format('Ymd H:i') }}</span>
           						   {{ $c->created_at->format('m/d/Y H:i') }}
           						</td>
           						</tr>

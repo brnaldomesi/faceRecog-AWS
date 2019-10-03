@@ -61,7 +61,7 @@ $(document).ready(function () {
 
         "pageLength": 10,
 
-        "order" : [[5, 'desc'],[2,'asc']]
+        "order": [[ 4, "desc" ]]
 	});
 	
 	alltable.buttons().container()
