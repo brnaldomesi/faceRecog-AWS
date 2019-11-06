@@ -122,8 +122,8 @@ class AwsS3ImageUpload extends Command
 		
         // getting the face_tmp one row
         $face_tmp = FaceTmp::orderBy('id','desc')->first();
-
-        if(isset($face_tmp->organizationId) && $face_tmp->organizationId != ''){
+		
+        if($face_tmp != null && isset($face_tmp->organizationId) && $face_tmp->organizationId != ''){
             $og_id = $face_tmp->organizationId;
 
             // check the faceset.
@@ -158,6 +158,8 @@ class AwsS3ImageUpload extends Command
 				} catch (Exception $e) {
 					$downloadFailed = true;
 				}
+				
+				
 				
 				
 				// Load our newly cropped image into image_source
@@ -199,38 +201,61 @@ class AwsS3ImageUpload extends Command
 
 			if ($downloadFailed == false)
 			{
-				// generate new token for the image to upload on s3.
-				$new_face_token = md5(strtotime(date('Y-m-d H:i:s')). $index);
-				
-				// get the file type.
-				$file_type_tmp = explode(".",$face_tmp->image_url);
-				$file_type = $file_type_tmp[count($file_type_tmp) -1];
-
-				// resize the image to a width of 480 and constrain aspect ratio (auto height)
-				$img = EditImage::make($image_source)->orientate();
-					
-				if ($img->width() > 480) {
-					$img->resize(480, null, function ($constraint) {
-						$constraint->aspectRatio();
-					});
-				}
-
-				// Encode the image to a JPG string and prep for upload to S3
-				$data = (string) $img->encode('jpg',90);
-        
-				// Determine what type of Pose this image is and set the storage folder appropriately
-				if ($face_tmp->pose == 'F') {
-					$folder = 'storage/face/';
-				} else {
-					$folder = 'storage/other/';
-				}
-
-				//upload image to s3 from the original image.
-				$keyname = $folder . $og_account_name .'/' . $new_face_token .'.'. $file_type;
-				
-				//Log::emergency($keyname); return;
 				try 
 				{
+					// generate new token for the image to upload on s3.
+					$new_face_token = md5(strtotime(date('Y-m-d H:i:s')). $index);
+					
+					// get the file type.
+					$file_type_tmp = explode(".",$face_tmp->image_url);
+					$file_type = $file_type_tmp[count($file_type_tmp) -1];
+
+					// Genereate an Intervention image from the image URL.  Added error catching
+					// because it was having issues creating the image for some reason.
+					$retry = true;
+					$try = 1;
+					
+					while ($retry && $try <= 3):
+						try {
+							// resize the image to a width of 480 and constrain aspect ratio (auto height)
+							$img = EditImage::make($image_source)->orientate();
+							$retry = false;
+						} catch (\Exception $e) {
+							$image_source =  @file_get_contents($face_tmp->image_url);
+							sleep(1);
+						}
+						$try++;
+					endwhile;
+					
+					if ($try >= 3 && $retry == true)
+					{
+						$downloadFailed = true;
+						
+						$face_tmp_id = $face_tmp->id;
+					    FaceTmp::where('id', '=', $face_tmp_id)->delete();
+						
+						return;
+					}
+					
+					if ($img->width() > 480) {
+						$img->resize(480, null, function ($constraint) {
+							$constraint->aspectRatio();
+						});
+					}
+
+					// Encode the image to a JPG string and prep for upload to S3
+					$data = (string) $img->encode('jpg',90);
+			
+					// Determine what type of Pose this image is and set the storage folder appropriately
+					if ($face_tmp->pose == 'F') {
+						$folder = 'storage/face/';
+					} else {
+						$folder = 'storage/other/';
+					}
+
+					//upload image to s3 from the original image.
+					$keyname = $folder . $og_account_name .'/' . $new_face_token .'.'. $file_type;
+				
 					// Upload data.
 					$result = $this->s3client ->putObject([
 						'Bucket' => $this->s3_bucket,

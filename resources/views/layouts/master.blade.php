@@ -8,7 +8,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Face') }}</title>
+    <title>{{ config('app.name', 'AFR Engine') }}</title>
 
     <!-- Fonts -->
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
@@ -224,6 +224,12 @@
     <script src="{{ asset('admin_assets/layout3/scripts/layout.js') }}" type="text/javascript"></script>
     <script src="{{ asset('admin_assets/layout3/scripts/demo.js') }}" type="text/javascript"></script>
     <script src="{{ asset('global/plugins/bootbox/bootbox.min.js') }}" type="text/javascript"></script>
+	
+	@if (Auth::user()->permission->isSuperAdmin())
+	@else
+	<script type="text/javascript">function add_chatinline(){var hccid=89042608;var nt=document.createElement("script");nt.async=true;nt.src="https://mylivechat.com/chatinline.aspx?hccid="+hccid;var ct=document.getElementsByTagName("script")[0];ct.parentNode.insertBefore(nt,ct);}
+add_chatinline(); </script>
+	@endif
     <script>
       jQuery(document).ready(function() {    
         Metronic.init(); // init metronic core components

@@ -168,9 +168,12 @@
 
 @endsection
 
+
+
 @section('extrajs')
   <script type="text/javascript" src="{{ asset('global/plugins/counterup/jquery.waypoints.min.js') }}"></script>
   <script type="text/javascript" src="{{ asset('global/plugins/counterup/jquery.counterup.min.js') }}"></script>
+
   <script>
     $(document).ready(function () {
           //Search.init()
@@ -179,6 +182,21 @@
               delay: 10,
               time: 1000
           })
+		  
+		  if (!{{ $ackTerms }}) {
+			bootbox.alert({
+				message: "Facial recognition results are advisory in nature and are to be treated as investigative leads only.  Search results do not, on their own, establish probable cause.  Any possible involvement of the subject(s) returned in search results must be determined through further investigative methods.",
+				buttons: {
+					ok: {
+						label: 'I understand',
+						className: 'btn-success'
+					}
+				}
+			});
+		  }
+		 
       });
   </script>
+  
+
 @endsection

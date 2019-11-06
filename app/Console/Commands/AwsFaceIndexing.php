@@ -109,8 +109,7 @@ class AwsFaceIndexing extends Command
 
     public function handle_one($index)
 	{
-		$log = fopen("indexing.txt","a");
-		
+	
         $face = Face::where('aws_face_id', '')->inRandomOrder()->first();
 	
         if(isset($face->facesetId))
@@ -133,8 +132,7 @@ class AwsFaceIndexing extends Command
 					
                     if($organization->aws_collection_male_id == '' || $organization->aws_collection_female_id == '') 
 					{
-						fwrite($log, "Creating new collections\n");
-						
+					
                         // create the aws_collection.
                         $male_name = $organization->account . '_' . 'male';
                         $female_name = $organization->account . '_' . 'female';
@@ -167,10 +165,6 @@ class AwsFaceIndexing extends Command
                         $aws_bucket = $this->s3_bucket;
                         $img_key = explode($this->s3_bucket.'/', $face->savedPath)[1];
 	
-                        $logstr = "Indexing: [" . $face['filename'] ."] as " . $gender . "...";
-                        
-                        fwrite($log, $logstr);
-
 						// face indexing by using aws rekoginition.
 						$indexed_face = $this->awsFaceIndexing($aws_bucket, $img_key,$external_image_url,$collection_id);
 
@@ -246,12 +240,10 @@ class AwsFaceIndexing extends Command
                             // save the aws_face_id on  faces table.
                             Face::where('id',$face->id)->update(['aws_face_id'=>$aws_face_id]);
                             Faceset::where('id', $facesetId)->increment('faces');
-							fwrite($log,"Done\n");
 							
                         } 
 						else 
 						{
-							fwrite($log,"FAILED\n");
 							
                             // remove object from s3 bucket and from db
                             try {
@@ -270,8 +262,6 @@ class AwsFaceIndexing extends Command
                 }
             }
         }
-		
-		fclose($log);
     }
 
     public function createAwsCollection($collection_name){
@@ -342,10 +332,6 @@ class AwsFaceIndexing extends Command
 					else 
 					{
                         var_dump($faceDetail['Pose']);
-						
-						$log = fopen("public/indexing.txt","a");
-						fwrite($log,"FAILED\n".var_dump($faceDetail['Pose'])."...");
-						fclose($log);
                     }
                 }
 				
