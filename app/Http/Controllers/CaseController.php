@@ -512,8 +512,7 @@ class CaseController extends Controller
 
 	public function search(Request $request)
 	{
-		$log = fopen("searches.txt","a");
-		
+	
 		if (is_null($request->image)) {
 			return response('Incorrect parameter', 400);
 		}
@@ -576,8 +575,7 @@ class CaseController extends Controller
 			
             foreach ($collection_ids as $collection_id_tmp){
 				
-				fwrite($log, "Searching " . $collection_id_tmp . "\n");
-				
+
 				if ($collection_id_tmp == '') {
 					continue;
 				}
@@ -609,8 +607,6 @@ class CaseController extends Controller
         // save the last searched date on the images table.
         $image->lastSearched = now();
 		$image->save();
-
-		fclose($log);
 
 		if(isset($search_res['status']) && $search_res['status'] != 'faild'){
             $search = CaseSearch::create([

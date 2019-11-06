@@ -264,7 +264,7 @@ class AwsAutoSearch extends Command
 
 				foreach ($mail['cases'] as $c) {
 					$link = url('cases/' . $c['id']);
-					$text .= "<br>Case '" . $c['name'] . "' has " . $c['count'] . " new search results.";
+					$text .= "<br>Case " . $c['name'] . " has " . $c['count'] . " new search results.";
 					$text .= "<br><a href='{$link}'>{$link}</a><br>";
 				}
 				$from = config('mail.username');

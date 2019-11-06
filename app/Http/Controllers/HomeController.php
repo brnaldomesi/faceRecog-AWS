@@ -50,6 +50,8 @@ class HomeController extends Controller
             $caseCount = Cases::count();
 			$solvedCaseCount = Cases::where('status','=','SOLVED')->get()->count();
 			$todaysUsers = User::whereDate('lastlogin','=',Carbon::today())->get()->count();
+			
+			$ackTerms = 'true';
         }
         else
         {
@@ -78,11 +80,19 @@ class HomeController extends Controller
                 ['organization_owner', Auth::user()->organizationId],
                 ['status', 'PENDING']
             ])->count();
+			
+			// Check if the user has seen the facial recognition terms of use popup
+			if (session()->get('ackTerms') == 'true') {
+				$ackTerms = 'true';
+			} else {
+				$ackTerms = 'false';
+				session()->put('ackTerms','true');
+			}
         }
         
         // Send the totals back to the home view so we can display the data to the user
         //return view('home', compact('caseCount', 'facesCount', 'searchCount', 'appCount', 'organizationCount', 'faceCount'));
 		
-		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount','faceQue','todaysUsers','searchCount','solvedCaseCount','orgTotalCases','orgCasesSolved'));
+		return view('home', compact('caseCount', 'appCount', 'organizationCount', 'faceCount','faceQue','todaysUsers','searchCount','solvedCaseCount','orgTotalCases','orgCasesSolved','ackTerms'));
     }
 }

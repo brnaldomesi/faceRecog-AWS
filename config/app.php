@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Facial Recognition'),
+    'name' => env('APP_NAME', 'AFR Engine'),
 
     /*
     |--------------------------------------------------------------------------
@@ -42,7 +42,7 @@ return [
     |
     */
 
-    'debug' => env('APP_DEBUG', true),
+    'debug' => env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'localface.com'),
+    'url' => env('APP_URL', 'https://www.afrengine.com/engine/'),
 
     /*
     |--------------------------------------------------------------------------
@@ -68,7 +68,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/Los_Angeles',
 
     /*
     |--------------------------------------------------------------------------
