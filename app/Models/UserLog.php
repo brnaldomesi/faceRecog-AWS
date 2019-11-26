@@ -16,7 +16,7 @@ class UserLog extends Model
   protected $fillable = [
       'userId', 'event', 'ip'
   ];
-
+  
   public function user()
   {
       return $this->belongsTo('App\Models\User', 'userId');
