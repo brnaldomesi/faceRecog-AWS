@@ -81,6 +81,14 @@ Route::group(['middleware' => ['authen']], function () {
     Route::post('/cases/getDetailFaceInfo','CaseController@getDetailFaceInfo')->name('search.detailfaceinfo');
 	Route::post('/cases/getPersonGallery','CaseController@getPersonGallery')->name('search.persongallery');
 
+	// Quick Search
+	Route::get('/quicksearch', 'QuickSearchController@index')->name('quicksearch.index');
+	Route::post('/quicksearch/search','QuickSearchController@search')->name('quicksearch.search');
+	Route::post('/quicksearch/create', 'QuickSearchController@quicksearch')->name('quicksearch.create');
+	Route::post('/quicksearch/history', 'QuickSearchController@history')->name('quicksearch.history');
+    Route::post('/quicksearch/getDetailFaceInfo','QuickSearchController@getDetailFaceInfo')->name('quicksearch.detailfaceinfo');
+	Route::post('/quicksearch/getPersonGallery','QuickSearchController@getPersonGallery')->name('quicksearch.persongallery');
+
 	// Compare
 	Route::get('/compare', 'CompareController@index')->name('compare.index');
 	Route::post('/compare/create', 'CompareController@compare')->name('compare.create');
