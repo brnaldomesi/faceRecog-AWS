@@ -35,6 +35,7 @@
       <!-- END PAGE BREADCRUMB -->
       <!-- BEGIN PAGE CONTENT INNER -->
       <div class="row">
+	  @if (Auth::user()->permission->isSuperAdmin() === false)
         <div class="col-md-6">
           <div class="portlet light">
             <div class="portlet-title">
@@ -46,14 +47,18 @@
             <div class="portlet-body">
 			  <input type="hidden" id="hidden-search-url" value="{{ route('quicksearch.search') }}">
               <input type='hidden' id="route-quicksearch-create" value="{{route('quicksearch.create')}}"></input>
-			  <input type='hidden' id="route-quicksearch-history" value="{{route('quicksearch.history')}}"></input>
               {!! Form::open(['id' => 'quickSearchForm', 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) !!}
                 @include ('quicksearch.create')
               {!! Form::close() !!}
             </div>
           </div>
         </div>
+	  @endif
+	   @if (Auth::user()->permission->isSuperAdmin())
+		   <div class="col-md-8">
+	   @else
         <div class="col-md-6">
+       @endif
           <div class="portlet light">
             <div class="portlet-title">
               <div class="caption">
@@ -62,6 +67,7 @@
               </div>
             </div>
             <div class="portlet-body">
+			<input type='hidden' id="route-quicksearch-history" value="{{route('quicksearch.history')}}"></input>
               {!! Form::open(['id' => 'quickSearchHistoryForm', 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) !!}
               
 			  <div class="form-group text-center">
@@ -81,6 +87,11 @@
 							<th>
 								Searched
 							</th>
+							@if (Auth::user()->permission->isAdmin())
+							<th>
+								User
+							</th>
+							@endif							
 						</tr>
 						</thead>
 						<tbody>
@@ -93,8 +104,15 @@
 										{{-- <div>{{ $value->filename }}</div> --}}
 									</a>
 								</td>
-								<td>{{ $value->reference }}</td>
+								<td>
+								{{ $value->reference }}</td>
+								</td>
 								<td>{{ Carbon\Carbon::parse($value->created_at)->format("m/d/Y H:i")}}</td>
+								@if (Auth::user()->permission->isAdmin())
+								<td>
+								{{ $value->name }}</td>
+								</td>
+								@endif
 							</tr>
 						@endforeach
 						</tbody>

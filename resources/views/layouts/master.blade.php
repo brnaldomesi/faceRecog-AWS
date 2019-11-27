@@ -133,6 +133,9 @@
                         <li class="nav-item @if(Request::segment(1) == 'allcases'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/allcases') }}">{{ __('Cases') }}</a>
                         </li>
+						<li class="nav-item @if(Request::segment(1) == 'quicksearch'){{ __('active')}}@endif">
+                            <a class="nav-link" href="{{ url('/quicksearch') }}">{{ __('Quick Search') }}</a>
+                        </li>
                         <li class="nav-item @if(Request::segment(1) == 'faces'){{ __('active')}}@endif">
                             <a class="nav-link" href="{{ url('/faces') }}">{{ __('Face Management') }}</a>
                         </li>						

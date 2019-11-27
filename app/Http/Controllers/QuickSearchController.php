@@ -51,7 +51,23 @@ class QuickSearchController extends Controller
 	
     public function index()
 	{
-		$quicksearches = QuickSearch::where('userid','=',Auth::user()->id)->orderBy('created_at', 'desc')->get();
+		if (Auth::user()->permission->isSuperAdmin())
+		{
+			$quicksearches = QuickSearch::join('users','users.id','=','quicksearch_history.userid')
+				->select('users.name','quicksearch_history.*')
+				->get();
+		}
+		else if (Auth::user()->permission->isAdmin())
+		{
+			$quicksearches = QuickSearch::where('quicksearch_history.organizationId','=',Auth::user()->organizationId)
+				->join('users','users.id','=','quicksearch_history.userid')
+				->select('users.name','quicksearch_history.*')
+				->get();
+		}
+		else
+		{
+			$quicksearches = QuickSearch::where('userid','=',Auth::user()->id)->orderBy('created_at', 'desc')->get();
+		}
 		
 		return view('quicksearch.index', [
 			'quicksearch_history' => $quicksearches
@@ -152,6 +168,7 @@ class QuickSearchController extends Controller
 			// Insert search results into the quicksearch_history table
 			$search = QuickSearch::create([
 			  'userid' => Auth::user()->id,
+			  'organizationId' => $organizationId,
 			  'reference' => $request->reference,
 			  'filename' => $name_upload,
 			  'results' => $search_res
