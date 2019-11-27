@@ -9,7 +9,7 @@ class QuickSearch extends Model
     //
 	protected $table = 'quicksearch_history';
 	
-    protected $fillable = ['userid', 'reference', 'filename', 'results'];
+    protected $fillable = ['userid', 'organizationId', 'reference', 'filename', 'results'];
 	protected $casts = [
 		'results' => 'array'
 	];
