@@ -103,7 +103,7 @@ class AwsS3ImageUpload extends Command
          *
          * */
 
-		$face_tmp = FaceTmp::orderBy('id','desc')->first();
+		$face_tmp = FaceTmp::orderBy('id','asc')->first();
 		
 		if (isset($face_tmp)) {
 			
@@ -121,7 +121,7 @@ class AwsS3ImageUpload extends Command
     public function handle_one($index){
 		
         // getting the face_tmp one row
-        $face_tmp = FaceTmp::orderBy('id','desc')->first();
+        $face_tmp = FaceTmp::orderBy('id','asc')->first();
 		
         if($face_tmp != null && isset($face_tmp->organizationId) && $face_tmp->organizationId != ''){
             $og_id = $face_tmp->organizationId;

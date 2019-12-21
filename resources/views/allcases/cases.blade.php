@@ -125,6 +125,7 @@
 					<input type="hidden" id="hidden-image-list-url" value="{{ route('allcases.id.image.show', [$cases->organization->id, $cases->id]) }}">
 					<input type="hidden" id="hidden-search-url" value="{{ route('search.case') }}">
 					<input type="hidden" id="hidden-search-history-url" value="{{ route('search.history') }}">
+					<input type="hidden" id="hidden-crimespree-url" value="{{ route('search.crimespree') }}">
 
 					<table class="table table-striped table-hover" id="table-image-list">
 						<thead>
@@ -224,7 +225,6 @@
 	</ol>
 </div>
 
-var cases_id = {{$cases->id}};
 </script>
 
 <script type="text/javascript" src="{{ asset('global/plugins/select2/select2.js') }}"></script>
@@ -251,6 +251,7 @@ var cases_id = {{$cases->id}};
 <script src="{{ asset('admin_assets/pages/scripts/form-fileupload.js') }}" type="text/javascript"></script>
 <script>
 	var url_getfacedetailinfo = '{{ route('search.detailfaceinfo') }}';
+	var url_getfacecasedetailinfo = '{{ route('search.detailfacecaseinfo') }}';
 	var url_getpersongallery = '{{ route('search.persongallery') }}';
 </script>
 <script type="text/javascript" src="{{ asset('js/Cases/cases.js') }}"></script>

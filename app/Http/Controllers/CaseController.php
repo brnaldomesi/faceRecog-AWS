@@ -19,6 +19,7 @@ use App\Models\FacesetSharing;
 use App\Models\Cases;
 use App\Models\Image;
 use App\Models\CaseSearch;
+use App\Models\CaseMatch;
 use App\Models\Organization;
 
 use App\Http\Requests\CasesCreate;
@@ -197,11 +198,6 @@ class CaseController extends Controller
 	public function addImage(Request $request, Cases $cases)
 	{		
 		Log::info('Uploading new case image');
-		
-        // s3 image upload get the image url. on the "cases" directory.
-        // s3 bucket/storage/case/images, and s3 bucket/storage/case/thumbnails
-        // aws rekognition : image indexing. and get the aws_face_id for this image.
-        // add new row on the images table.
 
         $file = null;
 
@@ -266,98 +262,6 @@ class CaseController extends Controller
                 'ACL' => 'public-read'
             ]);
 			
-/*			
-			// Successfully added image. Let's perform a case search to see
-			// if this suspect matches suspect photos in other cases
-			
-			$collection_id = $organization->aws_collection_cases_id;
-			if(isset($collection_id))
-			{ 
-				$threshold = env('AWS_CASESEARCH_MIN_SIMILARITY');
-				
-				// Search all cases for the User's Organization first
-				$search_res = $this->awsFaceSearch($keyname_origin,$collection_id,(int)$threshold);
-				
-				Log::info("Users CaseID = " . $cases->id);
-				
-				// Parse through the results and remove any matches for images in this same case
-				if(isset($search_res['data_list']) && count($search_res['data_list']) > 0 && $search_res['data_list'] != null)
-				{
-					foreach($search_res['data_list'] as $key => &$match)
-					{
-						Log::info("Checking Face " . $match['face_id']);
-						
-						// Grab the Image data for this match
-						$img = Image::where('aws_face_id','=',$match['face_id'])->first();
-						
-						if(isset($img))
-						{
-							Log::info("Face belongs to case " . $img->caseId);
-						
-							// If the Image->CaseID matches the current CaseID, remove it
-							if ($img->caseId == $cases->id) 
-							{
-								Log::info("Removing " . $match['face_id'] . " due to same case");
-								unset($search_res['data_list'][$key]);
-							}
-						}
-					}
-				}
-				
-				// Build our list of organization's this User has sharing permissions with
-				$organizations = FacesetSharing::where([
-						['organization_requestor', $organization_id], ['status', 'ACTIVE']
-					])
-				->get()->pluck('organization_owner');
-				
-				$owner = FacesetSharing::where([
-					['organization_owner', $organization_id], ['status', 'ACTIVE']
-					])
-				->get()->pluck('organization_requestor');
-        
-				$organizations = $organizations->merge($owner);
-				$organizations = $organizations->unique();
-				$collection_ids = Organization::whereIn('id', $organizations)->get()->pluck('aws_collection_cases_id');
-				
-				// if there is the shared collections, search collections.
-				if(count($collection_ids) > 0){
-					foreach ($collection_ids as $collection_id_tmp){
-					
-						if ($collection_id_tmp == '') {
-							continue;
-						}
-				
-						// Perform a search on each collection
-						$search_res_tmp = $this->awsFaceSearch($keyname_origin, $collection_id_tmp,(int)$threshold);
-                
-						if($search_res_tmp['status'] !== 200){
-							continue;
-						}
-						
-						$search_res['data_list'] = array_merge($search_res['data_list'],$search_res_tmp['data_list']);
-                
-						if($search_res['status'] != 200){
-							$search_res['status'] = 200;
-						}
-					}
-					
-					if(isset($search_res['data_list']) && count($search_res['data_list']) > 0 && $search_res['data_list'] != null)
-					{
-						usort($search_res['data_list'],function($first,$second){
-							return $first['similarity'] < $second['similarity'];
-						});
-					}
-
-					if(isset($search_res['data_list']) && count($search_res['data_list']) > $this->aws_search_max_cnt)
-					{
-						$search_res['data_list'] = array_slice($search_res['data_list'], 0, $this->aws_search_max_cnt);
-					}
-				}
-				
-				Log::info($search_res);
-			}
-*/
-
             // Print the URL to the object.
             $s3_image_url_tmp = $result['ObjectURL'];
             $a = env('AWS_S3_UPLOAD_URL_DOMAIN');
@@ -368,6 +272,8 @@ class CaseController extends Controller
             // response result initialization
             $response_result = [];
 
+			Log::info("Indexing the case image");
+
             // image indexing for the aws rekognition. with the collection : $aws_collection_id
             $face_indexing_res = $this->awsFaceIndexing($this->aws_s3_bucket, $s3_image_key,$s3_image_url,$aws_collection_id);
 
@@ -377,7 +283,8 @@ class CaseController extends Controller
 	            //$thumb_image = ImageResize::work1($file, 256, 0);
 	            $keyname_thumbnail = 'storage/case/thumbnails/'. $name_upload;
 
-	            try{
+	            try
+				{
 	                // upload thumbnails
 	                $result1 = $this->aws_s3_client->putObject([
 	                    'Bucket' => $this->aws_s3_bucket,
@@ -408,6 +315,116 @@ class CaseController extends Controller
 	                    'imgSrc'  => $s3_thumb_url_tmp,
 	                    'msg' 	  => 'No face found in the image!'
 	                );
+				} catch (S3Exception $e) {
+	                echo $e->getMessage() . PHP_EOL;
+	                return abort(500);
+	            }	
+					
+				try
+				{
+					// Successfully added image. Let's perform a case search to see
+					// if this suspect matches suspect photos in other cases
+					
+					$collection_id = $organization->aws_collection_cases_id;
+					if(isset($collection_id))
+					{ 
+						$threshold = env('AWS_CASESEARCH_MIN_SIMILARITY');
+						
+						// Search all cases for the User's Organization first
+						$search_res = $this->awsFaceSearch($keyname_origin,$collection_id,(int)$threshold);
+						
+						Log::info("Users CaseID = " . $cases->id);
+						
+						// Parse through the results and remove any matches for images in this same case
+						if(isset($search_res['data_list']) && count($search_res['data_list']) > 0 && $search_res['data_list'] != null)
+						{
+							foreach($search_res['data_list'] as $key => &$match)
+							{
+								Log::info("Checking Face " . $match['face_id']);
+								
+								// Grab the Image data for this match
+								$caseImg = Image::where('aws_face_id','=',$match['face_id'])->first();
+								
+								if(isset($caseImg))
+								{
+									Log::info("Face belongs to case " . $caseImg->caseId);
+								
+									// If the Image->CaseID matches the current CaseID, remove it
+									if ($caseImg->caseId == $cases->id) 
+									{
+										Log::info("Removing " . $match['face_id'] . " due to same case");
+										unset($search_res['data_list'][$key]);
+									}
+								}
+							}
+						}
+						
+						// Build our list of organization's this User has sharing permissions with
+						$organizations = FacesetSharing::where([
+								['organization_requestor', $organization_id], ['status', 'ACTIVE']
+							])
+						->get()->pluck('organization_owner');
+						
+						$owner = FacesetSharing::where([
+							['organization_owner', $organization_id], ['status', 'ACTIVE']
+							])
+						->get()->pluck('organization_requestor');
+				
+						$organizations = $organizations->merge($owner);
+						$organizations = $organizations->unique();
+						$collection_ids = Organization::whereIn('id', $organizations)->get()->pluck('aws_collection_cases_id');
+						
+						// if there is the shared collections, search collections.
+						if(count($collection_ids) > 0){
+							foreach ($collection_ids as $collection_id_tmp){
+							
+								if ($collection_id_tmp == '') {
+									continue;
+								}
+						
+								Log::info("Searching collection " . $collection_id_tmp);
+								// Perform a search on each collection
+								$search_res_tmp = $this->awsFaceSearch($keyname_origin, $collection_id_tmp,(int)$threshold);
+						
+								if($search_res_tmp['status'] !== 200){
+									continue;
+								}
+								
+								$search_res['data_list'] = array_merge($search_res['data_list'],$search_res_tmp['data_list']);
+						
+								if($search_res['status'] != 200){
+									$search_res['status'] = 200;
+								}
+							}
+							
+							if(isset($search_res['data_list']) && count($search_res['data_list']) > 0 && $search_res['data_list'] != null)
+							{
+								Log::info("Sorting results");
+								
+								usort($search_res['data_list'],function($first,$second){
+									return $first['similarity'] < $second['similarity'];
+								});
+							}
+
+							if(isset($search_res['data_list']) && count($search_res['data_list']) > $this->aws_search_max_cnt)
+							{
+								$search_res['data_list'] = array_slice($search_res['data_list'], 0, $this->aws_search_max_cnt);
+							}
+						}
+						
+						Log::info($search_res);
+						
+						if(isset($search_res['data_list']) && count($search_res['data_list']) > 0 && $search_res['data_list'] != null)
+						{
+							// Save the CaseMatch to the DB
+							$casematch = new CaseMatch;
+							$casematch->case_id = $cases->id;
+							$casematch->source_imageId = $image->id;
+							$casematch->results = $search_res;
+							$casematch->searchedOn = now();
+							$casematch->save();
+						}
+					}
 					
 
 	            } catch (S3Exception $e) {
@@ -492,17 +509,28 @@ class CaseController extends Controller
 			
 			if (!is_null($item->lastSearched)) {
 				$date = date_create($item->lastSearched);
-				$date = date_format($date,"m/d/Y H:i:s");
+				$date = date_format($date,"n/d/y H:i");
 			} else {
 				$date = "";
 			}
 			
+			$caseMatches = CaseMatch::where('source_imageId','=',$item->id)->first();
+			
+			if (isset($caseMatches)) {
+				$caseMatchId = $caseMatches->id;
+			} else {
+				$caseMatchId = '';
+			}
+			
+			
+			
 			return [
 				env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/images/'.$item->filename_uploaded, //asset($item->file_url),
                 env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/thumbnails/'.$item->filename_uploaded,//asset($item->thumbnail_url),
-				$item->gender,
-				$date,
-				$item->id
+				$item->gender,	// Gender of this iamge
+				$date,			// Date last searched
+				$item->id,		// image ID
+				$caseMatchId	// ID of any Case_Matches 
 			];
 		});
 		return response()->json(['data' => $result]);
@@ -656,7 +684,58 @@ class CaseController extends Controller
 		return response()->json($result);
 	}
 
+	public function crimeSpree(Request $request)
+	{
+		if (is_null($request->id)) {
+			return response('Incorrect parameter', 400);
+		}
+		
+		$caseMatch = CaseMatch::find($request->id);
+		if (is_null($caseMatch)) {
+			return response('Incorrect parameter', 400);
+		}
+		
+		$result = $caseMatch['results'];
+		
+		return response()->json($result);
+	}
 
+	public function getDetailFaceCaseInfo(Request $request){
+	    Log::emergency($request->aws_face_id);
+		
+		if(is_null($request->aws_face_id)){
+			Log::emergency("aws_face_id is null");
+	        return response('Incorrect parameter', 400);
+        }
+		
+        $image = Image::where('aws_face_id','=',$request->aws_face_id)->first();
+	    
+		if(is_null($image)){
+			Log::emergency("image is null");
+	        return response('Incorrect parameter',400);
+        }
+		
+		$caseInfo = Cases::where('cases.id',$image->caseId)
+			->leftJoin('organizations','cases.organizationId','=','organizations.id')
+			->leftJoin('users','cases.userId','=','users.id')
+			->select('users.name as userName','users.email as userEmail','cases.type as caseType','cases.caseNumber as caseNumber','cases.created_at as caseCreated','organizations.name as organizationName','cases.status as caseStatus')
+			->first();
+		
+		$date = date_create($caseInfo->caseCreated);
+		$date = date_format($date,"m/d/y");
+		
+		$caseDetails['organizationName'] = $caseInfo->organizationName;
+		$caseDetails['userName'] = $caseInfo->userName;
+		$caseDetails['userEmail'] = $caseInfo->userEmail;
+		$caseDetails['caseType'] = $caseInfo->caseType;
+		$caseDetails['caseNumber'] = $caseInfo->caseNumber;
+		$caseDetails['caseCreated'] = $date;
+		$caseDetails['caseStatus'] = ucfirst(strtolower($caseInfo->caseStatus));
+
+        return response()->json($caseDetails);
+
+    }
+	
 	public function getDetailFaceInfo(Request $request){
 	    if(is_null($request->aws_face_id)){
 	        return response('Incorrect parameter', 400);
@@ -701,6 +780,7 @@ class CaseController extends Controller
 		}
 		
 		$face = FaceModel::where('aws_face_id','=',$request->aws_face_id)->first();
+		
 		if(is_null($face)){
 			return response('Incorrect parameter',400);
 		}

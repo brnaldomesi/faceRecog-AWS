@@ -312,7 +312,7 @@ class AwsFaceIndexing extends Command
                         "Bytes"=> $bytes
                     ],
                     "MaxFaces"=> 1,
-                    "QualityFilter"=> "AUTO"
+                    "QualityFilter"=> "MEDIUM"
                 ]);
 
                 $face_id = '';
