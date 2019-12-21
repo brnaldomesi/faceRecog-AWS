@@ -63,6 +63,48 @@ function showGallery(aws_face_id) {
 	});
 }
 
+function showFaceCaseDetail(aws_face_id) {
+    Metronic.blockUI({
+        animate: true,
+        overlayColor: 'none',
+        centerY: true,
+    });
+
+	$("#details_link_"+aws_face_id).addClass('hidden');
+	$('#details_loading_'+aws_face_id).removeClass('hidden');
+	
+    $.ajax({
+        url: url_getfacecasedetailinfo,
+        type: 'post',
+        data: { 'aws_face_id' : aws_face_id },
+        success: function (response) {
+            Metronic.unblockUI();
+
+            $('#id_dv_case_detail_'+aws_face_id).removeClass('hidden');
+            
+			$('#id_dv_case_detail_'+aws_face_id + ' .txt-organization').html(response.organizationName);
+            $('#id_dv_case_detail_'+aws_face_id + ' .txt-user').html('<a href="mailto:' + response.userEmail + '">' + response.userName + '</href>');
+			$('#id_dv_case_detail_'+aws_face_id + ' .txt-casenumber').html(response.caseNumber);
+			$('#id_dv_case_detail_'+aws_face_id + ' .txt-casetype').html(response.caseType);			
+			$('#id_dv_case_detail_'+aws_face_id + ' .txt-casestatus').html(response.caseStatus);			
+			$('#id_dv_case_detail_'+aws_face_id + ' .txt-casedate').html(response.caseCreated);
+			
+			$('#details_loading_'+aws_face_id).addClass('hidden');
+
+        },
+        error: function (jqXHR, status, error) {
+			
+			$("#details_link_"+aws_face_id).removeClass('hidden');
+			$('#details_loading_'+aws_face_id).addClass('hidden');			
+			
+			Metronic.unblockUI();
+			bootbox.alert({
+				message: '<h4 style="color: #f00;">Error<br></h4>' + error
+			});
+        }
+    });
+}
+
 function showFaceDetail(aws_face_id) {
     Metronic.blockUI({
         animate: true,
@@ -113,7 +155,19 @@ function initEvent() {
 	});
 
 	$('#enrollForm').bind('fileuploadsubmit', function (e, data) {
+		
+		Metronic.blockUI({
+			message: "Analyzing image...",
+			animate: true,
+			overlayColor: 'none',
+			centerY: true,
+		});
+		
 		data.formData = data.context.find('select').serializeArray();
+	});
+	
+	$('#enrollForm').bind('fileuploadalways', function (e, data) {
+		Metronic.unblockUI();
 	});
 
 	$.ajaxSetup({
@@ -121,16 +175,6 @@ function initEvent() {
 		  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
 		}
 	});
-
-	// $("select[name=status]").change(function () {
-	// 	if ($(this).val() == 'CLOSED') {
-	// 		$("textarea[name=dispo]").prop('disabled', false)
-	// 			.parents(".form-group").removeClass('hidden');
-	// 	} else {
-	// 		$("textarea[name=dispo]").prop('disabled', true)
-	// 			.parents(".form-group").addClass('hidden');
-	// 	}
-	// });
 
 	$("a.fancybox-button").fancybox();
 	var cases_status = $("#hidden-cases-status").val();
@@ -160,7 +204,7 @@ function initEvent() {
 
 		"pageLength": 5,
 
-		"order" : [[2, 'desc']],
+		"order" : [[0, 'desc']],
 
 		"dom" : 'lfrt<"row"<"col-xs-12"i><"col-xs-12"p>>'
 	};
@@ -190,7 +234,7 @@ function initEvent() {
 		"pageLength": 5,
 
 		"order" : [[0, 'desc']],
-
+		
 		"dom" : 'lfrt<"row"<"col-xs-12"i><"col-xs-12"p>>'
 	};
 
@@ -211,26 +255,32 @@ function initEvent() {
 						animate: true,
 						target: $('#table-image-list_wrapper'),
 						overlayColor: 'none',
-						cenrerY: true,
+						centerY: true,
 					});
 				},
 				"dataSrc": function(res) { // Manipulate the data returned from the server
 					Metronic.unblockUI($('#table-image-list_wrapper'));
 					return res.data.map(function (val, key) {
 						return [
-							key + 1,
+							key+1,
 							'<a href="' + val[0] + '" class="fancybox-button" data-rel="fancybox-button">' + 
-							//'<img src="' + val[1] + '" style="width:96px"/><div>' + val[2] + '</div></a>',
-							'<img src="' + val[1] + '" style="width:96px"/></a><br>Gender: ' + val[2],
+							'<img src="' + val[1] + '" style="width:93px"/></a>' +
+							(
+							val[5] == '' ?
+								''
+								:
+								'<br><div class="clearfix margin-bottom-5"></div><button class="btn btn-sm btn-danger crimespree" id-no="' + val[5] + '">Crime Spree</button>'
+							),
 							val[3],
 							'<button class="btn btn-sm blue search" image-no="' + val[4] + '"><i class="fa fa-search"></i> Search</button>' +
 							(
-							cases_status == 'ACTIVE' ? 
-								'<div class="clearfix margin-bottom-10"></div>' +
-								'<button class="btn btn-sm red delete" image-no="' + val[4] +'"><i class="fa fa-trash"></i> Remove</button>'
-							:
-								''
+								cases_status == 'ACTIVE' ? 
+									'<div class="clearfix margin-bottom-10"></div>' +
+									'<button class="btn btn-sm red delete" image-no="' + val[4] +'"><i class="fa fa-trash"></i> Remove</button>'
+								:
+									''							
 							)
+							
 						];
 					});
 				},
@@ -356,7 +406,7 @@ function initEvent() {
 		Metronic.blockUI({
 			animate: true,
 			overlayColor: 'none',
-			cenrerY: true,
+			centerY: true,
 		});
 
 		var needle_image_src = $(this).find('img').attr('src');
@@ -367,6 +417,148 @@ function initEvent() {
 		
 		gtag('event', 'page_view');
 	});
+
+	$('#table-image-list').on('click', '.crimespree', function () {
+		
+		var needle_image_src = $(this).closest('tr').find('img').attr('src');
+		
+		Metronic.blockUI({
+			animate: true,
+			overlayColor: 'none',
+			centerY: true,
+		});
+		
+		$.ajax({
+			url: $("#hidden-crimespree-url").val(),
+			type: 'post',
+			data: { 'id' : $(this).attr('id-no') },
+			success: function (response) {
+
+                Metronic.unblockUI();
+
+				if(response.status == 'faild'){
+					bootbox.alert(response.msg);
+					return;
+				} else {
+					
+					showCaseMatchResultDialog(response, needle_image_src);
+				}
+
+
+			},
+			error: function (jqXHR, status, error) {
+				Metronic.unblockUI();
+				bootbox.alert(status + "<br>" + error);
+			}
+		});
+		
+		gtag('event', 'page_view');
+	
+	});
+	
+var showCaseMatchResultDialog = function (data, needle_image_src) {
+		var match_count = 0;
+		var title = body = '(Images depicted below are not positive identifications. They are to be used only as investigative leads)<br><br>';
+		var body_no_result = '<div style="font-size:200px; color:lightgray; text-align:center; font-family:\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif">:(</div>';
+
+		if (data.status == 204) {
+			title = data.msg;
+			body = body_no_result;
+		} else {
+			var flat = []; 
+
+		body += '<div class="clearfix">'
+		body += '	<div class="needle-side-bar col-md-2 col-sm-3 col-xs-6 col-xs-offset-3 col-sm-offset-0">';
+		body += '		<a href="' + needle_image_src + '" class="fancybox-button" data-rel="fancybox-button">';
+		body += '		<img src="' + needle_image_src + '" class="img-thumbnail" alt="" onerror="this.src=\'https://afrengine-images.s3.us-west-2.amazonaws.com/removed.jpg\'";/></a>';
+		body += '	</div>';
+
+		for (var i = 0, len = data.data_list.length; i < len; i++) {
+			flat.push(data.data_list[i]);
+			match_count += 1;
+		}
+
+		body += '<div class="my-bootbox-body col-md-10 col-sm-9 col-xs-12">';
+		body += '<ul class="list-new ext1" style="padding-inline-start:0px;">';
+
+		$.each(flat, function (index, value) {
+			var image_url = value.image;
+			if(image_url.substr(0, 7) == 'storage'){
+				image_url = s3_base_image_url + image_url;
+			}
+			
+			similarity = Math.round(value.similarity);
+			
+			body += '<li style="margin: 10px 0;list-style:none;">';
+			body += '	<div>';
+			body += '		<a href="' + image_url + '" class="fancybox-button" data-rel="fancybox-button">';
+			body += '		<img src="' + image_url + '" class="img-thumbnail" alt="" onerror="this.src=\'https://afrengine-images.s3.us-west-2.amazonaws.com/removed.jpg\'";/></a>';
+			body += '	</div>';
+			body += '	<div style="margin-top:20px; line-height:20px">'
+			body += '		<div class="field">';
+			body += '			<div><b>Similarity:</b></div>';
+			body += '			<div>' + value.similarity.toFixed() + '%</div>';
+			body += '			<div class="field" id="details_link_'+value.face_id+'"><a href="#" onclick="showFaceCaseDetail(\''+value.face_id+'\')">(Click for details)</a></div>';
+			body += '			<div class="field hidden" id="details_loading_'+value.face_id+'"><img src="https://www.afrengine.com/engine/img/input-spinner.gif"></div>';
+			body += '		</div>';				
+			body += '		<div class="hidden" id="id_dv_case_detail_'+value.face_id+'">';
+			body += '			<div class="field">';
+			body += '				<div><b>Organization:</b></div>';
+			body += '				<div class="txt-organization"></div>';
+			body += '			</div>';
+			body += '			<div class="field">';				
+			body += '				<div><b>Case Agent:</b></div>';
+			body += '				<div class="txt-user"></div>';
+			body += '			</div>';
+			body += '			<div class="field">';
+			body += '				<div><b>Case #:</b></div>';
+			body += '				<div class="txt-casenumber"></div>';
+			body += '			</div>';
+			body += '			<div class="field">';
+			body += '				<div><b>Case Date:</b></div>';
+			body += '				<div class="txt-casedate"></div>';				
+			body += '			</div>';						
+			body += '			<div class="field">';
+			body += '				<div><b>Case Type:</b></div>';
+			body += '				<div class="txt-casetype"></div>';				
+			body += '			</div>';
+			body += '			<div class="field">';
+			body += '				<div><b>Case Status:</b></div>';
+			body += '				<div class="txt-casestatus"></div>';				
+			body += '			</div>';			
+			
+			body += '		</div>';
+			body += '	</div>';
+			body += '</li>';
+		});
+		body += '</ul>';
+		body += '</div>';
+		
+		if (match_count == 0) {
+			title = 'No similar case images found';
+			body = body_no_result;
+		} else if (match_count == 1) {
+			title = '1 similar case image was found';
+		} else {
+			title = match_count + ' similar case images were found';
+		}
+		
+		bootbox.dialog({
+			title: title,
+			message: body,
+			onEscape: true,
+			buttons: {
+			    close: {
+			        label: "Close",
+			        className: 'blue',
+			    }
+			},
+			className: match_count > 0 ? "wide" : ''
+		});
+
+		return 1;
+		}
+};
 
 	$('#table-image-list').on('click', '.search', function () {
 

@@ -78,7 +78,9 @@ Route::group(['middleware' => ['authen']], function () {
 
 	Route::post('/cases/search', 'CaseController@search')->name('search.case');
 	Route::post('/cases/search-history', 'CaseController@searchHistory')->name('search.history');
+	Route::post('/cases/crimespree', 'CaseController@crimeSpree')->name('search.crimespree');
     Route::post('/cases/getDetailFaceInfo','CaseController@getDetailFaceInfo')->name('search.detailfaceinfo');
+	Route::post('/cases/getDetailFaceCaseInfo','CaseController@getDetailFaceCaseInfo')->name('search.detailfacecaseinfo');
 	Route::post('/cases/getPersonGallery','CaseController@getPersonGallery')->name('search.persongallery');
 
 	// Quick Search

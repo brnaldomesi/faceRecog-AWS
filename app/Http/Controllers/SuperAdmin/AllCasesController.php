@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\Cases;
 use App\Models\CaseSearch;
+use App\Models\CaseMatch;
 use App\Models\Organization;
 use App\Models\Image;
 
@@ -91,12 +92,21 @@ class AllCasesController extends Controller
 				$date = "";
 			}
 			
+			$caseMatches = CaseMatch::where('source_imageId','=',$item->id)->first();
+			
+			if (isset($caseMatches)) {
+				$caseMatchId = $caseMatches->id;
+			} else {
+				$caseMatchId = '';
+			}
+			
 			return [
 				env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/images/'.$item->filename_uploaded, //asset($item->file_url),
                 env('AWS_S3_REAL_OBJECT_URL_DOMAIN').'storage/case/thumbnails/'.$item->filename_uploaded,//asset($item->thumbnail_url),
 				$item->gender,
 				$date,
-				$item->id
+				$item->id,
+				$caseMatchId
 			];
 		});
 		return response()->json(['data' => $result]);

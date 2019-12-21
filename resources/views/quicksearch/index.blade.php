@@ -35,7 +35,7 @@
       <!-- END PAGE BREADCRUMB -->
       <!-- BEGIN PAGE CONTENT INNER -->
       <div class="row">
-	  @if (Auth::user()->permission->isSuperAdmin() === false)
+	  @if (Auth::user()->permission->isSuperAdmin() == false)
         <div class="col-md-6">
           <div class="portlet light">
             <div class="portlet-title">

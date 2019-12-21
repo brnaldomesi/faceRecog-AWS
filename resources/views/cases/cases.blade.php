@@ -170,6 +170,7 @@
 					<input type="hidden" id="hidden-image-list-url" value="{{ route('cases.id.image.show', $cases->id) }}">
 					<input type="hidden" id="hidden-search-url" value="{{ route('search.case') }}">
 					<input type="hidden" id="hidden-search-history-url" value="{{ route('search.history') }}">
+					<input type="hidden" id="hidden-crimespree-url" value="{{ route('search.crimespree') }}">
 
 					<table class="table table-striped table-hover" id="table-image-list">
 						<thead>
@@ -235,7 +236,7 @@
 							</a>
 						</td>
 						<td>
-							{{ Carbon\Carbon::parse($value->searchedOn)->format("m/d/Y H:i") }}
+							{{ Carbon\Carbon::parse($value->searchedOn)->format("n/d/y H:i") }}
 						</td>
 						<td>
 							{{count($value->results['data_list'])}}
@@ -364,6 +365,7 @@ var cases_id = {{$cases->id}};
 <script src="{{ asset('admin_assets/pages/scripts/form-fileupload.js') }}" type="text/javascript"></script>
 <script>
 	var url_getfacedetailinfo = '{{ route('search.detailfaceinfo') }}';
+	var url_getfacecasedetailinfo = '{{ route('search.detailfacecaseinfo') }}';	
 	var url_getpersongallery = '{{ route('search.persongallery') }}';
 	
 	@if (\Session::has('isCaseUpdated'))

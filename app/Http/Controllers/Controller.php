@@ -85,7 +85,7 @@ class Controller extends BaseController
                         "Bytes"=> $bytes
                     ],
                     "MaxFaces"=> 1,
-                    "QualityFilter"=> "AUTO"
+                    "QualityFilter"=> "MEDIUM"
                 ]);
 
                 $face_id = '';
