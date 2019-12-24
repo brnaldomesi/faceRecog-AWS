@@ -325,11 +325,6 @@ function initEvent() {
 				match_count += 1;
 			}
 
-			flat.sort(function (a, b) {
-		        var x = a['similarity']; var y = b['similarity'];
-       			return ((x > y) ? -1 : ((x < y) ? 1 : 0));
-			});
-
 			body += '<div class="my-bootbox-body col-md-10 col-sm-9 col-xs-12">';
 			body += '<ul class="list-new ext1" style="padding-inline-start:0px;">';
 

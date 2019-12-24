@@ -114,7 +114,7 @@
 					<div class="form-group">
 						{!! Form::label(null, 'Created Date ', ['class' => 'col-md-4 control-label']) !!}
 						<div class="col-md-6">
-						  {!! Form::text(null, $cases->created_at->format('m/d/Y'), ['class' => 'form-control', 'disabled' => 'disabled']) !!}
+						  {!! Form::text(null, $cases->created_at->format('n/d/y'), ['class' => 'form-control', 'disabled' => 'disabled']) !!}
 						</div>
 					</div>
 
@@ -188,7 +188,7 @@
 							</a>
 						</td>
 						<td>
-							{{ Carbon\Carbon::parse($value->searchedOn)->format("m/d/Y H:i") }}
+							{{ Carbon\Carbon::parse($value->searchedOn)->format("n/d/y H:i") }}
 						</td>
 						<td>
 							{{count($value->results['data_list'])}}

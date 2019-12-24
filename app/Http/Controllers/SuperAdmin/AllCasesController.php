@@ -87,7 +87,7 @@ class AllCasesController extends Controller
 			
 			if (!is_null($item->lastSearched)) {
 				$date = date_create($item->lastSearched);
-				$date = date_format($date,"m/d/Y H:i:s");
+				$date = date_format($date,"n/d/y H:i");
 			} else {
 				$date = "";
 			}
