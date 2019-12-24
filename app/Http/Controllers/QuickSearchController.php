@@ -80,12 +80,9 @@ class QuickSearchController extends Controller
 		$organization = Organization::where('id', $organizationId)->first();
         $organizationAccount = Organization::find($organizationId)->account;
 		
-		$res = new \stdClass;
-		
 		// Process the uploaded image and perform the Rekognition search
 		try 
 		{
-		
 			// Get image filename
 			$filename = $request->portraitInput1->getClientOriginalName();
 			$gender = $request->gender;
@@ -97,9 +94,21 @@ class QuickSearchController extends Controller
 			if ($file_type == 'jpeg') {
 				$file_type = "jpg";
 			}
+			
+			$name_upload = str_random(15) . "." . $file_type;
 
-			// Get image filecontent
+			$key = 'storage/search/images/' . $name_upload;
+
+			// Get image data into bytes for S3 upload
 			$image_file = file_get_contents($request->portraitInput1->getPathName());
+
+			// Upload image to S3
+			$result = $this->aws_s3_client->putObject([
+				'Bucket' => $this->aws_s3_bucket,
+				'Key' => $key,
+				'Body' => $image_file,
+				'ACL' => 'public-read'
+			]);
 
 			// Set our user's Collection based on the Gender provided
 			$collection_id = $organization->aws_collection_male_id;
@@ -109,9 +118,6 @@ class QuickSearchController extends Controller
 				$collection_id = $organization->aws_collection_female_id;
 				$collection_field =  'aws_collection_female_id';
 			}
-			
-			// Perform a Face Search on the Users's collection
-			$search_res = $this->faceCleanSearch($collection_id,$image_file);
 			
 			// Get a list of Organization's the User shares with
 			$organizations = FacesetSharing::where([
@@ -126,73 +132,47 @@ class QuickSearchController extends Controller
 			$organizations = $organizations->unique();
 			$collection_ids = Organization::whereIn('id', $organizations)->get()->pluck($collection_field);
 			
-			// Perform a Face Search on each Collection that shares with the User
-			if(count($collection_ids) > 0)
+			// Merge the user's collection with any collection ID's they are sharing with
+			$collection_ids = $collection_ids->merge($collection_id);
+			
+			// Run our Async Face Search using the uploaded image
+			$search_res = $this->awsFaceSearchAsync($key,$collection_ids);
+			
+			if (isset($search_res['status']) && $search_res['status'] != 204) 
 			{
-				foreach ($collection_ids as $collection_id_tmp)
-				{
-					if ($collection_id_tmp == '') {
-						continue;
-					}
-						
-						$search_res_tmp = $this->faceCleanSearch($collection_id_tmp,$image_file);
-						
-						$search_res = array_merge($search_res,$search_res_tmp);
-				}
+				// Insert search results into the quicksearch_history table
+				$search = QuickSearch::create([
+				  'userid' => Auth::user()->id,
+				  'organizationId' => $organizationId,
+				  'reference' => $request->reference,
+				  'filename' => $name_upload,
+				  'results' => $search_res['data_list']
+				]);
 				
-				 // rearrange data_list according to the similarity
-				if(isset($search_res) && count($search_res) > 0 && $search_res != null){
-					usort($search_res,function($first,$second){
-						return $first['similarity'] < $second['similarity'];
-					});
-				}
-
-				// Cap the search results based on the environment settings
-				if(isset($search_res) && count($search_res) > (int)env('AWS_SEARCH_MAX_CNT')){
-                $search_res = array_slice($search_res, 0,(int)env('AWS_SEARCH_MAX_CNT'));
-				}
+				// Insert this quick search into the UserLog table
+				UserLog::create([
+				  'userId' => Auth::user()->id,
+				  'event' => 'Quick Search #' . $search->id,
+				  'ip' => $request->ip()
+				]);
+				
+				// Return our formatted JSON response
+				return response()->json(array('status'=> $search_res['status'], 'msg'=> $search_res['msg'], 'data_list'=>$search_res['data_list']));
+				
+			} 
+			else 
+			{
+				return json_encode(array('status' => 204, 'msg' => "No matches found."));
 			}
-			
-			$name_upload = str_random(15) . "." . $file_type;
-			
-			$keyname_origin = 'storage/search/images/' . $name_upload;
-
-			// Upload data.
-			$result = $this->aws_s3_client->putObject([
-				'Bucket' => $this->aws_s3_bucket,
-				'Key' => $keyname_origin,
-				'Body' => $image_file,
-				'ACL' => 'public-read'
-			]);
-			
-			// Insert search results into the quicksearch_history table
-			$search = QuickSearch::create([
-			  'userid' => Auth::user()->id,
-			  'organizationId' => $organizationId,
-			  'reference' => $request->reference,
-			  'filename' => $name_upload,
-			  'results' => $search_res
-			]);
-			
-			// Insert this quick search into the UserLog table
-			UserLog::create([
-			  'userId' => Auth::user()->id,
-			  'event' => 'Quick Search #' . $search->id,
-			  'ip' => $request->ip()
-			]);
-			
-			$status = 200;
-			$msg = "Success";
 
 		} catch(RekognitionException $e){
-            $status = 'faild';
-			$msg = "We encountered an error performing this search.";
+
 			Log::emergency($e->getMessage());
 			
-			return json_encode(array('status'=>status, 'msg'=> $msg));
+			return json_encode(array('status' => 'faild', 'msg' => "We encountered an error performing this search."));
         }
 		
-		return json_encode(array('status'=> $status, 'msg'=> $msg, 'data_list'=>$search_res));
+		
 	}
 	
 	public function faceCleanSearch($collection_id,$image_file)

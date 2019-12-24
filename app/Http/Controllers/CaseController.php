@@ -38,6 +38,11 @@ use Aws\Rekognition\Exception\RekognitionException;
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 
+use Aws\CommandPool;
+use Aws\CommandInterface;
+use Aws\ResultInterface;
+use GuzzleHttp\Promise\PromiseInterface;
+
 use Auth;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use Storage;
@@ -278,7 +283,8 @@ class CaseController extends Controller
             $face_indexing_res = $this->awsFaceIndexing($this->aws_s3_bucket, $s3_image_key,$s3_image_url,$aws_collection_id);
 
             //  
-            if(isset($face_indexing_res['face_id']) && $face_indexing_res['face_id'] != '') {
+            if(isset($face_indexing_res['face_id']) && $face_indexing_res['face_id'] != '') 
+			{
 	            // save the thumbnail image.
 	            //$thumb_image = ImageResize::work1($file, 256, 0);
 	            $keyname_thumbnail = 'storage/case/thumbnails/'. $name_upload;
@@ -375,41 +381,12 @@ class CaseController extends Controller
 						$collection_ids = Organization::whereIn('id', $organizations)->get()->pluck('aws_collection_cases_id');
 						
 						// if there is the shared collections, search collections.
-						if(count($collection_ids) > 0){
-							foreach ($collection_ids as $collection_id_tmp){
-							
-								if ($collection_id_tmp == '') {
-									continue;
-								}
+						if(count($collection_ids) > 0)
+						{
+							// Perform a search on each collection
+							$search_res_tmp = $this->awsFaceSearchAsync($keyname_origin, $collection_ids, (int)$threshold);
 						
-								Log::info("Searching collection " . $collection_id_tmp);
-								// Perform a search on each collection
-								$search_res_tmp = $this->awsFaceSearch($keyname_origin, $collection_id_tmp,(int)$threshold);
-						
-								if($search_res_tmp['status'] !== 200){
-									continue;
-								}
-								
-								$search_res['data_list'] = array_merge($search_res['data_list'],$search_res_tmp['data_list']);
-						
-								if($search_res['status'] != 200){
-									$search_res['status'] = 200;
-								}
-							}
-							
-							if(isset($search_res['data_list']) && count($search_res['data_list']) > 0 && $search_res['data_list'] != null)
-							{
-								Log::info("Sorting results");
-								
-								usort($search_res['data_list'],function($first,$second){
-									return $first['similarity'] < $second['similarity'];
-								});
-							}
-
-							if(isset($search_res['data_list']) && count($search_res['data_list']) > $this->aws_search_max_cnt)
-							{
-								$search_res['data_list'] = array_slice($search_res['data_list'], 0, $this->aws_search_max_cnt);
-							}
+							$search_res['data_list'] = array_merge($search_res['data_list'],$search_res_tmp['data_list']);
 						}
 						
 						Log::info($search_res);
@@ -433,9 +410,8 @@ class CaseController extends Controller
 	            }
 
 	        } else {
-	        	// face indexing does not work.
-				Log::info('No face found in image');
-
+				// Indexing failed.  Remove the uploaded image
+				
                 // Remove origin image from S3 bucket
 	           	$result = $this->aws_s3_client->deleteObject([
 	                'Bucket' => $this->aws_s3_bucket,
@@ -451,7 +427,7 @@ class CaseController extends Controller
 	            $response_result = array(
 	            	'status'  => 'error',
                     'imgSrc'  => $imgSrc,
-                    'msg' 	  => 'No face found in the image!'
+                    'msg' 	  => $face_indexing_res['msg']
                 );
 	        }
 			
@@ -537,8 +513,114 @@ class CaseController extends Controller
 	}
 
 
-
 	public function search(Request $request)
+	{
+		if (is_null($request->image)) {
+			return response('Incorrect image parameter', 400);
+		}
+		
+		$image = Image::find($request->image);
+		
+		if (is_null($image)) {
+			return response('Unable to access case image', 400);
+		}
+		
+		$gender = $image->gender;
+        $organ_id = Auth::user()->organizationId;
+        $organization = Organization::find($organ_id);
+		
+		// Make sure our collections have been created before performing a search. It was a bug before.
+        if($organization->aws_collection_male_id == '' || $organization->aws_collection_female_id == '')
+		{
+			$male_name = $organization->account . '_' . 'male';
+			$female_name = $organization->account . '_' . 'female';
+			
+			if ($organization->aws_collection_male_id == '') {
+				$male_collection_id = $this->createAwsCollection($male_name);
+				Organization::where('id',$organ_id)->update(['aws_collection_male_id'=>$male_collection_id]);
+			}
+			
+			if ($organization->aws_collection_female_id == '') {
+				$female_collection_id = $this->createAwsCollection($female_name);
+				Organization::where('id',$organ_id)->update(['aws_collection_female_id'=>$female_collection_id]);
+			}
+			
+			$organization = Organization::find($organ_id);
+        }
+		
+		// Set our users collection field for this search
+        $collection_id = $organization->aws_collection_male_id;
+        $collection_field =  'aws_collection_male_id';
+        
+		if($gender != 'MALE'){
+            $collection_id = $organization->aws_collection_female_id;
+            $collection_field =  'aws_collection_female_id';
+        }
+		
+		// S3 key for the case image we are going to search
+        $key = $this->aws_s3_case_image_key_header. $image->filename_uploaded;
+		
+		// Build an array of Organization's this user is sharing data with so we can search their collections
+        $organizations = FacesetSharing::where([
+                ['organization_requestor', $organ_id], ['status', 'ACTIVE']
+            ])
+        ->get()->pluck('organization_owner');
+        $owner = FacesetSharing::where([
+                ['organization_owner', $organ_id], ['status', 'ACTIVE']
+            ])
+        ->get()->pluck('organization_requestor');
+        $organizations = $organizations->merge($owner);
+        $organizations = $organizations->unique();
+        
+		$collection_ids = Organization::whereIn('id', $organizations)->get()->pluck($collection_field);
+		
+		// Merge the user's collection with any collection ID's they are sharing with
+		$collection_ids = $collection_ids->merge($collection_id);
+
+		// Call our Async face search by passing our collection ID array
+		$search_res = $this->awsFaceSearchAsync($key,$collection_ids);
+		
+		// Update the last searched date for this case image
+        $image->lastSearched = now();
+		$image->save();
+
+		Log::emergency("results of awsFaceSearchAsync" . PHP_EOL . json_encode($search_res));
+		
+		// If our results array contains required fields, we can save the search result into the DB
+		if(isset($search_res['status']) && $search_res['status'] != 'faild')
+		{
+            
+			$search = CaseSearch::create([
+                'organizationId' => $organ_id,
+                'imageId' => $image->id,
+                'searchedOn' => now(),
+                'results' => $search_res
+            ]);
+			
+			// Insert this search into the UserLog table
+			UserLog::create([
+				'userId' => Auth::user()->id,
+				'event' => 'Case Search #' . $search->id,
+				'ip' => $request->ip()
+			]);
+		
+			// Send the results back to the user
+            return response()->json(
+                array_merge($search_res, [
+                        'time' => date('n/d/Y H:i'),
+                        'history_no' => $search->id
+                    ]
+                )
+            );
+        }
+		else
+		{
+			// Something failed so we need to send back a failed response.
+		    return response()->json(array('status'=>'faild', 'msg'=> $search_res['msg']));
+		}
+	}
+	
+	public function old_search(Request $request)
 	{
 	
 		if (is_null($request->image)) {
@@ -603,19 +685,18 @@ class CaseController extends Controller
 			
             foreach ($collection_ids as $collection_id_tmp){
 				
-
 				if ($collection_id_tmp == '') {
 					continue;
 				}
-				
-                $search_res_tmp = $this->awsFaceSearch($key, $collection_id_tmp);
-                if($search_res_tmp['status'] !== 200){
-                    continue;
-                }
-                $search_res['data_list'] = array_merge($search_res['data_list'],$search_res_tmp['data_list']);
-                if($search_res['status'] != 200){
-                    $search_res['status'] = 200;
-                }
+				$search_res_tmp = $this->awsFaceSearch($key, $collection_id_tmp);
+				if($search_res_tmp['status'] !== 200){
+					continue;
+				}
+				$search_res['data_list'] = array_merge($search_res['data_list'],$search_res_tmp['data_list']);
+			}
+			
+            if($search_res['status'] != 200){
+				$search_res['status'] = 200;
             }
 
             // rearrange data_list according to the similarity
@@ -653,7 +734,7 @@ class CaseController extends Controller
 		
             return response()->json(
                 array_merge($search_res, [
-                        'time' => date('Y-m-d h:m:s'),
+                        'time' => date('n/d/Y H:i'),
                         'history_no' => $search->id
                     ]
                 )
@@ -661,8 +742,6 @@ class CaseController extends Controller
         }else{
 		    return response()->json(array('status'=>'faild','msg'=>'Search result faild.'));
 		}
-		
-
 	}
 
 	public function searchHistory(Request $request)

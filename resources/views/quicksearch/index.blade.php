@@ -107,7 +107,7 @@
 								<td>
 								{{ $value->reference }}</td>
 								</td>
-								<td>{{ Carbon\Carbon::parse($value->created_at)->format("m/d/Y H:i")}}</td>
+								<td>{{ Carbon\Carbon::parse($value->created_at)->format("n/d/y H:i")}}</td>
 								@if (Auth::user()->permission->isAdmin())
 								<td>
 								{{ $value->name }}</td>

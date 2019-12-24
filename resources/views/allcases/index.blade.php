@@ -120,7 +120,7 @@
 
           						</td>
           						<td class="center" data-sort="{{ $c->created_at->format('Ymd H:i') }}">
-          						   {{ $c->created_at->format('m/d/Y') }}
+          						   {{ $c->created_at->format('n/d/y') }}
           						</td>
           						</tr>
                     @endforeach
