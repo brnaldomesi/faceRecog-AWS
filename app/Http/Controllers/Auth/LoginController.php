@@ -51,16 +51,17 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, User $user)
     {
-        $user->loginCount += 1;
-        $user->lastLogin = now();
-        $user->save();
+		// *** MOVED THIS TO LISTENERS FOLDER
+        //$user->loginCount += 1;
+        //$user->lastLogin = now();
+        //$user->save();
 		
 		// Insert this login into the UserLog table
-		UserLog::create([
-		  'userId' => $user->id,
-          'event' => 'Login',
-          'ip' => $request->ip()
-		]);
+		//UserLog::create([
+		//  'userId' => $user->id,
+        //  'event' => 'Login',
+        //  'ip' => $request->ip()
+		//]);
     }
 
     public function sendFailedLoginResponse(Request $request)
